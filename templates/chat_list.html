@@ -65,10 +65,31 @@
         padding: 15px;
         margin-bottom: 12px;
         display: flex;
-        justify-content: space-between;
         align-items: center;
         cursor: pointer;
         transition: background-color 0.3s;
+        gap: 15px;
+    }
+
+    .room-card-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #002D62;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .room-card-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
     }
 
     .room-card:hover {
@@ -125,7 +146,14 @@
     <ul class="room-card-list">
         {% for room in rooms %}
         <li class="room-card" data-room-id="{{ room.id }}" data-room-name="{{ room.name | lower }}">
-            <div class="room-card-info">
+            <div class="room-card-avatar">
+                {% if room.cover_image %}
+                    <img src="{{ url_for('static', filename=room.cover_image) }}" alt="{{ room.name }}">
+                {% else %}
+                    <span>{{ room.name[0] | upper }}</span>
+                {% endif %}
+            </div>
+            <div class="room-card-info" style="flex-grow: 1;">
                 <h3>{{ room.name }}</h3>
                 <p>{{ room.description or 'No description available.' }}</p>
             </div>
