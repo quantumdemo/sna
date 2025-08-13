@@ -634,7 +634,13 @@ def profile():
     # Fetch earned certificates
     certificates = current_user.certificates.order_by(Certificate.issued_at.desc()).all()
 
-    return render_template('profile.html', comments=recent_comments, certificates=certificates)
+    return render_template('profile.html', user=current_user, comments=recent_comments, certificates=certificates)
+
+@main.route("/user/<int:user_id>")
+@login_required
+def view_user(user_id):
+    user = User.query.get_or_404(user_id)
+    return render_template('public_profile.html', user=user)
 
 @main.route("/profile/edit", methods=['POST'])
 @login_required

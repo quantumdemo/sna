@@ -31,6 +31,35 @@ def save_chat_file(file):
 
 BANNED_WORDS = {'profanity', 'badword', 'censorthis'} # Example list
 
+def save_chat_room_cover_image(file):
+    """Saves a cover image for a chat room."""
+    allowed_extensions = {'png', 'jpg', 'jpeg'}
+    max_size = 2 * 1024 * 1024 # 2MB
+
+    filename = secure_filename(file.filename)
+    if '.' not in filename or filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
+        return None
+
+    # Check file size
+    file.seek(0, os.SEEK_END)
+    file_length = file.tell()
+    if file_length > max_size:
+        return None
+    file.seek(0) # Reset file pointer
+
+    random_hex = os.urandom(8).hex()
+    _, f_ext = os.path.splitext(filename)
+    new_filename = random_hex + f_ext
+
+    upload_folder = os.path.join(current_app.root_path, 'static/chat_room_covers')
+    os.makedirs(upload_folder, exist_ok=True)
+
+    filepath = os.path.join(upload_folder, new_filename)
+    file.save(filepath)
+
+    return os.path.join('chat_room_covers', new_filename)
+
+
 def save_editor_image(file):
     """Saves an image from the CKEditor upload, returns URL and error."""
     allowed_extensions = {'png', 'jpg', 'jpeg'}
