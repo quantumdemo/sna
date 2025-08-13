@@ -263,10 +263,26 @@ class LibraryPurchase(db.Model):
 class ChatRoom(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    room_type = db.Column(db.String(50), nullable=False, default='course') # 'course' or 'general'
+    description = db.Column(db.Text, nullable=True)
+    room_type = db.Column(db.String(50), nullable=False, default='public')  # public, private, course
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=True, unique=True)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # Nullable for auto-created rooms
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_locked = db.Column(db.Boolean, nullable=False, default=False)
+    speech_enabled = db.Column(db.Boolean, nullable=False, default=True)
+    last_message_timestamp = db.Column(db.DateTime, nullable=True, index=True)
+
     messages = db.relationship('ChatMessage', backref='room', lazy='dynamic', cascade="all, delete-orphan")
+    members = db.relationship('ChatRoomMember', backref='room', lazy='dynamic', cascade="all, delete-orphan")
+    creator = db.relationship('User', backref='created_chat_rooms')
+
+class ChatRoomMember(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    chat_room_id = db.Column(db.Integer, db.ForeignKey('chat_room.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    role_in_room = db.Column(db.String(50), nullable=False, default='member') # e.g., member, admin
+    __table_args__ = (db.UniqueConstraint('chat_room_id', 'user_id', name='_room_user_uc'),)
+
 
 class ChatMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Chat Room{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Edit Chat Room: {{ room.name }}</h2>
+    <form method="POST" action="{{ url_for('admin.edit_chat_room', room_id=room.id) }}">
+        <div class="form-group mb-3">
+            <label for="name">Room Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ room.name }}" required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3">{{ room.description or '' }}</textarea>
+        </div>
+        <div class="form-group form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="speech_enabled" name="speech_enabled" {% if room.speech_enabled %}checked{% endif %}>
+            <label class="form-check-label" for="speech_enabled">Enable Speech-to-Text</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{{ url_for('admin.manage_chat') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Chat Rooms{% endblock %}
+
+{% block styles %}
+<style>
+    body {
+        background-color: #14191D;
+        color: #FFFFFF;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .brand-bar {
+        background: linear-gradient(90deg, #002D62, #FDB813);
+        color: white;
+        text-align: center;
+        padding: 1rem 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+    }
+
+    .chat-list-container {
+        padding-top: 80px; /* Space for fixed brand-bar */
+        padding-bottom: 20px;
+    }
+
+    .search-bar-container {
+        position: sticky;
+        top: 60px; /* Position below brand-bar */
+        background-color: #14191D;
+        padding: 1rem 0;
+        z-index: 999;
+    }
+
+    #search-input {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 20px;
+        border: 1px solid #808080;
+        background-color: #1F262D;
+        color: #FFFFFF;
+        font-size: 1rem;
+    }
+
+    #search-input::placeholder {
+        color: #808080;
+    }
+
+    .room-card-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .room-card {
+        background-color: #1F262D;
+        border: 1px solid #000000;
+        border-radius: 20px;
+        padding: 15px;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .room-card:hover {
+        background-color: #2A343D;
+    }
+
+    .room-card-info h3 {
+        margin: 0 0 5px 0;
+        font-weight: bold;
+    }
+
+    .room-card-info p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #B0B0B0;
+    }
+
+    .room-card-meta {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: #B0B0B0;
+    }
+
+    .member-count {
+        font-size: 0.9rem;
+    }
+
+    .missed-message-counter {
+        background-color: #007BFF;
+        color: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="brand-bar">
+    NOVARA
+</div>
+
+<div class="container chat-list-container">
+    <div class="search-bar-container">
+        <input type="text" id="search-input" placeholder="Search chat rooms...">
+    </div>
+
+    <ul class="room-card-list">
+        {% for room in rooms %}
+        <li class="room-card" data-room-id="{{ room.id }}" data-room-name="{{ room.name | lower }}">
+            <div class="room-card-info">
+                <h3>{{ room.name }}</h3>
+                <p>{{ room.description or 'No description available.' }}</p>
+            </div>
+            <div class="room-card-meta">
+                <span class="member-count">{{ room.member_count }} members</span>
+                {% if room.unread_count > 0 %}
+                <span class="missed-message-counter">{{ room.unread_count }}</span>
+                {% endif %}
+            </div>
+        </li>
+        {% else %}
+        <p>You don't have access to any chat rooms yet.</p>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const roomCards = document.querySelectorAll('.room-card');
+
+    // Live search functionality
+    searchInput.addEventListener('keyup', function() {
+        const searchTerm = searchInput.value.toLowerCase();
+        roomCards.forEach(card => {
+            const roomName = card.dataset.roomName;
+            if (roomName.includes(searchTerm)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+
+    // Click to enter chat room
+    roomCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const roomId = this.dataset.roomId;
+            window.location.href = `/chat/${roomId}`;
+        });
+    });
+});
+</script>
+{% endblock %}

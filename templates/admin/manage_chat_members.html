@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Members for {{ room.name }}{% endblock %}
+
+{% block styles %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container .select2-selection--multiple {
+        background-color: #f8f9fa;
+        border-color: #ced4da;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #007bff;
+        color: white;
+        border: none;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Manage Members for Room: <strong>{{ room.name }}</strong></h2>
+    <p>This room is private. Only selected users will have access.</p>
+
+    <form method="POST" action="{{ url_for('admin.manage_chat_members', room_id=room.id) }}">
+        <div class="form-group mb-3">
+            <label for="members">Select Members</label>
+            <select class="form-control" id="members" name="members" multiple="multiple">
+                {% for user in users %}
+                <option value="{{ user.id }}" {% if user.id in member_ids %}selected{% endif %}>
+                    {{ user.name }} ({{ user.email }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Members</button>
+        <a href="{{ url_for('admin.manage_chat') }}" class="btn btn-secondary">Back to Room List</a>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#members').select2({
+        placeholder: "Select members",
+        allowClear: true
+    });
+});
+</script>
+{% endblock %}
