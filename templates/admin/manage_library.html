@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Library{% endblock %}
+
+{% block content %}
+<section id="manage-library">
+    <h1>Library Management</h1>
+    <p>Here you can approve and manage submitted library materials.</p>
+
+    <h2>Materials Pending Approval</h2>
+    <div class="item-list">
+        {% if pending_materials %}
+            <ul>
+                {% for item in pending_materials %}
+                <li>
+                    <strong>{{ item.title }}</strong> by {{ item.uploader.name }}
+                    <p>{{ item.description }}</p>
+                    <p>Category: {{ item.category.name }} | Price: ₦{{ item.price_naira }}</p>
+                    <div class="actions">
+                        <form action="{{ url_for('admin.approve_library_material', material_id=item.id) }}" method="post" style="display: inline;">
+                            <button type="submit" class="btn-small">Approve</button>
+                        </form>
+                        <form action="{{ url_for('admin.reject_library_material', material_id=item.id) }}" method="post" style="display: inline;">
+                            <input type="text" name="reason" placeholder="Reason for rejection" required>
+                            <button type="submit" class="btn-small btn-danger">Reject</button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No library materials are currently pending approval.</p>
+        {% endif %}
+    </div>
+
+    <h2>All Library Materials</h2>
+    <div class="item-list">
+        <ul>
+            {% for item in all_materials %}
+            <li>
+                <strong>{{ item.title }}</strong> by {{ item.uploader.name }} -
+                Status: {% if item.approved %}Approved{% elif item.rejection_reason %}Rejected{% else %}Pending{% endif %}
+                <form action="{{ url_for('admin.delete_library_material', material_id=item.id) }}" method="post" style="display: inline;">
+                    <button type="submit" class="btn-small btn-danger">Delete Permanently</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+{% endblock %}

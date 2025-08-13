@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}FAQ & Support{% endblock %}
+
+{% block content %}
+<section id="faq-page">
+    <h1>Frequently Asked Questions</h1>
+
+    <div class="faq-list">
+        <div class="faq-item">
+            <h3 class="faq-question">How do I enroll in a course?</h3>
+            <div class="faq-answer">
+                <p>Simply navigate to the "Courses" page, find a course you're interested in, and click the "Enroll Now" or "Buy Now" button. You will be guided through the payment process.</p>
+            </div>
+        </div>
+        <div class="faq-item">
+            <h3 class="faq-question">How do I become an instructor?</h3>
+            <div class="faq-answer">
+                <p>Click the "Register" button on the home page and select the "Instructor" role. After you fill out your information, your account will be submitted for admin approval. You will be notified once it's reviewed.</p>
+            </div>
+        </div>
+        <div class="faq-item">
+            <h3 class="faq-question">What payment methods do you accept?</h3>
+            <div class="faq-answer">
+                <p>We accept all major credit cards and bank transfers. (Note: Payment processing is not yet implemented).</p>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2>Contact Support</h2>
+    <p>If you can't find the answer here, please feel free to contact us.</p>
+    <form action="{{ url_for('main.support') }}" method="post">
+        <div>
+            <label for="name">Your Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+            <label for="email">Your Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn">Send Message</button>
+    </form>
+
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const questions = document.querySelectorAll('.faq-question');
+    questions.forEach(question => {
+        question.addEventListener('click', () => {
+            const answer = question.nextElementSibling;
+            answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+});
+</script>
+{% endblock %}

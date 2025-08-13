@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Lesson: {{ lesson.title }}{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editor = CKEDITOR.replace('editor', {
+                filebrowserUploadUrl: '{{ url_for("instructor.upload_image") }}',
+                filebrowserUploadMethod: 'form'
+            });
+
+            const form = document.getElementById('lesson-form');
+            form.addEventListener('submit', function(e) {
+                let content = editor.getData();
+
+                const youtubeRegex = /<iframe[^>]+src="https:\/\/www\.youtube\.com\/embed\/([a-zA-Z0-9_-]+)"[^>]*><\/iframe>/g;
+                content = content.replace(youtubeRegex, (match, videoId) => {
+                    return `<div class="secure-embed" data-type="youtube" data-id="${videoId}"></div>`;
+                });
+
+                const gdriveRegex = /<iframe[^>]+src="https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/preview"[^>]*><\/iframe>/g;
+                content = content.replace(gdriveRegex, (match, fileId) => {
+                    return `<div class="secure-embed" data-type="gdrive" data-id="${fileId}"></div>`;
+                });
+
+                editor.setData(content);
+                // The form submission will now carry the modified content
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+<section id="edit-lesson-page">
+    <h1>Edit Lesson: <em>{{ lesson.title }}</em></h1>
+    <p>Part of module: {{ lesson.module.title }} in course: {{ lesson.module.course.title }}</p>
+
+    <form id="lesson-form" action="{{ url_for('instructor.update_lesson', lesson_id=lesson.id) }}" method="post">
+        <div>
+            <label for="title">Lesson Title:</label>
+            <input type="text" id="title" name="title" value="{{ lesson.title }}" required>
+        </div>
+        <div>
+            <label for="video_url">YouTube Embed URL:</label>
+            <input type="text" id="video_url" name="video_url" value="{{ lesson.video_url or '' }}">
+        </div>
+        <div>
+            <label for="editor">Lesson Notes:</label>
+            <textarea name="notes" id="editor">{{ lesson.notes or '' }}</textarea>
+        </div>
+        <button type="submit" class="btn">Save Changes</button>
+        <a href="{{ url_for('instructor.manage_course', course_id=lesson.module.course_id) }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</section>
+{% endblock %}

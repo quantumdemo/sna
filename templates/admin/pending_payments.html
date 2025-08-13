@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Payments{% endblock %}
+
+{% block content %}
+<section id="pending-payments-page">
+    <h1>Pending Payment Verifications</h1>
+
+    <div class="payment-list">
+        {% if pending_enrollments %}
+            <ul>
+                {% for enrollment in pending_enrollments %}
+                <li>
+                    <p>
+                        <strong>Student:</strong> {{ enrollment.student.name }}<br>
+                        <strong>Course:</strong> {{ enrollment.course.title }}<br>
+                        <strong>Price:</strong> ₦{{ "{:,.2f}".format(enrollment.course.price_naira) }}<br>
+                        <strong>Submitted:</strong> {{ enrollment.timestamp.strftime('%Y-%m-%d %H:%M') }}<br>
+                        <a href="{{ url_for('static', filename=enrollment.proof_of_payment_path) }}" target="_blank">View Proof</a>
+                    </p>
+                    <div>
+                        <form action="{{ url_for('admin.approve_payment', enrollment_id=enrollment.id) }}" method="post" style="display: inline;">
+                            <button type="submit" class="btn-small">Approve</button>
+                        </form>
+                        <form action="{{ url_for('admin.reject_payment', enrollment_id=enrollment.id) }}" method="post" style="display: inline;">
+                            <input type="text" name="reason" placeholder="Reason for rejection (required)" required>
+                            <button type="submit" class="btn-small btn-danger">Reject</button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No payments are currently pending verification.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

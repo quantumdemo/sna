@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Purchase: {{ material.title }}{% endblock %}
+
+{% block content %}
+<section id="payment-page">
+    <h1>Purchase Library Material: {{ material.title }}</h1>
+    <p>{{ material.description }}</p>
+
+    <h2>Instructions</h2>
+    <p>Please make a payment of <strong>₦{{ "{:,.2f}".format(material.price_naira) }}</strong> to the following bank account:</p>
+    <ul>
+        <li><strong>Bank Name:</strong> {{ payment_details.bank_name }}</li>
+        <li><strong>Account Number:</strong> {{ payment_details.account_number }}</li>
+        <li><strong>Account Name:</strong> {{ payment_details.account_name }}</li>
+    </ul>
+
+    <hr>
+
+    <h2>Upload Proof of Payment</h2>
+    <p>After making the payment, please upload a screenshot or receipt for verification.</p>
+    <form action="{{ url_for('main.submit_library_payment_proof', material_id=material.id) }}" method="post" enctype="multipart/form-data">
+        <div>
+            <label for="proof_file">Proof of Payment (Image or PDF):</label>
+            <input type="file" name="proof_of_payment" id="proof_file" required accept="image/*,application/pdf">
+        </div>
+        <button type="submit" class="btn">Submit for Verification</button>
+    </form>
+
+</section>
+{% endblock %}

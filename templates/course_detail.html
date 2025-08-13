@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+<section id="course-detail-page">
+    <div class="course-header">
+        <h1>{{ course.title }}</h1>
+        <p>Rating: {{ "%.1f"|format(course.avg_rating) }} / 5.0</p>
+        <p>Taught by: <a href="#">{{ course.instructor.name }}</a></p> {# Instructor profile link in Phase 9 #}
+        <img src="{{ url_for('static', filename='images/' + (course.cover_image or 'course_placeholder.jpg')) }}" alt="{{ course.title }}" class="course-cover-image">
+    </div>
+
+    <div class="course-body">
+        <div class="course-main-content">
+            <h2>About this course</h2>
+            <p>{{ course.description }}</p>
+
+            <h2>Course Content</h2>
+            <div class="modules-list">
+                {% for module in course.modules.order_by('order') %}
+                <div class="module">
+                    <h3>{{ module.title }}</h3>
+                    <ul class="lessons-list">
+                        {% for lesson in module.lessons %}
+                        <li>
+                            {% if is_enrolled %}
+                                <a href="{{ url_for('main.lesson_view', lesson_id=lesson.id) }}">{{ lesson.title }}</a>
+                            {% else %}
+                                {{ lesson.title }} (Locked)
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                        {% if is_enrolled and module.assignment %}
+                        <li class="assignment-link">
+                            <a href="{{ url_for('main.view_assignment', assignment_id=module.assignment.id) }}"><strong>Assignment:</strong> {{ module.assignment.title }}</a>
+                        </li>
+                        {% endif %}
+                        {% if is_enrolled and module.quiz %}
+                        <li class="quiz-link">
+                            <a href="{{ url_for('main.take_quiz', quiz_id=module.quiz.id) }}"><strong>Quiz:</strong> Module {{ module.order }} Quiz</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% else %}
+                <p>No modules have been added to this course yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="final-exam-link">
+            {% if is_enrolled and course.final_exam %}
+                <hr>
+                <h3>Final Exam</h3>
+                <a href="{{ url_for('main.take_exam', exam_id=course.final_exam.id) }}" class="btn">Take Final Exam</a>
+            {% endif %}
+        </div>
+
+        <aside class="course-sidebar">
+            <div class="enroll-box">
+                {% if is_enrolled %}
+                    <p>You are enrolled in this course.</p>
+                    <a href="#" class="btn">Go to Dashboard</a> {# Link to student dashboard lesson #}
+                {% else %}
+                    <h2>Price: ₦{{ "{:,.2f}".format(course.price_naira) }}</h2>
+                    <a href="{{ url_for('main.enroll', course_id=course.id) }}" class="btn">Enroll Now</a>
+                {% endif %}
+            </div>
+        </aside>
+    </div>
+
+    <div class="course-comments">
+        <h2>Comments</h2>
+        {% if is_enrolled %}
+            <form action="{{ url_for('main.post_comment', course_id=course.id) }}" method="post">
+                <div>
+                    <label for="rating">Your Rating (1-5):</label>
+                    <input type="number" name="rating" id="rating" min="1" max="5" required>
+                </div>
+                <div>
+                    <label for="comment_body">Your Review:</label>
+                    <textarea name="comment_body" id="comment_body" rows="4" placeholder="Write a review..." required></textarea>
+                </div>
+                <button type="submit" class="btn">Submit Review</button>
+            </form>
+        {% else %}
+            <p>You must be enrolled to post comments.</p>
+        {% endif %}
+
+        <div class="comments-list">
+            {% for comment in comments %}
+            <div class="comment">
+                <strong>{{ comment.author.name }}</strong> on {{ comment.timestamp.strftime('%Y-%m-%d') }}
+                <p>{{ comment.body }}</p>
+            </div>
+            {% else %}
+                <p>No comments yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

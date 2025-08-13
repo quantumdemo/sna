@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Review Submissions for {{ assignment.title }}{% endblock %}
+
+{% block content %}
+<section id="review-assignment-submissions-page">
+    <h1>Review Assignment Submissions</h1>
+    <h2>For Assignment: <em>{{ assignment.title }}</em></h2>
+    <a href="{{ url_for('instructor.manage_course', course_id=assignment.module.course.id) }}" class="btn-small btn-secondary">Back to Course</a>
+
+    <div class="submission-list">
+        {% if submissions %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Submitted At</th>
+                        <th>Grade</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in submissions %}
+                    <tr>
+                        <td>{{ sub.student.name }}</td>
+                        <td>{{ sub.submitted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ sub.grade or 'Not Graded' }}</td>
+                        <td>
+                            <button class="btn-small" onclick="document.getElementById('submission-modal-{{ sub.id }}').style.display='block'">View Submission</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>There are no submissions for this assignment yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Submission Modals -->
+    {% for sub in submissions %}
+    <div id="submission-modal-{{ sub.id }}" class="modal" style="display:none;">
+        <div class="modal-content-large">
+            <span class="close" onclick="document.getElementById('submission-modal-{{ sub.id }}').style.display='none'">&times;</span>
+            <h3>Submission from {{ sub.student.name }}</h3>
+
+            <div class="submission-review-grid">
+                {% if sub.text_submission %}
+                <div class="submission-text-review">
+                    <h4>Text Submission</h4>
+                    <div class="text-box">
+                        {{ sub.text_submission }}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if sub.file_path %}
+                <div class="submission-file-review">
+                    <h4>File Submission</h4>
+                    {% set file_ext = sub.file_path.rsplit('.', 1)[1].lower() %}
+                    {% if file_ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                        <img src="{{ url_for('static', filename='assignments/' + sub.file_path) }}" alt="Submitted Image" style="max-width: 100%; height: auto;">
+                    {% else %}
+                        <p>This file type cannot be previewed.</p>
+                    {% endif %}
+                    <a href="{{ url_for('static', filename='assignments/' + sub.file_path) }}" target="_blank" class="btn-small">Download File</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <hr>
+            <h4>Grade Submission</h4>
+            <form action="{{ url_for('instructor.grade_submission', submission_id=sub.id) }}" method="post">
+                <label for="grade-{{ sub.id }}">Grade:</label>
+                <input type="text" name="grade" id="grade-{{ sub.id }}" value="{{ sub.grade or '' }}" required>
+                <button type="submit" class="btn">Save Grade</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Exam Appeal{% endblock %}
+
+{% block content %}
+<section id="exam-appeal-page">
+    <h1>Exam Locked: {{ submission.final_exam.course.title }}</h1>
+    <p>Your exam has been locked due to a suspected violation (e.g., leaving the exam tab).</p>
+
+    <div class="violation-details">
+        <h3>Violation Log</h3>
+        {% if submission.violations.all() %}
+            <ul>
+                {% for violation in submission.violations %}
+                    <li>{{ violation.timestamp.strftime('%Y-%m-%d %H:%M:%S') }} UTC: {{ violation.details }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No specific violation details recorded.</p>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    {% if submission.appeal_status == 'pending' %}
+        <div class="alert alert-info">Your appeal is currently pending review by the instructor.</div>
+    {% elif submission.appeal_status == 'accepted' %}
+        <div class="alert alert-success">Your appeal was accepted. The instructor has been notified to manually review your case.</div>
+    {% elif submission.appeal_status == 'rejected' %}
+        <div class="alert alert-danger">
+            Your appeal was rejected.
+            {% if submission.instructor_remarks %}
+                <p><strong>Instructor Remarks:</strong> {{ submission.instructor_remarks }}</p>
+            {% endif %}
+        </div>
+    {% else %}
+        <h3>Submit an Appeal</h3>
+        <p>If you believe this was a mistake, you can submit an appeal to your instructor for review.</p>
+        <form action="{{ url_for('main.submit_appeal', submission_id=submission.id) }}" method="post">
+            <div>
+                <label for="appeal_text">Your Explanation:</label>
+                <textarea name="appeal_text" id="appeal_text" rows="5" required placeholder="Please explain why the violation occurred (e.g., unstable internet connection, accidental click, etc.)."></textarea>
+            </div>
+            <button type="submit" class="btn">Submit Appeal</button>
+        </form>
+    {% endif %}
+
+    <div style="margin-top: 20px;">
+        <a href="{{ url_for('main.student_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</section>
+{% endblock %}

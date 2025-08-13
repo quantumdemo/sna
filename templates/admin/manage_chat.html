@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Chat Rooms{% endblock %}
+
+{% block content %}
+<section id="manage-chat-page">
+    <h1>Chat Room Management</h1>
+
+    <div class="chat-management-section">
+        <h2>General Chat</h2>
+        <div class="chat-room-item">
+            <span>Platform-wide General Chat</span>
+            <form action="{{ url_for('admin.toggle_chat') }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-secondary">
+                    {% if general_room.is_locked %}
+                        Unlock
+                    {% else %}
+                        Lock
+                    {% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="chat-management-section">
+        <h2>Course Chat Rooms</h2>
+        {% if course_chats %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Course Title</th>
+                        <th>Instructor</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for room in course_chats %}
+                    <tr>
+                        <td>{{ room.course_room.title }}</td>
+                        <td>{{ room.course_room.instructor.name }}</td>
+                        <td>
+                            {% if room.is_locked %}
+                                <span class="status-locked">Locked</span>
+                            {% else %}
+                                <span class="status-unlocked">Unlocked</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form action="{{ url_for('admin.toggle_course_chat_lock', room_id=room.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn-small btn-secondary">
+                                    {% if room.is_locked %}
+                                        Unlock
+                                    {% else %}
+                                        Lock
+                                    {% endif %}
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No course-specific chat rooms found.</p>
+        {% endif %}
+    </div>
+
+</section>
+{% endblock %}

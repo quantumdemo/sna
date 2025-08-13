@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Enrolled Students{% endblock %}
+
+{% block content %}
+<section id="enrolled-students-page">
+    <h1>Enrolled Students for: <em>{{ course.title }}</em></h1>
+    <a href="{{ url_for('instructor.manage_course', course_id=course.id) }}">&laquo; Back to Course Management</a>
+
+    <div class="student-list">
+        {% if course.students %}
+            <ul>
+                {% for student in course.students %}
+                <li>
+                    <strong>{{ student.name }}</strong> ({{ student.email }})
+                    <ul>
+                        {% for module in course.modules.order_by('order') %}
+                            {% if module.assignment %}
+                                <li>
+                                    Assignment: {{ module.assignment.title }} -
+                                    {% set submission = student.assignment_submissions.filter_by(assignment_id=module.assignment.id).first() %}
+                                    {% if submission %}
+                                        Submitted (Grade: {{ submission.grade or 'N/A' }})
+                                        <form action="{{ url_for('instructor.grade_submission', submission_id=submission.id) }}" method="post" style="display: inline-block;">
+                                            <input type="text" name="grade" placeholder="e.g. A+" size="5">
+                                            <button type="submit" class="btn-small">Grade</button>
+                                        </form>
+                                    {% else %}
+                                        Not Submitted
+                                    {% endif %}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No students are currently enrolled in this course.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

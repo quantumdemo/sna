@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Instructor Dashboard{% endblock %}
+
+{% block content %}
+<section id="instructor-dashboard">
+    <h1>Your Dashboard</h1>
+    <p>Welcome, {{ current_user.name }}. Here you can manage your courses and library submissions.</p>
+
+    <div class="dashboard-actions">
+        <a href="{{ url_for('instructor.create_course') }}" class="btn">Create New Course</a>
+    </div>
+
+    <h2>Your Courses</h2>
+    <div class="item-list">
+        {% if courses %}
+            <ul>
+                {% for course in courses %}
+                <li>
+                    <strong>{{ course.title }}</strong> -
+                    <span>Status: {% if course.approved %}Approved{% else %}Pending Review{% endif %}</span>
+                    <a href="{{ url_for('instructor.manage_course', course_id=course.id) }}" class="btn-small">Manage</a>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You have not created any courses yet.</p>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <h2>Your Library Submissions</h2>
+    <div class="item-list">
+        {% if library_materials %}
+            <ul>
+                {% for material in library_materials %}
+                <li>
+                    <strong>{{ material.title }}</strong> -
+                    <span class="status-{% if material.approved %}approved{% else %}pending{% endif %}">
+                        Status: {% if material.approved %}Approved{% elif material.rejection_reason %}Rejected{% else %}Pending Review{% endif %}
+                    </span>
+                    {% if material.rejection_reason %}
+                        <p class="rejection-reason">Reason: {{ material.rejection_reason }}</p>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You have not submitted any library materials yet.</p>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <h2>Submit New Library Material</h2>
+    <form action="{{ url_for('instructor.submit_library_material') }}" method="post" enctype="multipart/form-data" class="modern-form">
+        <div>
+            <label for="lib_title">Title:</label>
+            <input type="text" id="lib_title" name="title" required>
+        </div>
+        <div>
+            <label for="lib_description">Description:</label>
+            <textarea id="lib_description" name="description" rows="3"></textarea>
+        </div>
+        <div>
+            <label for="lib_category">Category:</label>
+            <select id="lib_category" name="category_id" required>
+                <option value="">Select a category...</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="lib_price">Price (₦, enter 0 for free):</label>
+            <input type="number" id="lib_price" name="price_naira" min="0" value="0" required>
+        </div>
+        <div>
+            <label for="lib_file">File (PDF, eBook, etc. Max 50MB):</label>
+            <input type="file" id="lib_file" name="file" required>
+        </div>
+        <button type="submit" class="btn">Submit for Review</button>
+    </form>
+</section>
+{% endblock %}

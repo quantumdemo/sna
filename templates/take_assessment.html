@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}{{ assessment.title or 'Assessment' }}{% endblock %}
+
+{% block content %}
+<div id="assessment-container">
+    <section id="assessment-page">
+        <h1>{{ assessment.title or 'Assessment' }}</h1>
+
+        {% if time_limit %}
+        <div id="timer">Time Remaining: <span id="time">{{ time_limit }}:00</span></div>
+        {% endif %}
+
+        <form id="assessment-form" action="{{ submit_url }}" method="post">
+            {% for question in assessment.questions %}
+            <div class="question">
+                {# Check if question is from new DB model or old JSON structure #}
+                {% if question.question_text %}
+                    <p><strong>Question {{ loop.index }}:</strong> {{ question.question_text }}</p>
+                    <div class="options">
+                        {% for choice in question.choices %}
+                        <div>
+                            <input type="radio" name="q_{{ question.id }}" id="q_{{ question.id }}_c_{{ choice.id }}" value="{{ choice.id }}" required>
+                            <label for="q_{{ question.id }}_c_{{ choice.id }}">{{ choice.choice_text }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {# Fallback for old JSON-based quizzes #}
+                    <p><strong>Question {{ loop.index }}:</strong> {{ question.q }}</p>
+                    <div class="options">
+                        {% for option in question.options %}
+                        <div>
+                            <input type="radio" name="q_{{ loop.parent.index }}" id="q_{{ loop.parent.index }}_o_{{ loop.index }}" value="{{ loop.index - 1 }}" required>
+                            <label for="q_{{ loop.parent.index }}_o_{{ loop.index }}">{{ option }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            <hr>
+            {% endfor %}
+            <button type="submit" class="btn">Submit Answers</button>
+        </form>
+    </section>
+
+    {% if assessment.calculator_allowed %}
+    <aside id="calculator">
+        <div id="calc-display">0</div>
+        <div class="calc-keys">
+            <button class="calc-btn" data-key="clear">C</button>
+            <button class="calc-btn" data-key="sqrt">√</button>
+            <button class="calc-btn" data-key="%">%</button>
+            <button class="calc-btn operator" data-key="/">÷</button>
+            <button class="calc-btn number" data-key="7">7</button>
+            <button class="calc-btn number" data-key="8">8</button>
+            <button class="calc-btn number" data-key="9">9</button>
+            <button class="calc-btn operator" data-key="*">×</button>
+            <button class="calc-btn number" data-key="4">4</button>
+            <button class="calc-btn number" data-key="5">5</button>
+            <button class="calc-btn number" data-key="6">6</button>
+            <button class="calc-btn operator" data-key="-">−</button>
+            <button class="calc-btn number" data-key="1">1</button>
+            <button class="calc-btn number" data-key="2">2</button>
+            <button class="calc-btn number" data-key="3">3</button>
+            <button class="calc-btn operator" data-key="+">+</button>
+            <button class="calc-btn number zero" data-key="0">0</button>
+            <button class="calc-btn" data-key=".">.</button>
+            <button class="calc-btn operator" data-key="=">=</button>
+        </div>
+    </aside>
+    {% endif %}
+</div>
+
+<div id="violation-overlay" style="display: none;">
+    <div class="violation-modal">
+        <h2>Exam Locked</h2>
+        <p>You have been locked out of the exam due to leaving the page. This incident has been logged.</p>
+        <p>You may appeal this decision after the exam period has concluded.</p>
+        <p>Violations logged: <span id="violation-count">1</span></p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Timer functionality
+    const timeDisplay = document.getElementById('time');
+    if (timeDisplay) {
+        let timeLeft = {{ time_limit * 60 }};
+        const timerInterval = setInterval(function() {
+            if (document.hidden) return; // Pause timer if tab is not active
+            const minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            timeDisplay.textContent = `${minutes}:${seconds}`;
+
+            if (--timeLeft < 0) {
+                clearInterval(timerInterval);
+                document.getElementById('assessment-form').submit();
+            }
+        }, 1000);
+    }
+
+    // Anti-cheating functionality (for exams only)
+    const isExam = {{ assessment.questions.first().exam_id is not none }};
+    if (isExam) {
+        let violationCount = 0;
+        const maxViolations = 1; // Lock after the first violation
+        const overlay = document.getElementById('violation-overlay');
+        const violationCounter = document.getElementById('violation-count');
+
+        function handleVisibilityChange() {
+            if (document.hidden) {
+                violationCount++;
+                violationCounter.textContent = violationCount;
+
+                // Log violation to the server
+                fetch('{{ url_for("main.log_exam_violation", submission_id=submission.id) }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ details: 'User switched tabs or minimized the window.' })
+                });
+
+                if (violationCount >= maxViolations) {
+                    overlay.style.display = 'flex';
+                    // Disable form submission
+                    document.getElementById('assessment-form').style.pointerEvents = 'none';
+                    document.removeEventListener("visibilitychange", handleVisibilityChange);
+                }
+            }
+        }
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+    }
+
+
+    // Calculator functionality
+    const calculator = document.getElementById('calculator');
+    if (calculator) {
+        const display = document.getElementById('calc-display');
+        let currentValue = '';
+        let operator = '';
+        let previousValue = '';
+
+        calculator.addEventListener('click', function(e) {
+            if (!e.target.matches('.calc-btn')) return;
+
+            const key = e.target.dataset.key;
+            const keyType = e.target.classList;
+
+            if (keyType.contains('number')) {
+                currentValue = currentValue === '0' ? key : currentValue + key;
+            } else if (keyType.contains('operator') && key !== '=') {
+                operator = key;
+                previousValue = currentValue;
+                currentValue = '';
+            } else if (key === '.') {
+                if (!currentValue.includes('.')) {
+                    currentValue += '.';
+                }
+            } else if (key === '=') {
+                if (operator && previousValue) {
+                    currentValue = String(eval(`${previousValue} ${operator} ${currentValue}`));
+                    operator = '';
+                    previousValue = '';
+                }
+            } else if (key === '%') {
+                currentValue = String(parseFloat(currentValue) / 100);
+            } else if (key === 'sqrt') {
+                currentValue = String(Math.sqrt(parseFloat(currentValue)));
+            } else if (key === 'clear') {
+                currentValue = '0';
+                operator = '';
+                previousValue = '';
+            }
+            display.textContent = currentValue || '0';
+        });
+    }
+});
+</script>
+{% endblock %}

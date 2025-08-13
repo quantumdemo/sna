@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lesson.title }}{% endblock %}
+
+{% block content %}
+<section id="lesson-view-page">
+    <div class="lesson-header">
+        <h1>{{ lesson.title }}</h1>
+        <p>Part of: <a href="{{ url_for('main.course_detail', course_id=lesson.module.course.id) }}">{{ lesson.module.course.title }}</a></p>
+    </div>
+
+    <div class="lesson-content">
+        {% if lesson.video_url %}
+        <div class="video-container">
+            <iframe width="560" height="315" src="{{ lesson.video_url }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        {% endif %}
+
+        {% if lesson.drive_link %}
+        <div class="drive-container">
+            <iframe src="{{ lesson.drive_link }}" width="100%" height="480" allow="autoplay"></iframe>
+        </div>
+        {% endif %}
+
+        {% if lesson.notes %}
+        <div class="notes-container">
+            <h2>Notes</h2>
+            <div>{{ lesson.notes|secure_embeds|safe }}</div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

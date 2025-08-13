@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Certificate Requests{% endblock %}
+
+{% block content %}
+<section id="manage-requests">
+    <h1>Manage Certificate Requests</h1>
+
+    <div class="requests-section">
+        <h2>Pending Requests</h2>
+        {% if pending_requests %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Requested At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in pending_requests %}
+                    <tr>
+                        <td>{{ req.user.name }} ({{ req.user.email }})</td>
+                        <td>{{ req.course.title }}</td>
+                        <td>{{ req.requested_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td class="actions">
+                            <form action="{{ url_for('admin.approve_certificate_request', request_id=req.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-success">Approve</button>
+                            </form>
+                            <form action="{{ url_for('admin.reject_certificate_request', request_id=req.id) }}" method="POST" style="display:inline;" class="reject-form">
+                                <input type="text" name="rejection_reason" placeholder="Reason for rejection" required>
+                                <button type="submit" class="btn btn-danger">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No pending certificate requests.</p>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <div class="requests-section">
+        <h2>Recently Approved Requests</h2>
+        {% if approved_requests %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Approved At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in approved_requests %}
+                    <tr>
+                        <td>{{ req.user.name }}</td>
+                        <td>{{ req.course.title }}</td>
+                        <td>{{ req.reviewed_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No requests have been approved recently.</p>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <div class="requests-section">
+        <h2>Recently Rejected Requests</h2>
+        {% if rejected_requests %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Rejected At</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in rejected_requests %}
+                    <tr>
+                        <td>{{ req.user.name }}</td>
+                        <td>{{ req.course.title }}</td>
+                        <td>{{ req.reviewed_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ req.rejection_reason }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No requests have been rejected recently.</p>
+        {% endif %}
+    </div>
+
+</section>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Categories{% endblock %}
+
+{% block content %}
+<section id="manage-categories">
+    <h1>Category Management</h1>
+
+    <div class="add-category-form">
+        <h2>Add New Category</h2>
+        <form action="{{ url_for('admin.add_category') }}" method="post">
+            <input type="text" name="name" placeholder="Category Name" required>
+            <button type="submit" class="btn">Add Category</button>
+        </form>
+    </div>
+
+    <h2>Existing Categories</h2>
+    <div class="category-list">
+        <ul>
+            {% for category in categories %}
+            <li>
+                {{ category.name }}
+                <form action="{{ url_for('admin.delete_category', category_id=category.id) }}" method="post" style="display: inline;">
+                    <button type="submit" class="btn-small btn-danger">Delete</button>
+                </form>
+            </li>
+            {% else %}
+            <li>No categories found.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+{% endblock %}

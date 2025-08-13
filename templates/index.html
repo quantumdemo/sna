@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Home - E-Learning Platform{% endblock %}
+
+{% block content %}
+<section id="hero">
+    <h1>Welcome to Our E-Learning Platform</h1>
+    <p>Your journey to knowledge starts here.</p>
+    <a href="{{ url_for('main.register') }}" class="btn">Sign Up</a>
+    <a href="#" class="btn">Browse Courses</a> {# Link to be updated in Phase 3 #}
+</section>
+
+<section id="featured-courses">
+    <h2>Featured Courses</h2>
+    <div class="course-grid">
+        {% if featured_courses %}
+            {% for course in featured_courses %}
+            <div class="course-card">
+                <img src="{{ url_for('static', filename='images/' + (course.cover_image or 'course_placeholder.jpg')) }}" alt="{{ course.title }}">
+                <h3>{{ course.title }}</h3>
+                <p>Instructor: {{ course.instructor.name }}</p>
+                <p>Category: {{ course.category.name }}</p>
+                <p>Rating: {{ "%.1f"|format(course.avg_rating) }} / 5.0</p>
+                <p>Price: ₦{{ "{:,.2f}".format(course.price_naira) }}</p>
+                <a href="{{ url_for('main.course_detail', course_id=course.id) }}" class="btn">View Details</a>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No featured courses available at the moment.</p>
+        {% endif %}
+    </div>
+</section>
+
+<section id="how-it-works">
+    <h2>How It Works</h2>
+    <div class="how-it-works-container">
+        <div class="for-students">
+            <h3>For Students</h3>
+            <p>1. Browse our extensive catalog of courses.</p>
+            <p>2. Enroll in the course that's right for you.</p>
+            <p>3. Learn at your own pace with our flexible platform.</p>
+        </div>
+        <div class="for-instructors">
+            <h3>For Instructors</h3>
+            <p>1. Apply to become an instructor.</p>
+            <p>2. Create and upload your own courses.</p>
+            <p>3. Share your knowledge with the world.</p>
+        </div>
+    </div>
+</section>
+
+<section id="testimonials">
+    <h2>What Our Students Say</h2>
+    <div class="testimonial-grid">
+        <div class="testimonial">
+            <p>"This platform is amazing! I've learned so much."</p>
+            <cite>- Student A</cite>
+        </div>
+        <div class="testimonial">
+            <p>"The instructors are top-notch and the content is high-quality."</p>
+            <cite>- Student B</cite>
+        </div>
+    </div>
+</section>
+{% endblock %}

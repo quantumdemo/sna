@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Manage: {{ course.title }}{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const textareas = document.querySelectorAll('.ckeditor-textarea');
+            textareas.forEach(textarea => {
+                CKEDITOR.replace(textarea.id, {
+                    filebrowserUploadUrl: '{{ url_for("instructor.upload_image") }}',
+                    filebrowserUploadMethod: 'form'
+                });
+            });
+
+            const forms = document.querySelectorAll('.add-lesson-form-js');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    const moduleId = this.dataset.moduleId;
+                    const editorInstance = CKEDITOR.instances['editor-' + moduleId];
+                    if (editorInstance) {
+                        let content = editorInstance.getData();
+
+                        const youtubeRegex = /<iframe[^>]+src="https:\/\/www\.youtube\.com\/embed\/([a-zA-Z0-9_-]+)"[^>]*><\/iframe>/g;
+                        content = content.replace(youtubeRegex, (match, videoId) => {
+                            return `<div class="secure-embed" data-type="youtube" data-id="${videoId}"></div>`;
+                        });
+
+                        const gdriveRegex = /<iframe[^>]+src="https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/preview"[^>]*><\/iframe>/g;
+                        content = content.replace(gdriveRegex, (match, fileId) => {
+                            return `<div class="secure-embed" data-type="gdrive" data-id="${fileId}"></div>`;
+                        });
+
+                        editorInstance.setData(content);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+<section id="manage-course-page">
+    <h1>Manage Course: <em>{{ course.title }}</em></h1>
+    <a href="{{ url_for('instructor.enrolled_students', course_id=course.id) }}" class="btn">View Enrolled Students</a>
+
+    <div class="course-settings">
+        <h3>Course Settings</h3>
+        <p>
+            Chat Room Status:
+            <strong>
+                {% if course.chat_room and course.chat_room.is_locked %}
+                    Locked
+                {% else %}
+                    Unlocked
+                {% endif %}
+            </strong>
+        </p>
+        <form action="{{ url_for('instructor.toggle_course_chat_lock', course_id=course.id) }}" method="post">
+            <button type="submit" class="btn-small">
+                {% if course.chat_room and course.chat_room.is_locked %}
+                    Unlock Chat
+                {% else %}
+                    Lock Chat
+                {% endif %}
+            </button>
+        </form>
+    </div>
+    <hr>
+
+    <div class="manage-course-grid">
+        <div class="course-editor">
+            <h2>Edit Course Details</h2>
+            <form action="{{ url_for('instructor.edit_course', course_id=course.id) }}" method="post">
+                <div>
+                    <label for="title">Course Title:</label>
+                    <input type="text" id="title" name="title" value="{{ course.title }}" required>
+                </div>
+                <div>
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" rows="5">{{ course.description }}</textarea>
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" name="final_exam_enabled" id="final_exam_enabled" {% if course.final_exam_enabled %}checked{% endif %}>
+                    <label for="final_exam_enabled">Enable Final Exam for Certificate</label>
+                </div>
+                <button type="submit" class="btn">Save Changes</button>
+            </form>
+        </div>
+
+        <div class="module-manager">
+            <h2>Modules & Lessons</h2>
+            <div class="modules-list">
+                {% for module in course.modules.order_by('order') %}
+                <div class="module-manage-item">
+                    <h4>{{ module.order }}. {{ module.title }}</h4>
+                    <ul>
+                        {% for lesson in module.lessons %}
+                        <li>
+                            {{ lesson.title }}
+                            <a href="{{ url_for('instructor.edit_lesson', lesson_id=lesson.id) }}" class="btn-small btn-secondary">Edit</a>
+                        </li>
+                        {% else %}
+                        <li>No lessons in this module yet.</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="add-lesson-form">
+                        <h5>Add New Lesson to this Module</h5>
+                        <form class="add-lesson-form-js" data-module-id="{{ module.id }}" action="{{ url_for('instructor.add_lesson', module_id=module.id) }}" method="post">
+                            <input type="text" name="title" placeholder="Lesson Title" required>
+                            <input type="text" name="video_url" placeholder="YouTube Embed URL (optional)">
+                            <textarea name="notes" id="editor-{{ module.id }}" class="ckeditor-textarea" placeholder="Lesson Notes (optional)"></textarea>
+                            <button type="submit" class="btn-small">Add Lesson</button>
+                        </form>
+                    </div>
+                    <div class="add-assignment-form">
+                        <h5>Add Assignment to this Module</h5>
+                        {% if module.assignment %}
+                            <p>An assignment has been added to this module.</p>
+                            <a href="{{ url_for('instructor.review_assignment_submissions', assignment_id=module.assignment.id) }}" class="btn-small">Review Submissions</a>
+                             <a href="#" class="btn-small btn-secondary">Edit Assignment</a> {# Link to edit page coming soon #}
+                        {% else %}
+                            <form action="{{ url_for('instructor.add_assignment', module_id=module.id) }}" method="post">
+                                <input type="text" name="title" placeholder="Assignment Title" required>
+                                <textarea name="description" placeholder="Assignment Description" required></textarea>
+                                <div>
+                                    <label>Submission Type:</label>
+                                    <select name="submission_type" required>
+                                        <option value="text">Text Only</option>
+                                        <option value="file" selected>File Upload Only</option>
+                                        <option value="both">Both Text and File</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label>Max File Size (MB):</label>
+                                    <input type="number" name="max_file_size" min="1" placeholder="e.g., 5">
+                                </div>
+                                <button type="submit" class="btn-small">Add Assignment</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                    <div class="add-quiz-form">
+                        <h5>Add Quiz to this Module</h5>
+                        {% if module.quiz %}
+                            <p>A quiz has already been added to this module.</p>
+                            <a href="{{ url_for('instructor.manage_quiz', quiz_id=module.quiz.id) }}" class="btn-small btn-secondary">Manage Quiz</a>
+                        {% else %}
+                            <form action="{{ url_for('instructor.create_quiz', module_id=module.id) }}" method="post">
+                                <button type="submit" class="btn-small">Create Quiz</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <p>No modules created yet.</p>
+                {% endfor %}
+            </div>
+
+            <div class="add-module-form">
+                <h3>Add New Module</h3>
+                <form action="{{ url_for('instructor.add_module', course_id=course.id) }}" method="post">
+                    <input type="text" name="title" placeholder="Module Title" required>
+                    <button type="submit" class="btn">Add Module</button>
+                </form>
+            </div>
+
+    <hr>
+
+    <div class="final-exam-form">
+        <h3>Final Exam</h3>
+        {% if course.final_exam %}
+            <p>A final exam has been set for this course.</p>
+            <a href="{{ url_for('instructor.manage_exam', exam_id=course.final_exam.id) }}" class="btn">Manage Exam Questions</a>
+        {% else %}
+            <form action="{{ url_for('instructor.create_exam', course_id=course.id) }}" method="post" class="settings-form">
+                <label for="exam_time_limit">Time Limit (minutes):</label>
+                <input type="number" name="time_limit_minutes" id="exam_time_limit" min="1" value="60">
+                <label for="pass_mark">Pass Mark (%):</label>
+                <input type="number" name="pass_mark" id="pass_mark" min="0" max="100" value="50">
+                <div class="checkbox-container">
+                    <input type="checkbox" name="calculator_allowed" id="calculator_allowed">
+                    <label for="calculator_allowed">Calculator Allowed</label>
+                </div>
+                <button type="submit" class="btn">Create Final Exam</button>
+            </form>
+        {% endif %}
+    </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

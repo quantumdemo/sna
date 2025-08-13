@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Library{% endblock %}
+
+{% block content %}
+<section id="library-page">
+    <h1>Library</h1>
+    <p>Browse our collection of downloadable materials.</p>
+
+    <aside class="filters">
+        <form method="GET" action="{{ url_for('main.library') }}">
+            <div class="filter-group">
+                <input type="search" name="search" placeholder="Search by keyword..." value="{{ search_values.get('search', '') }}">
+            </div>
+            <div class="filter-group">
+                <label for="category">Category</label>
+                <select name="category" id="category">
+                    <option value="">All</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if search_values.get('category') == cat.id|string %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Price</label>
+                <input type="radio" name="price" value="" id="price_all" {% if not search_values.get('price') %}checked{% endif %}> <label for="price_all">All</label>
+                <input type="radio" name="price" value="free" id="price_free" {% if search_values.get('price') == 'free' %}checked{% endif %}> <label for="price_free">Free</label>
+                <input type="radio" name="price" value="paid" id="price_paid" {% if search_values.get('price') == 'paid' %}checked{% endif %}> <label for="price_paid">Paid</label>
+            </div>
+            <div class="filter-group">
+                <label for="sort">Sort by</label>
+                <select name="sort" id="sort">
+                    <option value="newest" {% if search_values.get('sort', 'newest') == 'newest' %}selected{% endif %}>Newest</option>
+                    <option value="popular" {% if search_values.get('sort') == 'popular' %}selected{% endif %}>Most Popular</option>
+                </select>
+            </div>
+            <button type="submit" class="btn">Filter</button>
+        </form>
+    </aside>
+
+    <div class="library-grid">
+        {% if materials %}
+            {% for item in materials %}
+            <div class="library-card">
+                <h3>{{ item.title }}</h3>
+                <p class="category-tag">{{ item.category.name }}</p>
+                <p>{{ item.description }}</p>
+                <p>Uploaded by: {{ item.uploader.name }}</p>
+                <p>Price:
+                    {% if item.price_naira == 0 %}
+                        <strong>Free</strong>
+                    {% else %}
+                        <strong>₦{{ "{:,.2f}".format(item.price_naira) }}</strong>
+                    {% endif %}
+                </p>
+                <div class="card-actions">
+                    {% if item.price_naira == 0 %}
+                        <a href="{{ url_for('main.download_library_material', material_id=item.id) }}" class="btn">Download</a>
+                    {% else %}
+                        <a href="{{ url_for('main.purchase_library_material', material_id=item.id) }}" class="btn">Purchase</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No library materials match your criteria.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

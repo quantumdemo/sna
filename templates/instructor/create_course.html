@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Course{% endblock %}
+
+{% block content %}
+<section id="create-course">
+    <h1>Create a New Course</h1>
+    <form action="{{ url_for('instructor.create_course') }}" method="post" enctype="multipart/form-data">
+        <div>
+            <label for="title">Course Title:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div>
+            <label for="description">Course Description:</label>
+            <textarea id="description" name="description" rows="5" required></textarea>
+        </div>
+        <div>
+            <label for="category">Category:</label>
+            <select id="category" name="category_id" required>
+                <option value="">Select a Category</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="price_naira">Price (₦):</label>
+            <input type="number" id="price_naira" name="price_naira" min="0" required onchange="togglePaymentFields()">
+        </div>
+
+        <div id="payment-instructions" style="display: none;">
+            <h3>Payment Instructions</h3>
+            <div>
+                <label for="bank_name">Bank Name:</label>
+                <input type="text" id="bank_name" name="bank_name">
+            </div>
+            <div>
+                <label for="account_number">Account Number:</label>
+                <input type="text" id="account_number" name="account_number">
+            </div>
+            <div>
+                <label for="account_name">Account Name:</label>
+                <input type="text" id="account_name" name="account_name">
+            </div>
+            <div>
+                <label for="extra_instructions">Extra Instructions:</label>
+                <textarea id="extra_instructions" name="extra_instructions" rows="3"></textarea>
+            </div>
+        </div>
+
+        <div>
+            <label for="cover_image">Cover Image:</label>
+            <input type="file" id="cover_image" name="cover_image" accept="image/*">
+        </div>
+        <button type="submit" class="btn">Create Course</button>
+    </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function togglePaymentFields() {
+    const price = document.getElementById('price_naira').value;
+    const paymentDiv = document.getElementById('payment-instructions');
+    if (price > 0) {
+        paymentDiv.style.display = 'block';
+    } else {
+        paymentDiv.style.display = 'none';
+    }
+}
+// Run on page load in case of form validation errors
+document.addEventListener('DOMContentLoaded', togglePaymentFields);
+</script>
+{% endblock %}

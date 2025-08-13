@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Certificate of Completion</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            border: 10px solid #787878;
+            height: 100%;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 100px;
+            color: rgba(0, 0, 0, 0.05);
+            font-weight: bold;
+            z-index: -1;
+        }
+        .header {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+        .subheader {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .student-name {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 40px 0;
+            color: #d4af37; /* Gold color */
+        }
+        .statement {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .course-name {
+            font-size: 28px;
+            font-style: italic;
+            margin-bottom: 40px;
+        }
+        .footer {
+            position: absolute;
+            bottom: 40px;
+            width: 100%;
+            left: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+        }
+        .signature, .details {
+            width: 40%;
+            text-align: center;
+        }
+        .signature p, .details p {
+            border-top: 1px solid #000;
+            padding-top: 5px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark">Scholars Novara Institute</div>
+
+    <div class="header">Scholars Novara Institute</div>
+
+    <div class="subheader">Certificate of Completion</div>
+
+    <div class="statement">This is to certify that</div>
+
+    <div class="student-name">{{ student_name }}</div>
+
+    <div class="statement">has successfully completed the course</div>
+
+    <div class="course-name">"{{ course_name }}"</div>
+
+    <div class="footer">
+        <div class="details">
+            <p>Issued on: {{ completion_date }}</p>
+            <p>Certificate ID: {{ certificate_id }}</p>
+        </div>
+        <div class="signature">
+            <p>Authorized Signature</p>
+        </div>
+    </div>
+</body>
+</html>

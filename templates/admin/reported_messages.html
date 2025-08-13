@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Reported Chat Messages{% endblock %}
+
+{% block content %}
+<section id="reported-messages">
+    <h1>Reported Chat Messages</h1>
+    <p>Review messages reported by students for inappropriate content.</p>
+
+    <div class="item-list">
+        {% if reports %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Message Content</th>
+                        <th>Author</th>
+                        <th>Reported By</th>
+                        <th>Room</th>
+                        <th>Reported At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports %}
+                    <tr>
+                        <td>"{{ report.message.content }}"</td>
+                        <td>{{ report.message.author.name }}</td>
+                        <td>{{ report.reporter.name }}</td>
+                        <td>{{ report.message.room.name }}</td>
+                        <td>{{ report.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td class="actions">
+                            {# In a real app, a delete button here would need JS to emit socket event #}
+                            {# For now, linking to user management is a good first step #}
+                            <a href="{{ url_for('admin.manage_users') }}" class="btn-small">Manage Users</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>There are no reported messages.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

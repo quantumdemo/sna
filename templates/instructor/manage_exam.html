@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Exam: {{ exam.course.title }}{% endblock %}
+
+{% block content %}
+<section id="manage-exam-page">
+    <h1>Manage Final Exam</h1>
+    <h2>For Course: <em>{{ exam.course.title }}</em></h2>
+
+    <div class="exam-settings">
+        <h3>Exam Settings</h3>
+        <form action="{{ url_for('instructor.edit_exam', exam_id=exam.id) }}" method="post" class="settings-form">
+            <div>
+                <label for="time_limit_minutes">Time Limit (minutes):</label>
+                <input type="number" name="time_limit_minutes" id="time_limit_minutes" value="{{ exam.time_limit_minutes or '' }}">
+            </div>
+            <div>
+                <label for="pass_mark">Pass Mark (%):</label>
+                <input type="number" name="pass_mark" id="pass_mark" value="{{ exam.pass_mark }}" required>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" name="calculator_allowed" id="calculator_allowed" {% if exam.calculator_allowed %}checked{% endif %}>
+                <label for="calculator_allowed">Calculator Allowed</label>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" name="retake_allowed" id="retake_allowed" {% if exam.retake_allowed %}checked{% endif %}>
+                <label for="retake_allowed">Allow Retake if Failed</label>
+            </div>
+            <button type="submit" class="btn">Save Settings</button>
+        </form>
+    </div>
+
+    <div class="page-actions">
+        <a href="{{ url_for('instructor.manage_course', course_id=exam.course.id) }}" class="btn btn-secondary">Back to Course</a>
+        <a href="{{ url_for('instructor.review_exam_submissions', exam_id=exam.id) }}" class.btn">Review Submissions</a>
+    </div>
+
+    <hr>
+
+    <div class="exam-questions-manager">
+        <div class="questions-list">
+            <h3>Existing Questions</h3>
+            {% if exam.questions.all() %}
+                <ol>
+                    {% for q in exam.questions %}
+                    <li>
+                        <strong>{{ q.question_text }}</strong>
+                        <ul>
+                            {% for choice in q.choices %}
+                            <li {% if choice.id == q.correct_choice_id %}class="correct-answer"{% endif %}>
+                                {{ choice.choice_text }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {# Add Edit/Delete buttons later #}
+                    </li>
+                    {% endfor %}
+                </ol>
+            {% else %}
+                <p>No questions have been added to this exam yet.</p>
+            {% endif %}
+        </div>
+
+        <div class="add-question-form">
+            <h3>Add New Question</h3>
+            <form action="{{ url_for('instructor.add_question_to_exam', exam_id=exam.id) }}" method="post">
+                <div>
+                    <label for="question_text">Question:</label>
+                    <textarea name="question_text" id="question_text" rows="3" required></textarea>
+                </div>
+                <div class="choices-group">
+                    <label>Choices:</label>
+                    <div>
+                        <input type="radio" name="correct_choice" value="0" required>
+                        <input type="text" name="choice1" placeholder="Choice A" required>
+                    </div>
+                    <div>
+                        <input type="radio" name="correct_choice" value="1">
+                        <input type="text" name="choice2" placeholder="Choice B" required>
+                    </div>
+                    <div>
+                        <input type="radio" name="correct_choice" value="2">
+                        <input type="text" name="choice3" placeholder="Choice C" required>
+                    </div>
+                    <div>
+                        <input type="radio" name="correct_choice" value="3">
+                        <input type="text" name="choice4" placeholder="Choice D" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn">Add Question</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Courses{% endblock %}
+
+{% block content %}
+<section id="courses-page">
+    <h1>Our Courses</h1>
+    <div class="courses-container">
+        <aside class="filters">
+            <h3>Search & Filter</h3>
+            <form action="{{ url_for('main.courses') }}" method="get">
+                <input type="text" name="search" placeholder="Search by title..." value="{{ request.args.get('search', '') }}">
+
+                <h4>Category</h4>
+                {% for category in categories %}
+                <div>
+                    <input type="checkbox" id="cat-{{ category.id }}" name="category" value="{{ category.id }}" {% if category.id|string in request.args.getlist('category') %}checked{% endif %}>
+                    <label for="cat-{{ category.id }}">{{ category.name }}</label>
+                </div>
+                {% endfor %}
+
+                <h4>Price (₦)</h4>
+                <div>
+                    <label for="min_price">Min:</label>
+                    <input type="number" id="min_price" name="min_price" placeholder="0" value="{{ request.args.get('min_price', '') }}">
+                </div>
+                <div>
+                    <label for="max_price">Max:</label>
+                    <input type="number" id="max_price" name="max_price" placeholder="50000" value="{{ request.args.get('max_price', '') }}">
+                </div>
+
+                <button type="submit" class="btn">Filter</button>
+            </form>
+        </aside>
+
+        <main class="course-grid-full">
+            {% if courses.items %}
+                {% for course in courses.items %}
+                <div class="course-card">
+                    <img src="{{ url_for('static', filename='images/' + (course.cover_image or 'course_placeholder.jpg')) }}" alt="{{ course.title }}">
+                    <h3>{{ course.title }}</h3>
+                    <p>Instructor: {{ course.instructor.name }}</p>
+                    <p>Category: {{ course.category.name }}</p>
+                    <p>Rating: {{ "%.1f"|format(course.avg_rating) }} / 5.0</p>
+                    <p>Price: ₦{{ "{:,.2f}".format(course.price_naira) }}</p>
+                    <a href="{{ url_for('main.course_detail', course_id=course.id) }}" class="btn">View Details</a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No courses found that match your criteria.</p>
+            {% endif %}
+        </main>
+    </div>
+
+    <div class="pagination">
+        {% if courses.has_prev %}
+            <a href="{{ url_for('main.courses', page=courses.prev_num, **request.args) }}">&laquo; Previous</a>
+        {% endif %}
+
+        Page {{ courses.page }} of {{ courses.pages }}.
+
+        {% if courses.has_next %}
+            <a href="{{ url_for('main.courses', page=courses.next_num, **request.args) }}">Next &raquo;</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

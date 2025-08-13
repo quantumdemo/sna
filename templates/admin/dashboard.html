@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<section id="admin-dashboard">
+    <h1>Admin Dashboard</h1>
+    <p>Welcome, {{ current_user.name }}.</p>
+
+    <div class="admin-stats">
+        <div class="stat-card">
+            <h3>Total Users</h3>
+            <p>{{ analytics.user_count }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Total Courses</h3>
+            <p>{{ analytics.course_count }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Total Enrollments</h3>
+            <p>{{ analytics.enrollment_count }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>New Users (Last 7 Days)</h3>
+            <p>{{ analytics.new_users_last_7_days }}</p>
+        </div>
+    </div>
+
+    <div class="admin-charts">
+        <canvas id="userRolesChart"></canvas>
+    </div>
+
+    <hr>
+
+    <nav class="admin-nav">
+        <a href="{{ url_for('admin.manage_users') }}" class="btn">Manage Users</a>
+        <a href="{{ url_for('admin.manage_courses') }}" class="btn">Manage Courses</a>
+        <a href="{{ url_for('admin.manage_categories') }}" class="btn">Manage Categories</a>
+        <a href="{{ url_for('admin.manage_library') }}" class="btn">Manage Library</a>
+        <a href="{{ url_for('admin.pending_payments') }}" class="btn">Course Payments</a>
+        <a href="{{ url_for('admin.library_payments') }}" class="btn">Library Payments</a>
+        <a href="{{ url_for('admin.manage_certificate_requests') }}" class="btn">Certificate Requests</a>
+        <a href="{{ url_for('admin.reported_messages') }}" class="btn">Reported Messages</a>
+        <a href="{{ url_for('admin.manage_chat') }}" class="btn">Manage Chat</a>
+    </nav>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('userRolesChart').getContext('2d');
+    const userRolesChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: {{ analytics.user_roles_labels|tojson }},
+            datasets: [{
+                label: '# of Users',
+                data: {{ analytics.user_roles_values|tojson }},
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 206, 86, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'User Roles Distribution'
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

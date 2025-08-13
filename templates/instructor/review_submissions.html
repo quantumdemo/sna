@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Review Submissions for {{ exam.course.title }}{% endblock %}
+
+{% block content %}
+<section id="review-submissions-page">
+    <h1>Review Exam Submissions</h1>
+    <h2>For Exam: <em>{{ exam.course.title }}</em></h2>
+    <a href="{{ url_for('instructor.manage_exam', exam_id=exam.id) }}" class="btn-small btn-secondary">Back to Exam Management</a>
+
+    <div class="submission-list">
+        {% if submissions %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Score</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in submissions %}
+                    <tr>
+                        <td>{{ sub.student.name }}</td>
+                        <td>{{ "%.2f"|format(sub.score) }}%</td>
+                        <td>{{ sub.status.replace('_', ' ').title() }}</td>
+                        <td>
+                            {% if sub.status == 'locked' %}
+                                {% if sub.appeal_status == 'pending' %}
+                                    <button class="btn-small btn-secondary" onclick="document.getElementById('appeal-modal-{{ sub.id }}').style.display='block'">Review Appeal</button>
+                                {% elif sub.appeal_status %}
+                                    Appeal {{ sub.appeal_status.title() }}
+                                {% else %}
+                                    No Appeal Submitted
+                                {% endif %}
+                            {% elif sub.status == 'pending_review' %}
+                                <form action="{{ url_for('instructor.release_submission_results', submission_id=sub.id) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn-small">Release Results</button>
+                                </form>
+                            {% else %}
+                                {{ sub.status.replace('_', ' ').title() }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>There are no submissions for this exam yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Appeal Modals -->
+    {% for sub in submissions %}
+        {% if sub.status == 'locked' and sub.appeal_status == 'pending' %}
+        <div id="appeal-modal-{{ sub.id }}" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close" onclick="document.getElementById('appeal-modal-{{ sub.id }}').style.display='none'">&times;</span>
+                <h3>Review Appeal for {{ sub.student.name }}</h3>
+                <p><strong>Student's Explanation:</strong></p>
+                <blockquote class="appeal-text">
+                    {{ sub.appeal_text or "No explanation provided." }}
+                </blockquote>
+                <p><strong>Violation Log:</strong></p>
+                <ul>
+                    {% for violation in sub.violations %}
+                    <li>{{ violation.timestamp.strftime('%Y-%m-%d %H:%M:%S') }} UTC: {{ violation.details }}</li>
+                    {% else %}
+                    <li>No violations logged.</li>
+                    {% endfor %}
+                </ul>
+                <hr>
+                <form action="{{ url_for('instructor.handle_appeal', submission_id=sub.id) }}" method="post">
+                    <div>
+                        <label for="remarks-{{ sub.id }}">Remarks (optional, visible to student if rejected):</label>
+                        <textarea name="remarks" id="remarks-{{ sub.id }}" rows="3"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" name="action" value="accept" class="btn">Accept Appeal & Unlock</button>
+                        <button type="submit" name="action" value="reject" class="btn btn-danger">Reject Appeal</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+</section>
+{% endblock %}

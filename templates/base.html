@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}E-Learning Platform{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="{{ url_for('main.home') }}">Home</a>
+            <a href="#">Courses</a> {# Will be implemented in Phase 3 #}
+
+            {% if current_user.is_authenticated %}
+                {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+                {% elif current_user.role == 'instructor' %}
+                    {% if current_user.approved %}
+                        <a href="{{ url_for('instructor.dashboard') }}">Dashboard</a>
+                    {% else %}
+                        <a href="{{ url_for('main.pending_approval') }}">Status</a>
+                    {% endif %}
+                {% elif current_user.role == 'student' %}
+                    <a href="{{ url_for('main.student_dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('main.chat') }}">Chat</a>
+                {% endif %}
+                <a href="{{ url_for('main.profile') }}">Profile</a>
+                <a href="{{ url_for('main.logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('main.login') }}">Login</a>
+                <a href="{{ url_for('main.register') }}">Register</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flashes">
+                    <ul>
+                        {% for category, message in messages %}
+                            <li class="{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="#">About Us</a>
+            <a href="#">Contact</a>
+            <a href="{{ url_for('main.faq') }}">FAQ</a>
+        </div>
+        <div class="social-media">
+            <a href="#">Facebook</a>
+            <a href="#">Twitter</a>
+            <a href="#">LinkedIn</a>
+        </div>
+        <p>&copy; 2024 E-Learning Platform. All rights reserved.</p>
+    </footer>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

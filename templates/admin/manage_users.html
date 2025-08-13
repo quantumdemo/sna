@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<section id="manage-users">
+    <h1>User Management</h1>
+
+    <h2>Instructors Pending Approval</h2>
+    <div class="user-list">
+        {% if pending_instructors %}
+            <ul>
+                {% for user in pending_instructors %}
+                <li>
+                    {{ user.name }} ({{ user.email }})
+                    <form action="{{ url_for('admin.approve_user', user_id=user.id) }}" method="post" style="display: inline;">
+                        <button type="submit" class="btn-small">Approve</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No instructors are currently pending approval.</p>
+        {% endif %}
+    </div>
+
+    <h2>All Users</h2>
+    <div class="user-list">
+        <ul>
+            {% for user in all_users %}
+            <li>
+                {{ user.name }} ({{ user.email }}) - Role: {{ user.role }} -
+                Status: {% if user.approved %}Approved{% else %}Pending{% endif %}
+                - Banned: {{ user.is_banned }}
+                {% if user.role != 'admin' %}
+                <form action="{{ url_for('admin.toggle_ban', user_id=user.id) }}" method="post" style="display: inline;">
+                    <button type="submit" class="btn-small btn-danger">
+                        {% if user.is_banned %}Unban{% else %}Ban{% endif %}
+                    </button>
+                </form>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+{% endblock %}
