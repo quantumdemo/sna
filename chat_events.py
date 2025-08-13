@@ -80,7 +80,7 @@ def register_chat_events(socketio):
             can_send = False
             if room.room_type == 'general' and current_user.role == 'admin':
                 can_send = True
-            elif room.room_type == 'course' and (current_user.role == 'admin' or (course and current_user.id == course.instructor_id)):
+            elif room.room_type == 'course' and (current_user.role == 'admin' or (room.course_room and current_user.id == room.course_room.instructor_id)):
                 can_send = True
 
             if not can_send:
