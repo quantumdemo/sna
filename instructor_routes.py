@@ -19,7 +19,7 @@ def before_request():
 from flask import request, flash, redirect, url_for, current_app, jsonify
 import json
 import bleach
-from models import Category, LibraryMaterial, Module, Lesson, Assignment, AssignmentSubmission, Quiz, FinalExam, ChatRoom, Question, Choice, ExamSubmission
+from models import Category, LibraryMaterial, Module, Lesson, Assignment, AssignmentSubmission, Quiz, FinalExam, ChatRoom, ChatRoomMember, Question, Choice, ExamSubmission
 from werkzeug.utils import secure_filename
 import os
 from utils import save_editor_image
@@ -75,6 +75,11 @@ def create_course():
             course_id=new_course.id
         )
         db.session.add(new_chat_room)
+        db.session.commit()
+
+        # Add the instructor as a member of the new chat room
+        instructor_member = ChatRoomMember(chat_room_id=new_chat_room.id, user_id=current_user.id, role_in_room='instructor')
+        db.session.add(instructor_member)
         db.session.commit()
 
         flash('Your course has been created and is pending review.')

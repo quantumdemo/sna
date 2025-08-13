@@ -16,9 +16,11 @@
             {% if current_user.is_authenticated %}
                 {% if current_user.role == 'admin' %}
                     <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('main.chat_list') }}">Chat</a>
                 {% elif current_user.role == 'instructor' %}
                     {% if current_user.approved %}
                         <a href="{{ url_for('instructor.dashboard') }}">Dashboard</a>
+                        <a href="{{ url_for('main.chat_list') }}">Chat</a>
                     {% else %}
                         <a href="{{ url_for('main.pending_approval') }}">Status</a>
                     {% endif %}

@@ -140,7 +140,8 @@
         <!-- Messages will be dynamically inserted here -->
     </div>
 
-    <div class="chat-bottom-bar">
+    <div class="chat-bottom-bar" style="position: relative;">
+        <div id="mentions-autocomplete" class="autocomplete-items" style="display: none; bottom: 100%; left: 0; position: absolute; background-color: #2A343D; border: 1px solid #808080; border-radius: 10px;"></div>
         <input type="file" id="file-input" style="display: none;" multiple>
         <button id="media-btn">🖼️</button>
         <button id="doc-btn">📄</button>
@@ -170,6 +171,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const emojiBtn = document.getElementById('emoji-btn');
     const emojiPicker = document.querySelector('emoji-picker');
     const micBtn = document.getElementById('mic-btn');
+    const mentionsAutocomplete = document.getElementById('mentions-autocomplete');
+    let usersInRoom = [];
 
     // --- SocketIO Event Handlers ---
     socket.on('connect', () => {
@@ -188,6 +191,25 @@ document.addEventListener('DOMContentLoaded', function() {
     messageInput.addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
+
+        const text = this.value;
+        const atIndex = text.lastIndexOf('@');
+        if (atIndex !== -1) {
+            const query = text.substring(atIndex + 1);
+            showMentions(query);
+        } else {
+            mentionsAutocomplete.style.display = 'none';
+        }
+    });
+
+    mentionsAutocomplete.addEventListener('click', (e) => {
+        if (e.target && e.target.tagName === 'DIV') {
+            const mentionText = e.target.dataset.username;
+            const atIndex = messageInput.value.lastIndexOf('@');
+            messageInput.value = messageInput.value.substring(0, atIndex) + `@${mentionText} `;
+            mentionsAutocomplete.style.display = 'none';
+            messageInput.focus();
+        }
     });
 
     messageInput.addEventListener('keypress', function(e) {
@@ -271,6 +293,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function fetchHistory() {
+        fetch(`/chat/room/${currentRoomId}/users`)
+            .then(response => response.json())
+            .then(data => {
+                usersInRoom = data;
+            });
+
         fetch(`/chat/room/${currentRoomId}/history`)
             .then(response => response.json())
             .then(history => {
@@ -305,8 +333,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        const profilePicUrl = `/static/profile_pics/${data.user_profile_pic || 'default.jpg'}`;
+
         bubble.innerHTML = `
-            <div class="author">${data.user_name}</div>
+            <div class="author">
+                <img src="${profilePicUrl}" alt="${data.user_name}" style="width: 20px; height: 20px; border-radius: 50%; margin-right: 8px; vertical-align: middle;">
+                ${data.user_name}
+            </div>
             <div class="content">${data.content || ''}</div>
             ${fileHtml}
             <div class="timestamp">${ts}</div>
@@ -315,6 +348,32 @@ document.addEventListener('DOMContentLoaded', function() {
         messageContainer.appendChild(bubble);
         messageWindow.appendChild(messageContainer);
         messageWindow.scrollTop = messageWindow.scrollHeight;
+    }
+
+    function showMentions(query) {
+        mentionsAutocomplete.innerHTML = '';
+        if (query.length === 0) {
+            mentionsAutocomplete.style.display = 'none';
+            return;
+        }
+
+        const filteredUsers = usersInRoom.filter(user =>
+            user.name.toLowerCase().includes(query.toLowerCase())
+        );
+
+        if (filteredUsers.length > 0) {
+            filteredUsers.forEach(user => {
+                const item = document.createElement('div');
+                item.textContent = user.name;
+                item.dataset.username = user.name;
+                item.style.padding = '10px';
+                item.style.cursor = 'pointer';
+                mentionsAutocomplete.appendChild(item);
+            });
+            mentionsAutocomplete.style.display = 'block';
+        } else {
+            mentionsAutocomplete.style.display = 'none';
+        }
     }
 
     function uploadFile(file) {
