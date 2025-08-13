@@ -1,0 +1,144 @@
+/* General Body Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Header and Navigation */
+header {
+    background-color: #333;
+    color: white;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    margin: 0 15px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* Main Content */
+main {
+    padding: 0 20px;
+}
+
+/* Hero Section */
+#hero {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #4a90e2;
+    color: white;
+}
+
+#hero h1 {
+    font-size: 2.5rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 20px;
+    border-radius: 5px;
+    background-color: #333;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn:hover {
+    background-color: #555;
+}
+
+/* Sections */
+section {
+    padding: 40px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+/* Featured Courses */
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.course-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+}
+
+.course-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+/* How It Works */
+.how-it-works-container {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+.for-students, .for-instructors {
+    flex-basis: 45%;
+}
+
+/* Testimonials */
+.testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.testimonial {
+    background-color: white;
+    padding: 20px;
+    border-left: 5px solid #4a90e2;
+}
+
+.testimonial cite {
+    display: block;
+    margin-top: 10px;
+    font-style: italic;
+    text-align: right;
+}
+
+/* Footer */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.footer-links, .social-media {
+    margin-bottom: 10px;
+}
+
+.footer-links a, .social-media a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+}
+
+.footer-links a:hover, .social-media a:hover {
+    text-decoration: underline;
+}
