@@ -54,70 +54,74 @@ def register_chat_events(socketio):
 
     @socketio.on('message')
     def handle_message(data):
-        if not current_user.is_authenticated:
-            return
-
-        room_id = data.get('room_id')
-        content = data.get('content')
-        file_path = data.get('file_path')
-        file_name = data.get('file_name')
-
-        if not room_id or (not content and not file_path):
-            return
-
-        room = ChatRoom.query.get(room_id)
-        if not room or not is_user_authorized_for_room(current_user, room):
-            return
-
-        # Mute check
-        is_muted = MutedUser.query.filter_by(user_id=current_user.id, room_id=room.id).first()
-        if is_muted:
-            emit('error', {'msg': 'You are muted in this room.'})
-            return
-
-        # Lock check - this is the new granular logic
-        if room.is_locked:
-            can_send = False
-            if room.room_type == 'general' and current_user.role == 'admin':
-                can_send = True
-            elif room.room_type == 'course' and (current_user.role == 'admin' or (course and current_user.id == course.instructor_id)):
-                can_send = True
-
-            if not can_send:
-                emit('error', {'msg': 'This chat room is currently locked.'})
+        try:
+            if not current_user.is_authenticated:
                 return
 
-        filtered_content = filter_profanity(content)
+            room_id = data.get('room_id')
+            content = data.get('content')
+            file_path = data.get('file_path')
+            file_name = data.get('file_name')
 
-        new_message = ChatMessage(
-            room_id=room.id,
-            user_id=current_user.id,
-            content=filtered_content,
-            file_path=file_path,
-            file_name=file_name
-        )
-        db.session.add(new_message)
+            if not room_id or (not content and not file_path):
+                return
 
-        # Update the room's last message timestamp
-        room.last_message_timestamp = new_message.timestamp
+            room = ChatRoom.query.get(room_id)
+            if not room or not is_user_authorized_for_room(current_user, room):
+                return
 
-        db.session.commit()
+            # Mute check
+            is_muted = MutedUser.query.filter_by(user_id=current_user.id, room_id=room.id).first()
+            if is_muted:
+                emit('error', {'msg': 'You are muted in this room.'})
+                return
 
-        msg_data = {
-            'user_name': current_user.name,
-            'user_id': current_user.id,
-            'user_profile_pic': current_user.profile_pic or 'default.jpg',
-            'content': new_message.content,
-            'file_path': new_message.file_path,
-            'file_name': new_message.file_name,
-            'timestamp': new_message.timestamp.isoformat() + "Z",
-            'room_id': room.id,
-            'message_id': new_message.id,
-            'is_pinned': new_message.is_pinned,
-            'reactions': [] # New messages have no reactions
-        }
+            # Lock check - this is the new granular logic
+            if room.is_locked:
+                can_send = False
+                if room.room_type == 'general' and current_user.role == 'admin':
+                    can_send = True
+            elif room.room_type == 'course' and (current_user.role == 'admin' or (room.course_room and current_user.id == room.course_room.instructor_id)):
+                    can_send = True
 
-        emit('message', msg_data, to=room_id)
+                if not can_send:
+                    emit('error', {'msg': 'This chat room is currently locked.'})
+                    return
+
+            filtered_content = filter_profanity(content)
+
+            new_message = ChatMessage(
+                room_id=room.id,
+                user_id=current_user.id,
+                content=filtered_content,
+                file_path=file_path,
+                file_name=file_name
+            )
+            db.session.add(new_message)
+
+            # Update the room's last message timestamp
+            room.last_message_timestamp = new_message.timestamp
+
+            db.session.commit()
+
+            msg_data = {
+                'user_name': current_user.name,
+                'user_id': current_user.id,
+                'user_profile_pic': current_user.profile_pic or 'default.jpg',
+                'content': new_message.content,
+                'file_path': new_message.file_path,
+                'file_name': new_message.file_name,
+                'timestamp': new_message.timestamp.isoformat() + "Z",
+                'room_id': room.id,
+                'message_id': new_message.id,
+                'is_pinned': new_message.is_pinned,
+                'reactions': [] # New messages have no reactions
+            }
+
+            emit('message', msg_data, to=room_id)
+        except Exception as e:
+            print(f"Error handling message: {e}")
+            emit('error', {'msg': 'An unexpected error occurred. Please try again.'})
 
     @socketio.on('delete_message')
     def delete_message(data):
