@@ -706,6 +706,7 @@ def chat_list():
             'id': room.id,
             'name': room.name,
             'description': room.description,
+            'cover_image': room.cover_image,
             'member_count': room.members.count(),
             'unread_count': unread_count
         })
