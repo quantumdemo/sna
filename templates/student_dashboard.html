@@ -52,6 +52,7 @@
                         </div>
 
                         <div class="card-actions">
+                            <a href="{{ url_for('main.course_detail', course_id=enrollment.course.id) }}" class="btn">Go to Course</a>
                             {% if enrollment.course.final_exam_enabled %}
                                 {% if progress.all_prerequisites_met and enrollment.course.final_exam %}
                                     <a href="{{ url_for('main.take_exam', exam_id=enrollment.course.final_exam.id) }}" class="btn">Take Final Exam</a>
