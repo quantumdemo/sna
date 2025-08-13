@@ -2,10 +2,25 @@ from flask_socketio import emit, join_room, leave_room
 from flask_login import current_user
 from extensions import db
 from datetime import datetime
-from models import ChatRoom, ChatMessage, User, Course, MutedUser, ReportedMessage, MessageReaction, UserLastRead
+from models import ChatRoom, ChatRoomMember, ChatMessage, User, Course, MutedUser, ReportedMessage, MessageReaction, UserLastRead
 from utils import filter_profanity
 
 def register_chat_events(socketio):
+
+    def is_user_authorized_for_room(user, room):
+        if user.role == 'admin':
+            return True
+        if room.room_type == 'public':
+            return True
+
+        # Check for course-based access for course rooms
+        if room.room_type == 'course' and room.course_room:
+            if user.id == room.course_room.instructor_id or user.is_enrolled(room.course_room):
+                return True
+
+        # Check for explicit membership
+        return ChatRoomMember.query.filter_by(user_id=user.id, chat_room_id=room.id).count() > 0
+
 
     @socketio.on('join')
     def on_join(data):
@@ -13,38 +28,20 @@ def register_chat_events(socketio):
             return
 
         room_id = data.get('room_id')
-        if not room_id:
-            return
-
         room = ChatRoom.query.get(room_id)
-        if not room:
+        if not room or not is_user_authorized_for_room(current_user, room):
             return
 
-        is_authorized = False
-        if room.room_type == 'general':
-            # Admins, instructors, and students can join the general chat
-            if current_user.role in ['admin', 'instructor', 'student']:
-                is_authorized = True
-        elif room.room_type == 'course':
-            course = room.course_room
-            if course and (current_user.is_enrolled(course) or
-                           current_user.id == course.instructor_id or
-                           current_user.role == 'admin'):
-                is_authorized = True
+        join_room(room_id)
 
-        if is_authorized:
-            join_room(room_id)
-
-            # Update last read timestamp
-            last_read = UserLastRead.query.filter_by(user_id=current_user.id, room_id=room_id).first()
-            if last_read:
-                last_read.last_read_timestamp = datetime.utcnow()
-            else:
-                last_read = UserLastRead(user_id=current_user.id, room_id=room_id, last_read_timestamp=datetime.utcnow())
-                db.session.add(last_read)
-            db.session.commit()
+        # Update last read timestamp
+        last_read = UserLastRead.query.filter_by(user_id=current_user.id, room_id=room_id).first()
+        if last_read:
+            last_read.last_read_timestamp = datetime.utcnow()
         else:
-            pass
+            last_read = UserLastRead(user_id=current_user.id, room_id=room_id, last_read_timestamp=datetime.utcnow())
+            db.session.add(last_read)
+        db.session.commit()
 
     @socketio.on('leave')
     def on_leave(data):
@@ -69,22 +66,7 @@ def register_chat_events(socketio):
             return
 
         room = ChatRoom.query.get(room_id)
-        if not room:
-            return
-
-        # Authorization check
-        is_authorized = False
-        course = room.course_room
-        if room.room_type == 'general':
-            if current_user.role in ['admin', 'instructor', 'student']:
-                is_authorized = True
-        elif room.room_type == 'course' and course:
-            if (current_user.is_enrolled(course) or
-                current_user.id == course.instructor_id or
-                current_user.role == 'admin'):
-                is_authorized = True
-
-        if not is_authorized:
+        if not room or not is_user_authorized_for_room(current_user, room):
             return
 
         # Mute check
@@ -115,6 +97,10 @@ def register_chat_events(socketio):
             file_name=file_name
         )
         db.session.add(new_message)
+
+        # Update the room's last message timestamp
+        room.last_message_timestamp = new_message.timestamp
+
         db.session.commit()
 
         msg_data = {

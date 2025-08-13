@@ -48,12 +48,14 @@ class ChatFeaturesTests(unittest.TestCase):
         return self.client.post('/login', data={'email': email, 'password': password}, follow_redirects=True)
 
     def test_room_creation_and_access(self):
-        # 1. Test general room is created
+        # 1. Test general room is created and public
         self.login('stud@test.com', 'pw')
         response = self.client.get('/chat')
         self.assertEqual(response.status_code, 200)
-        general_room = ChatRoom.query.filter_by(room_type='general').first()
+        # General room should be public and visible to all
+        general_room = ChatRoom.query.filter_by(name='General').first()
         self.assertIsNotNone(general_room)
+        self.assertEqual(general_room.room_type, 'public')
         self.assertIn(b'General', response.data)
 
         # 2. Test course room is created with course
@@ -62,9 +64,13 @@ class ChatFeaturesTests(unittest.TestCase):
             'title': 'My Test Course',
             'description': 'Desc',
             'category_id': self.category.id,
-            'price_naira': 100
+            'price_naira': 100,
+            'bank_name': 'Test Bank',
+            'account_number': '1234567890',
+            'account_name': 'Test Account'
         }, follow_redirects=True)
         course = Course.query.filter_by(title='My Test Course').first()
+        self.assertIsNotNone(course)
         self.assertIsNotNone(course.chat_room)
         self.assertEqual(course.chat_room.name, 'My Test Course')
 

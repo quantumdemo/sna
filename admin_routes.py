@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, abort, flash, redirect, url_for, request, current_app, jsonify
 from flask_login import login_required, current_user
 
-from models import User, Course, Category, LibraryMaterial, PlatformSetting, Enrollment, CertificateRequest, Certificate, LibraryPurchase, ChatRoom, MutedUser, ReportedMessage, AdminLog
+from models import User, Course, Category, LibraryMaterial, PlatformSetting, Enrollment, CertificateRequest, Certificate, LibraryPurchase, ChatRoom, ChatRoomMember, MutedUser, ReportedMessage, AdminLog
 from extensions import db
 from pdf_generator import generate_certificate_pdf
 
@@ -39,26 +39,117 @@ def dashboard():
         'user_roles_values': [count for role, count in user_roles]
     }
 
-    general_room = ChatRoom.query.filter_by(room_type='general').first()
-    if not general_room:
-        general_room = ChatRoom(name='General', room_type='general')
-        db.session.add(general_room)
-        db.session.commit()
-
-    chat_status = 'Locked' if general_room.is_locked else 'Unlocked'
-
+    general_room = ChatRoom.query.filter_by(name='General').first()
+    chat_status = 'Locked' if general_room and general_room.is_locked else 'Unlocked'
     return render_template('admin/dashboard.html', analytics=analytics_data, chat_status=chat_status)
 
 @admin_bp.route('/chat')
 def manage_chat():
-    general_room = ChatRoom.query.filter_by(room_type='general').first()
-    course_chats = ChatRoom.query.filter(ChatRoom.room_type == 'course').join(Course).order_by(Course.title).all()
-    return render_template('admin/manage_chat.html', general_room=general_room, course_chats=course_chats)
+    all_rooms = ChatRoom.query.order_by(ChatRoom.name).all()
+    return render_template('admin/manage_chat.html', rooms=all_rooms)
+
+@admin_bp.route('/chat/create', methods=['GET', 'POST'])
+def create_chat_room():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        description = request.form.get('description')
+        room_type = request.form.get('room_type')
+        speech_enabled = 'speech_enabled' in request.form
+
+        if not name or not room_type:
+            flash('Room name and type are required.', 'danger')
+            return redirect(url_for('admin.create_chat_room'))
+
+        new_room = ChatRoom(
+            name=name,
+            description=description,
+            room_type=room_type,
+            speech_enabled=speech_enabled,
+            created_by_id=current_user.id
+        )
+        db.session.add(new_room)
+        db.session.commit()
+
+        # If private, add selected members
+        if room_type == 'private':
+            member_ids = request.form.getlist('members')
+            for user_id in member_ids:
+                member = User.query.get(user_id)
+                if member:
+                    new_member = ChatRoomMember(chat_room_id=new_room.id, user_id=member.id)
+                    db.session.add(new_member)
+            db.session.commit()
+
+        flash(f'Chat room "{name}" created successfully.', 'success')
+        return redirect(url_for('admin.manage_chat'))
+
+    # For GET request
+    users = User.query.filter(User.role != 'admin').order_by(User.name).all()
+    return render_template('admin/create_chat_room.html', users=users)
+
+@admin_bp.route('/chat/<int:room_id>/edit', methods=['GET', 'POST'])
+def edit_chat_room(room_id):
+    room = ChatRoom.query.get_or_404(room_id)
+    if request.method == 'POST':
+        room.name = request.form.get('name', room.name)
+        room.description = request.form.get('description', room.description)
+        room.speech_enabled = 'speech_enabled' in request.form
+        db.session.commit()
+        flash('Room details updated successfully.', 'success')
+        return redirect(url_for('admin.manage_chat'))
+
+    return render_template('admin/edit_chat_room.html', room=room)
+
+@admin_bp.route('/chat/<int:room_id>/delete', methods=['POST'])
+def delete_chat_room(room_id):
+    room = ChatRoom.query.get_or_404(room_id)
+    # Add safety check, e.g., don't delete General or course-linked rooms this way
+    if room.room_type in ['general', 'course']:
+        flash(f'Cannot delete a "{room.room_type}" type room via this method.', 'danger')
+        return redirect(url_for('admin.manage_chat'))
+
+    db.session.delete(room)
+    db.session.commit()
+    flash(f'Room "{room.name}" has been deleted.', 'success')
+    return redirect(url_for('admin.manage_chat'))
+
+@admin_bp.route('/chat/<int:room_id>/members', methods=['GET', 'POST'])
+def manage_chat_members(room_id):
+    room = ChatRoom.query.get_or_404(room_id)
+    if room.room_type != 'private':
+        flash('Member management is only for private rooms.', 'warning')
+        return redirect(url_for('admin.manage_chat'))
+
+    if request.method == 'POST':
+        new_member_ids = set(request.form.getlist('members'))
+        existing_member_ids = {str(member.user_id) for member in room.members}
+
+        # Add new members
+        to_add = new_member_ids - existing_member_ids
+        for user_id in to_add:
+            member = ChatRoomMember(chat_room_id=room.id, user_id=int(user_id))
+            db.session.add(member)
+
+        # Remove old members
+        to_remove = existing_member_ids - new_member_ids
+        for user_id in to_remove:
+            member = ChatRoomMember.query.filter_by(chat_room_id=room.id, user_id=int(user_id)).first()
+            if member:
+                db.session.delete(member)
+
+        db.session.commit()
+        flash('Room members updated successfully.', 'success')
+        return redirect(url_for('admin.manage_chat_members', room_id=room.id))
+
+    all_users = User.query.filter(User.role != 'admin').order_by(User.name).all()
+    member_ids = {member.user_id for member in room.members}
+    return render_template('admin/manage_chat_members.html', room=room, users=all_users, member_ids=member_ids)
 
 @admin_bp.route('/toggle_chat', methods=['POST'])
 def toggle_chat():
-    general_room = ChatRoom.query.filter_by(room_type='general').first()
+    general_room = ChatRoom.query.filter_by(name='General').first()
     if not general_room:
+        flash('General chat room not found.', 'danger')
         return redirect(url_for('admin.manage_chat'))
 
     general_room.is_locked = not general_room.is_locked

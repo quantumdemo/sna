@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Create Chat Room{% endblock %}
+
+{% block styles %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container .select2-selection--multiple {
+        background-color: #f8f9fa;
+        border-color: #ced4da;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #007bff;
+        color: white;
+        border: none;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Create New Chat Room</h2>
+    <form method="POST" action="{{ url_for('admin.create_chat_room') }}">
+        <div class="form-group mb-3">
+            <label for="name">Room Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+        </div>
+        <div class="form-group mb-3">
+            <label for="room_type">Room Type</label>
+            <select class="form-control" id="room_type" name="room_type">
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+            </select>
+        </div>
+        <div class="form-group form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="speech_enabled" name="speech_enabled" checked>
+            <label class="form-check-label" for="speech_enabled">Enable Speech-to-Text</label>
+        </div>
+        <div class="form-group mb-3" id="members-select-container" style="display: none;">
+            <label for="members">Select Members for Private Room</label>
+            <select class="form-control" id="members" name="members" multiple="multiple">
+                {% for user in users %}
+                <option value="{{ user.id }}">{{ user.name }} ({{ user.email }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Room</button>
+        <a href="{{ url_for('admin.manage_chat') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#members').select2({
+        placeholder: "Select members",
+        allowClear: true
+    });
+
+    $('#room_type').on('change', function() {
+        if (this.value === 'private') {
+            $('#members-select-container').show();
+        } else {
+            $('#members-select-container').hide();
+        }
+    });
+});
+</script>
+{% endblock %}

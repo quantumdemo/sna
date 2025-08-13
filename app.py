@@ -1,6 +1,6 @@
 from flask import Flask
 from extensions import db, login_manager, socketio
-from models import User, ChatMessage
+from models import User, ChatRoom, ChatMessage
 import os
 import click
 from datetime import datetime, timedelta
@@ -71,6 +71,15 @@ def create_app(config_object=None):
 
     with app.app_context():
         db.create_all()
+        # Ensure the general chat room exists and is public
+        general_room = ChatRoom.query.filter_by(name='General').first()
+        if not general_room:
+            general_room = ChatRoom(name='General', room_type='public', description='A place for everyone to chat.')
+            db.session.add(general_room)
+        elif general_room.room_type != 'public':
+            general_room.room_type = 'public'
+
+        db.session.commit()
 
     # Register chat events
     from chat_events import register_chat_events

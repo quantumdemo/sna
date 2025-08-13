@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
 import random
-from models import User, Course, Category, Comment, Lesson, LibraryMaterial, Assignment, AssignmentSubmission, Quiz, FinalExam, QuizSubmission, ExamSubmission, Enrollment, LessonCompletion, Module, Certificate, CertificateRequest, LibraryPurchase, ChatRoom, UserLastRead, ChatMessage, ExamViolation
+from models import User, Course, Category, Comment, Lesson, LibraryMaterial, Assignment, AssignmentSubmission, Quiz, FinalExam, QuizSubmission, ExamSubmission, Enrollment, LessonCompletion, Module, Certificate, CertificateRequest, LibraryPurchase, ChatRoom, ChatRoomMember, UserLastRead, ChatMessage, ExamViolation
 from extensions import db
 from utils import save_chat_file
 
@@ -665,40 +665,82 @@ def change_password():
     flash('Your password has been updated.', 'success')
     return redirect(url_for('main.profile'))
 
-from models import PlatformSetting
-
 @main.route('/chat')
 @login_required
-def chat():
-    # Ensure the general chat room exists
-    general_room = ChatRoom.query.filter_by(room_type='general').first()
-    if not general_room:
-        general_room = ChatRoom(name='General', room_type='general')
-        db.session.add(general_room)
-        db.session.commit()
+def chat_list():
+    """
+    Displays the list of chat rooms available to the current user.
+    """
+    # Admins see all rooms
+    if current_user.role == 'admin':
+        user_rooms = ChatRoom.query.order_by(ChatRoom.last_message_timestamp.desc().nullslast()).all()
+    else:
+        # Students and instructors see public rooms and rooms they are members of
+        member_room_ids = db.session.query(ChatRoomMember.chat_room_id).filter_by(user_id=current_user.id).all()
+        member_room_ids = [item[0] for item in member_room_ids]
 
-    # The old PlatformSetting is now replaced by the is_locked property of the general room
-    if general_room.is_locked:
-        flash('The general chat room is currently locked by an administrator.', 'warning')
-        # We can still let them see the chat page with their course chats
+        user_rooms_query = ChatRoom.query.filter(
+            (ChatRoom.room_type == 'public') |
+            (ChatRoom.id.in_(member_room_ids))
+        ).order_by(ChatRoom.last_message_timestamp.desc().nullslast())
+        user_rooms = user_rooms_query.all()
 
-    # Fetch rooms the user has access to
-    accessible_rooms = []
-    if current_user.role == 'student':
-        accessible_rooms.append(general_room)
-        enrollments = Enrollment.query.filter_by(user_id=current_user.id, status='approved').all()
-        for enrollment in enrollments:
-            if enrollment.course.chat_room:
-                accessible_rooms.append(enrollment.course.chat_room)
-    elif current_user.role == 'instructor':
-        courses_taught = Course.query.filter_by(instructor_id=current_user.id).all()
-        for course in courses_taught:
-            if course.chat_room:
-                accessible_rooms.append(course.chat_room)
-    elif current_user.role == 'admin':
-        accessible_rooms = ChatRoom.query.all()
+    room_data = []
+    for room in user_rooms:
+        last_read = UserLastRead.query.filter_by(user_id=current_user.id, room_id=room.id).first()
+        last_read_time = last_read.last_read_timestamp if last_read else datetime.min
 
-    return render_template('chat.html', rooms=accessible_rooms, user_role=current_user.role)
+        unread_count = db.session.query(ChatMessage).filter(
+            ChatMessage.room_id == room.id,
+            ChatMessage.timestamp > last_read_time,
+            ChatMessage.user_id != current_user.id
+        ).count()
+
+        room_data.append({
+            'id': room.id,
+            'name': room.name,
+            'description': room.description,
+            'member_count': room.members.count(),
+            'unread_count': unread_count
+        })
+
+    return render_template('chat_list.html', rooms=room_data)
+
+
+@main.route('/chat/<int:room_id>')
+@login_required
+def chat_room(room_id):
+    """
+    Displays the actual chat interface for a specific room.
+    """
+    room = ChatRoom.query.get_or_404(room_id)
+
+    # Authorization check
+    is_member = ChatRoomMember.query.filter_by(chat_room_id=room_id, user_id=current_user.id).first()
+    is_public = room.room_type == 'public'
+    is_admin = current_user.role == 'admin'
+
+    if not (is_member or is_public or is_admin):
+        abort(403)
+
+    # For the old template, we need to pass a list of rooms,
+    # so we'll just pass the current room for now.
+    # This will be refactored in the frontend step.
+    return render_template('chat.html', rooms=[room], current_room=room, user_role=current_user.role)
+
+@main.route('/chat/<int:room_id>/info')
+@login_required
+def chat_room_info(room_id):
+    room = ChatRoom.query.get_or_404(room_id)
+    # Authorization check
+    is_member = ChatRoomMember.query.filter_by(chat_room_id=room_id, user_id=current_user.id).first()
+    is_public = room.room_type == 'public'
+    is_admin = current_user.role == 'admin'
+
+    if not (is_member or is_public or is_admin):
+        abort(403)
+
+    return render_template('chat_info.html', room=room)
 
 @main.route('/chat/upload', methods=['POST'])
 @login_required

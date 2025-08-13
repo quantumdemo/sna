@@ -24,7 +24,7 @@
                     {% endif %}
                 {% elif current_user.role == 'student' %}
                     <a href="{{ url_for('main.student_dashboard') }}">Dashboard</a>
-                    <a href="{{ url_for('main.chat') }}">Chat</a>
+                    <a href="{{ url_for('main.chat_list') }}">Chat</a>
                 {% endif %}
                 <a href="{{ url_for('main.profile') }}">Profile</a>
                 <a href="{{ url_for('main.logout') }}">Logout</a>

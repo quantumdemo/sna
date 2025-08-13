@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}{{ room.name }} - Info{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3>Room Information</h3>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">{{ room.name }}</h5>
+            <p class="card-text">{{ room.description or 'No description available.' }}</p>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Type:</strong> {{ room.room_type | capitalize }}</li>
+                <li class="list-group-item"><strong>Created by:</strong> {{ room.creator.name if room.creator else 'System' }}</li>
+                <li class="list-group-item"><strong>Created at:</strong> {{ room.created_at.strftime('%Y-%m-%d') }}</li>
+                <li class="list-group-item"><strong>Speech-to-Text Enabled:</strong> {% if room.speech_enabled %}Yes{% else %}No{% endif %}</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h3>Members ({{ room.members.count() }})</h3>
+        </div>
+        <ul class="list-group list-group-flush">
+            {% for member in room.members %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ member.user.name }}
+                <span class="badge bg-primary rounded-pill">{{ member.user.role }}</span>
+            </li>
+            {% else %}
+            <li class="list-group-item">This room has no members.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <a href="{{ url_for('main.chat_room', room_id=room.id) }}" class="btn btn-secondary mt-3">Back to Chat</a>
+</div>
+{% endblock %}
