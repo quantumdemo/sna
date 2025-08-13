@@ -747,7 +747,13 @@ def chat_room_info(room_id):
     if not (is_member or is_public or is_admin):
         abort(403)
 
-    return render_template('chat_info.html', room=room)
+    # Fetch recent media
+    media_messages = ChatMessage.query.filter(
+        ChatMessage.room_id == room_id,
+        ChatMessage.file_path.isnot(None)
+    ).order_by(ChatMessage.timestamp.desc()).limit(10).all()
+
+    return render_template('chat_info.html', room=room, media_messages=media_messages)
 
 @main.route('/chat/upload', methods=['POST'])
 @login_required
