@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from models import User, Course, Category, LibraryMaterial, PlatformSetting, Enrollment, CertificateRequest, Certificate, LibraryPurchase, ChatRoom, ChatRoomMember, MutedUser, ReportedMessage, AdminLog
 from extensions import db
 from pdf_generator import generate_certificate_pdf
+from utils import save_chat_room_cover_image
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -55,17 +56,26 @@ def create_chat_room():
         description = request.form.get('description')
         room_type = request.form.get('room_type')
         speech_enabled = 'speech_enabled' in request.form
+        cover_image_file = request.files.get('cover_image')
 
         if not name or not room_type:
             flash('Room name and type are required.', 'danger')
             return redirect(url_for('admin.create_chat_room'))
+
+        cover_image_path = None
+        if cover_image_file:
+            cover_image_path = save_chat_room_cover_image(cover_image_file)
+            if not cover_image_path:
+                flash('Invalid image file. Allowed types: png, jpg, jpeg.', 'danger')
+                return redirect(url_for('admin.create_chat_room'))
 
         new_room = ChatRoom(
             name=name,
             description=description,
             room_type=room_type,
             speech_enabled=speech_enabled,
-            created_by_id=current_user.id
+            created_by_id=current_user.id,
+            cover_image=cover_image_path
         )
         db.session.add(new_room)
         db.session.commit()
@@ -94,6 +104,16 @@ def edit_chat_room(room_id):
         room.name = request.form.get('name', room.name)
         room.description = request.form.get('description', room.description)
         room.speech_enabled = 'speech_enabled' in request.form
+
+        cover_image_file = request.files.get('cover_image')
+        if cover_image_file:
+            cover_image_path = save_chat_room_cover_image(cover_image_file)
+            if cover_image_path:
+                room.cover_image = cover_image_path
+            else:
+                flash('Invalid image file for cover image. Allowed types: png, jpg, jpeg.', 'danger')
+                return redirect(url_for('admin.edit_chat_room', room_id=room.id))
+
         db.session.commit()
         flash('Room details updated successfully.', 'success')
         return redirect(url_for('admin.manage_chat'))

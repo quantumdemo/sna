@@ -5,7 +5,17 @@
 {% block content %}
 <div class="container mt-4">
     <h2>Edit Chat Room: {{ room.name }}</h2>
-    <form method="POST" action="{{ url_for('admin.edit_chat_room', room_id=room.id) }}">
+    <form method="POST" action="{{ url_for('admin.edit_chat_room', room_id=room.id) }}" enctype="multipart/form-data">
+        {% if room.cover_image %}
+        <div class="mb-3">
+            <p>Current Cover Image:</p>
+            <img src="{{ url_for('static', filename=room.cover_image) }}" alt="Cover Image" style="max-width: 200px; border-radius: 10px;">
+        </div>
+        {% endif %}
+        <div class="form-group mb-3">
+            <label for="cover_image">New Cover Image (optional)</label>
+            <input type="file" class="form-control" id="cover_image" name="cover_image">
+        </div>
         <div class="form-group mb-3">
             <label for="name">Room Name</label>
             <input type="text" class="form-control" id="name" name="name" value="{{ room.name }}" required>

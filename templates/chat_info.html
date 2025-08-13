@@ -5,6 +5,9 @@
 {% block content %}
 <div class="container mt-4">
     <div class="card">
+        {% if room.cover_image %}
+            <img src="{{ url_for('static', filename=room.cover_image) }}" class="card-img-top" alt="Room Cover Image" style="max-height: 300px; object-fit: cover;">
+        {% endif %}
         <div class="card-header">
             <h3>Room Information</h3>
         </div>
@@ -27,7 +30,7 @@
         <ul class="list-group list-group-flush">
             {% for member in room.members %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ member.user.name }}
+                <a href="{{ url_for('main.view_user', user_id=member.user.id) }}">{{ member.user.name }}</a>
                 <span class="badge bg-primary rounded-pill">{{ member.user.role }}</span>
             </li>
             {% else %}
