@@ -735,6 +735,52 @@ def create_group():
     users = User.query.filter(User.id != current_user.id).all()
     return render_template('create_group.html', users=users)
 
+@main.route('/chat/<int:room_id>/edit-icon', methods=['GET', 'POST'])
+@login_required
+def edit_group_icon(room_id):
+    room = ChatRoom.query.get_or_404(room_id)
+    # Authorization check could be more robust
+    if room.creator.id != current_user.id and current_user.role != 'admin':
+        abort(403)
+
+    if request.method == 'POST':
+        if 'group_icon' in request.files:
+            file = request.files['group_icon']
+            if file.filename != '':
+                icon_path = save_group_icon(file)
+                room.cover_image = icon_path
+                db.session.commit()
+                flash('Group icon updated successfully!', 'success')
+                return redirect(url_for('main.chat_room_info', room_id=room.id))
+
+    return render_template('edit_group_icon.html', room=room)
+
+@main.route('/chat/<int:room_id>/add-members', methods=['GET', 'POST'])
+@login_required
+def add_members(room_id):
+    room = ChatRoom.query.get_or_404(room_id)
+    # Authorization check
+    if room.creator.id != current_user.id and current_user.role != 'admin':
+        abort(403)
+
+    if request.method == 'POST':
+        members_to_add = request.form.getlist('members')
+        for user_id in members_to_add:
+            user = User.query.get(int(user_id))
+            # Check if user is already a member
+            is_member = ChatRoomMember.query.filter_by(user_id=user.id, chat_room_id=room.id).first()
+            if not is_member:
+                new_member = ChatRoomMember(user_id=user.id, chat_room_id=room.id)
+                db.session.add(new_member)
+        db.session.commit()
+        flash('Members added successfully!', 'success')
+        return redirect(url_for('main.chat_room_info', room_id=room.id))
+
+    # Exclude users who are already members
+    existing_member_ids = [member.user_id for member in room.members]
+    users = User.query.filter(User.id.notin_(existing_member_ids)).all()
+    return render_template('add_members.html', room=room, users=users)
+
 @main.route('/chat')
 @login_required
 def chat_list():
@@ -817,7 +863,14 @@ def chat_room_info(room_id):
         ChatMessage.file_path.isnot(None)
     ).order_by(ChatMessage.timestamp.desc()).limit(10).all()
 
-    return render_template('chat_info.html', room=room, media_messages=media_messages)
+    # Get current user's role in the room
+    user_membership = ChatRoomMember.query.filter_by(
+        user_id=current_user.id,
+        chat_room_id=room_id
+    ).first()
+    user_role_in_room = user_membership.role_in_room if user_membership else None
+
+    return render_template('chat_info.html', room=room, media_messages=media_messages, user_role_in_room=user_role_in_room)
 
 @main.route('/chat/upload', methods=['POST'])
 @login_required

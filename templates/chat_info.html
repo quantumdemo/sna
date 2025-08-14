@@ -39,6 +39,7 @@
         padding: 2rem 1rem;
     }
     .info-avatar-large {
+        position: relative;
         width: 150px;
         height: 150px;
         border-radius: 50%;
@@ -51,6 +52,22 @@
         color: white;
         border: 3px solid white;
         margin-bottom: 1rem;
+    }
+    .camera-icon {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 40px;
+        height: 40px;
+        background-color: #007BFF;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        border: 2px solid white;
     }
     .info-avatar-large img {
         width: 100%;
@@ -235,6 +252,11 @@
             {% else %}
                 <span>{{ room.name[0] | upper }}</span>
             {% endif %}
+            {% if user_role_in_room == 'admin' %}
+                <a href="{{ url_for('main.edit_group_icon', room_id=room.id) }}" class="camera-icon">
+                    <i class="fas fa-camera"></i>
+                </a>
+            {% endif %}
         </div>
         <h2>{{ room.name }}</h2>
         <p class="room-description">{{ room.description or 'No description available.' }}</p>
@@ -245,21 +267,31 @@
     </div>
 
     <div class="info-section members-list-section">
-        <h3>Members</h3>
+        <div class="d-flex justify-content-between align-items-center">
+            <h3>Members</h3>
+            {% if user_role_in_room == 'admin' %}
+                <a href="{{ url_for('main.add_members', room_id=room.id) }}" class="btn btn-primary btn-sm">Add Member</a>
+            {% endif %}
+        </div>
         <ul class="members-list">
             {% for member in room.members %}
-            <li>
-                <div class="member-avatar">
-                    {% if member.user.profile_pic %}
-                        <img src="{{ url_for('static', filename='profile_pics/' + member.user.profile_pic) }}" alt="{{ member.user.name }}">
-                    {% else %}
-                        <span>{{ member.user.name[0] | upper }}</span>
-                    {% endif %}
+            <li class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="member-avatar">
+                        {% if member.user.profile_pic %}
+                            <img src="{{ url_for('static', filename='profile_pics/' + member.user.profile_pic) }}" alt="{{ member.user.name }}">
+                        {% else %}
+                            <span>{{ member.user.name[0] | upper }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="member-info">
+                        <span class="member-name">{{ member.user.name }}</span>
+                        <span class="member-role">{{ member.role_in_room | capitalize }}</span>
+                    </div>
                 </div>
-                <div class="member-info">
-                    <span class="member-name">{{ member.user.name }}</span>
-                    <span class="member-role">{{ member.role_in_room | capitalize }}</span>
-                </div>
+                {% if user_role_in_room == 'admin' and member.user_id != current_user.id %}
+                    <button class="btn btn-danger btn-sm remove-member-btn" data-member-id="{{ member.user.id }}">Remove</button>
+                {% endif %}
             </li>
             {% endfor %}
         </ul>

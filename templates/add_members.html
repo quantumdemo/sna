@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Add Members to {{ room.name }}{% endblock %}
+
+{% block styles %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: #1F262D;
+        border-radius: 10px;
+        color: white;
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+    }
+    .user-list {
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid #808080;
+        border-radius: 5px;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    .user-item {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem;
+    }
+    .user-item:hover {
+        background-color: #2A343D;
+    }
+    .user-item input[type="checkbox"] {
+        margin-right: 0.5rem;
+    }
+    .btn-submit {
+        width: 100%;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 5px;
+        background-color: #007BFF;
+        color: white;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 1rem;
+    }
+    .btn-submit:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Add Members to {{ room.name }}</h2>
+    <form action="{{ url_for('main.add_members', room_id=room.id) }}" method="POST">
+        <div class="form-group">
+            <label>Select users to add</label>
+            <input type="text" id="member-search" placeholder="Search for users...">
+            <div class="user-list">
+                {% for user in users %}
+                <div class="user-item">
+                    <input type="checkbox" name="members" value="{{ user.id }}" id="user-{{ user.id }}">
+                    <label for="user-{{ user.id }}">{{ user.name }}</label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <button type="submit" class="btn-submit">Add Selected Members</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('member-search').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let users = document.querySelectorAll('.user-item');
+        users.forEach(user => {
+            let label = user.querySelector('label');
+            if (label.textContent.toLowerCase().includes(filter)) {
+                user.style.display = '';
+            } else {
+                user.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}
