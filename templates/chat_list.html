@@ -130,6 +130,26 @@
         font-weight: bold;
         font-size: 0.8rem;
     }
+    .create-group-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background-color: #007BFF;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        text-decoration: none;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        transition: background-color 0.3s;
+    }
+    .create-group-btn:hover {
+        background-color: #0056b3;
+    }
 </style>
 {% endblock %}
 
@@ -168,6 +188,8 @@
         <p>You don't have access to any chat rooms yet.</p>
         {% endfor %}
     </ul>
+
+    <a href="{{ url_for('main.create_group') }}" class="create-group-btn">+</a>
 </div>
 {% endblock %}
 
