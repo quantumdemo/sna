@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Group Icon{% endblock %}
+
+{% block styles %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: #1F262D;
+        border-radius: 10px;
+        color: white;
+        text-align: center;
+    }
+    .preview-container {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        border: 3px solid #007BFF;
+        margin: 1rem auto;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .preview-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .btn-submit {
+        width: 100%;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 5px;
+        background-color: #007BFF;
+        color: white;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 1rem;
+    }
+    .btn-submit:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Change Group Icon</h2>
+    <form action="{{ url_for('main.edit_group_icon', room_id=room.id) }}" method="POST" enctype="multipart/form-data">
+        <div class="preview-container">
+            <img id="image-preview" src="{{ url_for('static', filename=room.cover_image or 'images/course_placeholder.jpg') }}" alt="Group Icon Preview">
+        </div>
+        <div class="form-group">
+            <label for="group_icon">Select new icon</label>
+            <input type="file" id="group_icon" name="group_icon" accept="image/*" required onchange="previewImage(event)">
+        </div>
+        <button type="submit" class="btn-submit">Save Changes</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function previewImage(event) {
+        var reader = new FileReader();
+        reader.onload = function(){
+            var output = document.getElementById('image-preview');
+            output.src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>
+{% endblock %}
