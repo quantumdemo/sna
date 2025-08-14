@@ -62,6 +62,7 @@ def register_chat_events(socketio):
             content = data.get('content')
             file_path = data.get('file_path')
             file_name = data.get('file_name')
+            replied_to_id = data.get('replied_to_id')
 
             if not room_id or (not content and not file_path):
                 return
@@ -95,7 +96,8 @@ def register_chat_events(socketio):
                 user_id=current_user.id,
                 content=filtered_content,
                 file_path=file_path,
-                file_name=file_name
+                file_name=file_name,
+                replied_to_id=replied_to_id
             )
             db.session.add(new_message)
 
@@ -103,6 +105,13 @@ def register_chat_events(socketio):
             room.last_message_timestamp = new_message.timestamp
 
             db.session.commit()
+
+            replied_to_data = None
+            if new_message.replied_to:
+                replied_to_data = {
+                    'user_name': new_message.replied_to.author.name,
+                    'content': new_message.replied_to.content
+                }
 
             msg_data = {
                 'user_name': current_user.name,
@@ -115,7 +124,8 @@ def register_chat_events(socketio):
                 'room_id': room.id,
                 'message_id': new_message.id,
                 'is_pinned': new_message.is_pinned,
-                'reactions': [] # New messages have no reactions
+                'reactions': [], # New messages have no reactions
+                'replied_to': replied_to_data
             }
 
             emit('message', msg_data, to=room_id)
