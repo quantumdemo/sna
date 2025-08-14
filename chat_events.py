@@ -190,6 +190,38 @@ def register_chat_events(socketio):
 
         emit('status', {'msg': 'Message has been reported to administrators.'})
 
+
+    @socketio.on('remove_member')
+    def remove_member(data):
+        if not current_user.is_authenticated:
+            return
+
+        room_id = data.get('room_id')
+        user_id = data.get('user_id')
+
+        room = ChatRoom.query.get(room_id)
+        if not room:
+            return
+
+        # Authorization check
+        user_membership = ChatRoomMember.query.filter_by(
+            user_id=current_user.id,
+            chat_room_id=room_id
+        ).first()
+        if not user_membership or user_membership.role_in_room != 'admin':
+            return
+
+        member_to_remove = ChatRoomMember.query.filter_by(
+            user_id=user_id,
+            chat_room_id=room_id
+        ).first()
+
+        if member_to_remove:
+            db.session.delete(member_to_remove)
+            db.session.commit()
+            emit('member_removed', {'user_id': user_id, 'room_id': room_id}, to=room_id)
+
+
     @socketio.on('react_to_message')
     def react_to_message(data):
         if not current_user.is_authenticated:
@@ -231,33 +263,3 @@ def register_chat_events(socketio):
             'room_id': message.room_id,
             'reactions': reactions_data
         }, to=message.room_id)
-
-    @socketio.on('remove_member')
-    def remove_member(data):
-        if not current_user.is_authenticated:
-            return
-
-        room_id = data.get('room_id')
-        user_id = data.get('user_id')
-
-        room = ChatRoom.query.get(room_id)
-        if not room:
-            return
-
-        # Authorization check
-        user_membership = ChatRoomMember.query.filter_by(
-            user_id=current_user.id,
-            chat_room_id=room_id
-        ).first()
-        if not user_membership or user_membership.role_in_room != 'admin':
-            return
-
-        member_to_remove = ChatRoomMember.query.filter_by(
-            user_id=user_id,
-            chat_room_id=room_id
-        ).first()
-
-        if member_to_remove:
-            db.session.delete(member_to_remove)
-            db.session.commit()
-            emit('member_removed', {'user_id': user_id, 'room_id': room_id}, to=room_id)

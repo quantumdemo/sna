@@ -120,6 +120,39 @@
         margin-top: 5px;
         display: block;
     }
+    .react-btn {
+        background: none;
+        border: none;
+        color: #B0B0B0;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 0;
+    }
+    .reactions-popover {
+        position: absolute;
+        background-color: #2A343D;
+        border-radius: 20px;
+        padding: 5px;
+        display: none;
+        gap: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .reactions-popover span {
+        cursor: pointer;
+        font-size: 1.5rem;
+        padding: 5px;
+    }
+    .reactions-container {
+        display: flex;
+        gap: 5px;
+        margin-top: 5px;
+    }
+    .reaction {
+        background-color: #2A343D;
+        border-radius: 20px;
+        padding: 2px 8px;
+        font-size: 0.8rem;
+    }
 
     .chat-bottom-bar {
         display: flex;
@@ -221,7 +254,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    socket.on('message_reacted', (data) => {
+        if (data.room_id == currentRoomId) {
+            const reactionsContainer = document.getElementById(`reactions-${data.message_id}`);
+            reactionsContainer.innerHTML = '';
+            const reactions = data.reactions.reduce((acc, r) => {
+                acc[r.reaction] = (acc[r.reaction] || 0) + 1;
+                return acc;
+            }, {});
+            for (const [reaction, count] of Object.entries(reactions)) {
+                const reactionEl = document.createElement('span');
+                reactionEl.classList.add('reaction');
+                reactionEl.textContent = `${reaction} ${count}`;
+                reactionsContainer.appendChild(reactionEl);
+            }
+        }
+    });
+
     // --- UI Event Listeners ---
+    messageWindow.addEventListener('click', function(e) {
+        if (e.target.classList.contains('react-btn')) {
+            const messageId = e.target.dataset.messageId;
+            const popover = document.getElementById(`popover-${messageId}`);
+            popover.style.display = popover.style.display === 'none' ? 'flex' : 'none';
+        }
+        if (e.target.dataset.reaction) {
+            const messageId = e.target.parentElement.id.split('-')[1];
+            const reaction = e.target.dataset.reaction;
+            socket.emit('react_to_message', { message_id: messageId, reaction: reaction });
+            e.target.parentElement.style.display = 'none';
+        }
+    });
+
     messageInput.addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
@@ -377,6 +441,13 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="content">${data.content || ''}</div>
             ${fileHtml}
             <div class="timestamp">${ts}</div>
+            <button class="react-btn" data-message-id="${data.message_id}">React</button>
+            <div class="reactions-popover" id="popover-${data.message_id}">
+                <span data-reaction="👍">👍</span>
+                <span data-reaction="❤️">❤️</span>
+                <span data-reaction="😂">😂</span>
+            </div>
+            <div class="reactions-container" id="reactions-${data.message_id}"></div>
         `;
 
         messageContainer.appendChild(bubble);
