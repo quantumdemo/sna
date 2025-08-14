@@ -237,7 +237,7 @@ def register_chat_events(socketio):
         if member_to_remove:
             db.session.delete(member_to_remove)
             db.session.commit()
-            emit('member_removed', {'user_id': user_id, 'room_id': room_id}, to=room_id)
+            emit('member_removed', {'user_id': user_id, 'room_id': room_id}, to=message.room_id)
 
 
     @socketio.on('react_to_message')
