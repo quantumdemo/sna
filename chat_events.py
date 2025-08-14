@@ -135,7 +135,7 @@ def register_chat_events(socketio):
 
     @socketio.on('delete_message')
     def delete_message(data):
-        if not current_user.is_authenticated or not current_user.role in ['admin', 'instructor']:
+        if not current_user.is_authenticated:
             return
 
         message_id = data.get('message_id')
@@ -144,7 +144,15 @@ def register_chat_events(socketio):
         if not message:
             return
 
-        if current_user.role == 'instructor' and current_user.id != message.room.course_room.instructor_id:
+        is_admin = current_user.role == 'admin'
+        is_instructor_of_course = (
+            current_user.role == 'instructor' and
+            message.room.course_room and
+            current_user.id == message.room.course_room.instructor_id
+        )
+        is_author = message.user_id == current_user.id
+
+        if not (is_admin or is_instructor_of_course or is_author):
             return
 
         db.session.delete(message)
@@ -272,4 +280,26 @@ def register_chat_events(socketio):
             'message_id': message_id,
             'room_id': message.room_id,
             'reactions': reactions_data
+        }, to=message.room_id)
+
+    @socketio.on('edit_message')
+    def edit_message(data):
+        if not current_user.is_authenticated:
+            return
+
+        message_id = data.get('message_id')
+        new_content = data.get('content')
+
+        message = ChatMessage.query.get(message_id)
+        if not message or message.user_id != current_user.id:
+            return
+
+        message.content = new_content
+        message.is_edited = True
+        db.session.commit()
+
+        emit('message_edited', {
+            'message_id': message_id,
+            'room_id': message.room_id,
+            'new_content': new_content
         }, to=message.room_id)
