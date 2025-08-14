@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
 import random
+import secrets
 from models import User, Course, Category, Comment, Lesson, LibraryMaterial, Assignment, AssignmentSubmission, Quiz, FinalExam, QuizSubmission, ExamSubmission, Enrollment, LessonCompletion, Module, Certificate, CertificateRequest, LibraryPurchase, ChatRoom, ChatRoomMember, UserLastRead, ChatMessage, ExamViolation
 from extensions import db
 from utils import save_chat_file
@@ -707,6 +708,9 @@ def create_group():
                 icon_path = save_group_icon(file)
                 new_room.cover_image = icon_path
 
+        if group_type == 'public':
+            new_room.join_token = secrets.token_urlsafe(16)
+
         db.session.add(new_room)
         db.session.commit()
 
@@ -780,6 +784,26 @@ def add_members(room_id):
     existing_member_ids = [member.user_id for member in room.members]
     users = User.query.filter(User.id.notin_(existing_member_ids)).all()
     return render_template('add_members.html', room=room, users=users)
+
+@main.route('/chat/join/<token>')
+@login_required
+def join_chat(token):
+    room = ChatRoom.query.filter_by(join_token=token).first_or_404()
+
+    if room.room_type != 'public':
+        flash('This is a private group.', 'danger')
+        return redirect(url_for('main.chat_list'))
+
+    is_member = ChatRoomMember.query.filter_by(user_id=current_user.id, chat_room_id=room.id).first()
+    if is_member:
+        flash('You are already a member of this group.', 'info')
+    else:
+        new_member = ChatRoomMember(user_id=current_user.id, chat_room_id=room.id)
+        db.session.add(new_member)
+        db.session.commit()
+        flash('You have successfully joined the group!', 'success')
+
+    return redirect(url_for('main.chat_room', room_id=room.id))
 
 @main.route('/chat')
 @login_required

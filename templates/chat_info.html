@@ -324,5 +324,13 @@
             <span class="slider round"></span>
         </label>
     </div>
+
+    {% if room.room_type == 'public' and user_role_in_room == 'admin' and room.join_token %}
+    <div class="info-section">
+        <h3>Shareable Link</h3>
+        <p>Anyone with the link can join this group.</p>
+        <input type="text" value="{{ url_for('main.join_chat', token=room.join_token, _external=True) }}" readonly>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

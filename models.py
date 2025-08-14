@@ -272,6 +272,7 @@ class ChatRoom(db.Model):
     speech_enabled = db.Column(db.Boolean, nullable=False, default=True)
     last_message_timestamp = db.Column(db.DateTime, nullable=True, index=True)
     cover_image = db.Column(db.String(150), nullable=True)
+    join_token = db.Column(db.String(100), unique=True, nullable=True, index=True)
 
     messages = db.relationship('ChatMessage', backref='room', lazy='dynamic', cascade="all, delete-orphan")
     members = db.relationship('ChatRoomMember', backref='room', lazy='dynamic', cascade="all, delete-orphan")
