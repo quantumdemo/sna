@@ -671,6 +671,70 @@ def change_password():
     flash('Your password has been updated.', 'success')
     return redirect(url_for('main.profile'))
 
+def save_group_icon(form_picture):
+    random_hex = os.urandom(8).hex()
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(current_app.root_path, 'static/group_icons', picture_fn)
+    os.makedirs(os.path.dirname(picture_path), exist_ok=True)
+
+    output_size = (256, 256)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return os.path.join('group_icons', picture_fn)
+
+@main.route('/chat/create', methods=['GET', 'POST'])
+@login_required
+def create_group():
+    if request.method == 'POST':
+        group_name = request.form.get('group_name')
+        group_description = request.form.get('group_description')
+        group_type = request.form.get('group_type')
+        members = request.form.getlist('members')
+
+        new_room = ChatRoom(
+            name=group_name,
+            description=group_description,
+            room_type=group_type,
+            created_by_id=current_user.id
+        )
+
+        if 'group_icon' in request.files:
+            file = request.files['group_icon']
+            if file.filename != '':
+                icon_path = save_group_icon(file)
+                new_room.cover_image = icon_path
+
+        db.session.add(new_room)
+        db.session.commit()
+
+        # Add creator as admin
+        creator_member = ChatRoomMember(
+            chat_room_id=new_room.id,
+            user_id=current_user.id,
+            role_in_room='admin'
+        )
+        db.session.add(creator_member)
+
+        # Add selected members
+        for user_id in members:
+            if int(user_id) != current_user.id:
+                member = ChatRoomMember(
+                    chat_room_id=new_room.id,
+                    user_id=int(user_id),
+                    role_in_room='member'
+                )
+                db.session.add(member)
+
+        db.session.commit()
+        flash('Group created successfully!', 'success')
+        return redirect(url_for('main.chat_room', room_id=new_room.id))
+
+    users = User.query.filter(User.id != current_user.id).all()
+    return render_template('create_group.html', users=users)
+
 @main.route('/chat')
 @login_required
 def chat_list():
