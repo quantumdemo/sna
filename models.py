@@ -296,6 +296,9 @@ class ChatMessage(db.Model):
     file_name = db.Column(db.String(255), nullable=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     is_pinned = db.Column(db.Boolean, default=False)
+    replied_to_id = db.Column(db.Integer, db.ForeignKey('chat_message.id'), nullable=True)
+
+    replies = db.relationship('ChatMessage', backref=db.backref('replied_to', remote_side=[id]), lazy='dynamic')
     reactions = db.relationship('MessageReaction', backref='message', lazy='dynamic', cascade="all, delete-orphan")
 
 class MutedUser(db.Model):

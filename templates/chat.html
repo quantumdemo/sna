@@ -153,6 +153,21 @@
         padding: 2px 8px;
         font-size: 0.8rem;
     }
+    .quoted-message {
+        background-color: #1F262D;
+        border-left: 3px solid #007BFF;
+        padding: 8px;
+        margin-bottom: 8px;
+        border-radius: 5px;
+    }
+    .quoted-message .author {
+        font-weight: bold;
+        font-size: 0.8rem;
+    }
+    .quoted-message .content {
+        font-size: 0.9rem;
+        color: #B0B0B0;
+    }
 
     .chat-bottom-bar {
         display: flex;
@@ -207,9 +222,14 @@
         <!-- Messages will be dynamically inserted here -->
     </div>
 
-    <div class="chat-bottom-bar" style="position: relative;">
-        <div id="mentions-autocomplete" class="autocomplete-items" style="display: none; bottom: 100%; left: 0; position: absolute; background-color: #2A343D; border: 1px solid #808080; border-radius: 10px;"></div>
-        <input type="file" id="file-input" style="display: none;" multiple>
+    <div class="chat-bottom-bar" style="position: relative; flex-direction: column; align-items: stretch;">
+        <div id="reply-banner" style="display: none; padding: 5px; background-color: #2A343D; border-radius: 10px; margin-bottom: 5px;">
+            <div id="reply-banner-text"></div>
+            <button id="cancel-reply-btn" style="background: none; border: none; color: white; float: right;">&times;</button>
+        </div>
+        <div style="display: flex; align-items: center;">
+            <div id="mentions-autocomplete" class="autocomplete-items" style="display: none; bottom: 100%; left: 0; position: absolute; background-color: #2A343D; border: 1px solid #808080; border-radius: 10px;"></div>
+            <input type="file" id="file-input" style="display: none;" multiple>
         <button id="media-btn">🖼️</button>
         <button id="doc-btn">📄</button>
         <button id="emoji-btn">😀</button>
@@ -239,7 +259,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const emojiPicker = document.querySelector('emoji-picker');
     const micBtn = document.getElementById('mic-btn');
     const mentionsAutocomplete = document.getElementById('mentions-autocomplete');
+    const replyBanner = document.getElementById('reply-banner');
+    const replyBannerText = document.getElementById('reply-banner-text');
+    const cancelReplyBtn = document.getElementById('cancel-reply-btn');
     let usersInRoom = [];
+    let repliedToMessage = null;
 
     // --- SocketIO Event Handlers ---
     socket.on('connect', () => {
@@ -277,8 +301,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const messageId = e.target.dataset.messageId;
             const popover = document.getElementById(`popover-${messageId}`);
             popover.style.display = popover.style.display === 'none' ? 'flex' : 'none';
-        }
-        if (e.target.dataset.reaction) {
+        } else if (e.target.classList.contains('reply-btn')) {
+            const messageId = e.target.dataset.messageId;
+            const messageContent = e.target.closest('.message-bubble').querySelector('.content').textContent;
+            repliedToMessage = { id: messageId, content: messageContent };
+            replyBannerText.textContent = `Replying to: "${messageContent.substring(0, 50)}..."`;
+            replyBanner.style.display = 'block';
+        } else if (e.target.dataset.reaction) {
             const messageId = e.target.parentElement.id.split('-')[1];
             const reaction = e.target.dataset.reaction;
             socket.emit('react_to_message', { message_id: messageId, reaction: reaction });
@@ -382,11 +411,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- Helper Functions ---
+    cancelReplyBtn.addEventListener('click', () => {
+        repliedToMessage = null;
+        replyBanner.style.display = 'none';
+    });
+
     function sendMessage() {
         const content = messageInput.value.trim();
         if (content) {
-            socket.emit('message', { room_id: currentRoomId, content: content });
+            let messageData = { room_id: currentRoomId, content: content };
+            if (repliedToMessage) {
+                messageData.replied_to_id = repliedToMessage.id;
+            }
+            socket.emit('message', messageData);
             messageInput.value = '';
+            repliedToMessage = null;
+            replyBanner.style.display = 'none';
         }
     }
 
@@ -433,7 +473,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const profilePicUrl = `/static/profile_pics/${data.user_profile_pic || 'default.jpg'}`;
 
+        let repliedToHtml = '';
+        if (data.replied_to) {
+            repliedToHtml = `
+                <div class="quoted-message">
+                    <div class="author">${data.replied_to.user_name}</div>
+                    <div class="content">${data.replied_to.content.substring(0, 100)}...</div>
+                </div>
+            `;
+        }
+
         bubble.innerHTML = `
+            ${repliedToHtml}
             <div class="author">
                 <img src="${profilePicUrl}" alt="${data.user_name}" style="width: 20px; height: 20px; border-radius: 50%; margin-right: 8px; vertical-align: middle;">
                 ${data.user_name}
@@ -447,6 +498,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span data-reaction="❤️">❤️</span>
                 <span data-reaction="😂">😂</span>
             </div>
+            <button class="reply-btn" data-message-id="${data.message_id}">Reply</button>
             <div class="reactions-container" id="reactions-${data.message_id}"></div>
         `;
 
