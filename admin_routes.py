@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, abort, flash, redirect, url_for, request, current_app, jsonify
+from flask import Blueprint, render_template, abort, flash, redirect, url_for, request, current_app, jsonify, send_from_directory
 from flask_login import login_required, current_user
+import os
 
 from models import User, Course, Category, LibraryMaterial, PlatformSetting, Enrollment, CertificateRequest, Certificate, LibraryPurchase, ChatRoom, ChatRoomMember, MutedUser, ReportedMessage, AdminLog
 from extensions import db
@@ -392,6 +393,11 @@ def reject_payment(enrollment_id):
     db.session.commit()
     flash(f'Payment for {enrollment.student.name} has been rejected.', 'success')
     return redirect(url_for('admin.pending_payments'))
+
+@admin_bp.route('/payment-proof/<path:filename>')
+def payment_proof(filename):
+    proofs_dir = os.path.join(current_app.root_path, 'static', 'payment_proofs')
+    return send_from_directory(proofs_dir, filename)
 
 @admin_bp.route('/library/<int:material_id>/delete', methods=['POST'])
 def delete_library_material(material_id):
