@@ -422,7 +422,8 @@ def approve_certificate_request(request_id):
         user_id=req.user_id,
         course_id=req.course_id,
         certificate_uid=str(uuid.uuid4()),
-        issued_at=datetime.utcnow()
+        issued_at=datetime.utcnow(),
+        file_path='' # Initialize with empty string to satisfy NOT NULL constraint
     )
 
     # Generate the PDF and update the certificate's file_path
