@@ -27,7 +27,7 @@
                         <td>{{ purchase.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
                         <td>
                             {% if purchase.proof_of_payment_path %}
-                                <a href="{{ url_for('static', filename=purchase.proof_of_payment_path) }}" target="_blank">View Proof</a>
+                                <a href="{{ url_for('admin.payment_proof', filename=purchase.proof_of_payment_path) }}" target="_blank">View Proof</a>
                             {% else %}
                                 N/A
                             {% endif %}
