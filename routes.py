@@ -220,6 +220,11 @@ def submit_assignment(assignment_id):
 @login_required
 def take_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
+
+    # Ensure the quiz is properly associated with a module and course
+    if not quiz.module or not quiz.module.course:
+        abort(404)
+
     if not current_user.is_enrolled(quiz.module.course):
         abort(403)
 
