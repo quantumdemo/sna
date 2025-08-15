@@ -446,6 +446,85 @@ header .search-icon {
     font-weight: 500;
 }
 
+/* --- Departments & Campus Life --- */
+.departments-life {
+    background-color: var(--off-white);
+}
+
+.departments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.department-card {
+    background: var(--white);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    border-radius: 12px;
+    border: 2px solid var(--cool-grey);
+    transition: all 0.3s ease;
+}
+
+.department-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+    border-color: var(--gold);
+}
+
+.department-card i {
+    font-size: 3rem;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+}
+
+.department-card h3 {
+    font-size: 1.4rem;
+    color: var(--deep-navy);
+}
+
+.campus-life-carousel-section {
+    padding: 0;
+    max-width: 100vw;
+}
+
+.campus-life-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    width: 100%;
+}
+
+.carousel-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    position: relative;
+    scroll-snap-align: center;
+}
+
+.carousel-slide img {
+    width: 100%;
+    height: 60vh;
+    object-fit: cover;
+    display: block;
+}
+
+.carousel-slide .caption {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(13, 27, 76, 0.7);
+    color: var(--white);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    text-align: center;
+}
+
+
 /* --- Testimonials --- */
 .testimonials {
     background-color: var(--off-white);
@@ -493,6 +572,120 @@ header .search-icon {
     margin: 2rem auto 0;
     width: fit-content;
 }
+
+.success-spotlights {
+    margin-top: 4rem;
+    display: grid;
+    gap: 3rem;
+}
+
+.spotlight {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    align-items: center;
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+}
+
+.spotlight:nth-child(even) {
+    grid-template-columns: 2fr 1fr;
+}
+
+.spotlight:nth-child(even) .spotlight-image {
+    order: 2;
+}
+
+.spotlight-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.spotlight-content {
+    padding: 2rem;
+}
+
+.spotlight-content h3 {
+    font-size: 1.8rem;
+    color: var(--deep-navy);
+}
+
+
+/* --- Campus Life & Student Stories --- */
+.campus-life {
+    background-color: var(--white);
+}
+
+.student-stories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+    margin-bottom: 4rem;
+}
+
+.story-card {
+    text-align: center;
+}
+
+.story-card img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1.5rem;
+}
+
+.story-card blockquote {
+    font-style: italic;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    border-left: 3px solid var(--gold);
+    padding-left: 1rem;
+    text-align: left;
+}
+
+.story-card cite {
+    font-weight: 500;
+    color: var(--deep-navy);
+}
+
+.life-highlights {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+}
+
+.highlight-card {
+    background-color: var(--off-white);
+    padding: 2rem;
+    text-align: center;
+    border-radius: 12px;
+    border: 2px solid var(--cool-grey);
+    transition: all 0.3s ease;
+}
+
+.highlight-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--soft-purple);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.06);
+}
+
+.highlight-card i {
+    font-size: 2.5rem;
+    color: var(--soft-purple);
+    margin-bottom: 1rem;
+}
+
+.highlight-card h3 {
+    font-size: 1.2rem;
+    color: var(--deep-navy);
+}
+
 
 /* --- Footer --- */
 footer {
