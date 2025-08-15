@@ -277,6 +277,7 @@ class ChatRoom(db.Model):
     messages = db.relationship('ChatMessage', backref='room', lazy='dynamic', cascade="all, delete-orphan")
     members = db.relationship('ChatRoomMember', backref='room', lazy='dynamic', cascade="all, delete-orphan")
     creator = db.relationship('User', backref='created_chat_rooms')
+    polls = db.relationship('Poll', back_populates='room', lazy='dynamic', cascade="all, delete-orphan")
 
 class ChatRoomMember(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -301,6 +302,7 @@ class ChatMessage(db.Model):
 
     replies = db.relationship('ChatMessage', backref=db.backref('replied_to', remote_side=[id]), lazy='dynamic')
     reactions = db.relationship('MessageReaction', backref='message', lazy='dynamic', cascade="all, delete-orphan")
+    poll = db.relationship('Poll', back_populates='message', uselist=False, cascade="all, delete-orphan")
 
 class MutedUser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -346,3 +348,32 @@ class AdminLog(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     admin = db.relationship('User', backref='admin_logs')
+
+class Poll(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    room_id = db.Column(db.Integer, db.ForeignKey('chat_room.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    question = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    room = db.relationship('ChatRoom', back_populates='polls')
+    user = db.relationship('User')
+    options = db.relationship('PollOption', back_populates='poll', cascade="all, delete-orphan")
+    message_id = db.Column(db.Integer, db.ForeignKey('chat_message.id'))
+    message = db.relationship('ChatMessage', back_populates='poll')
+
+class PollOption(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    poll_id = db.Column(db.Integer, db.ForeignKey('poll.id'), nullable=False)
+    text = db.Column(db.String(100), nullable=False)
+
+    poll = db.relationship('Poll', back_populates='options')
+    votes = db.relationship('PollVote', back_populates='option', cascade="all, delete-orphan")
+
+class PollVote(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    option_id = db.Column(db.Integer, db.ForeignKey('poll_option.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    option = db.relationship('PollOption', back_populates='votes')
+    user = db.relationship('User')

@@ -2,7 +2,7 @@ from flask_socketio import emit, join_room, leave_room
 from flask_login import current_user
 from extensions import db
 from datetime import datetime
-from models import ChatRoom, ChatRoomMember, ChatMessage, User, Course, MutedUser, ReportedMessage, MessageReaction, UserLastRead
+from models import ChatRoom, ChatRoomMember, ChatMessage, User, Course, MutedUser, ReportedMessage, MessageReaction, UserLastRead, Poll, PollOption, PollVote
 from utils import filter_profanity
 
 def register_chat_events(socketio):
@@ -303,3 +303,102 @@ def register_chat_events(socketio):
             'room_id': message.room_id,
             'new_content': new_content
         }, to=message.room_id)
+
+    @socketio.on('create_poll')
+    def create_poll(data):
+        if not current_user.is_authenticated:
+            return
+
+        room_id = data.get('room_id')
+        question = data.get('question')
+        options = data.get('options')
+
+        room = ChatRoom.query.get(room_id)
+        if not room or not is_user_authorized_for_room(current_user, room) or not question or not options or len(options) < 2:
+            return
+
+        # Create a chat message to represent the poll
+        poll_message = ChatMessage(
+            room_id=room.id,
+            user_id=current_user.id,
+            content=f"Poll: {question}" # Simple text representation
+        )
+        db.session.add(poll_message)
+        db.session.commit() # Commit to get message ID
+
+        new_poll = Poll(
+            room_id=room.id,
+            user_id=current_user.id,
+            question=question,
+            message_id=poll_message.id
+        )
+        db.session.add(new_poll)
+
+        for option_text in options:
+            poll_option = PollOption(poll=new_poll, text=option_text)
+            db.session.add(poll_option)
+
+        db.session.commit()
+
+        # Now that poll and options have IDs, construct the data to emit
+        poll_data_to_emit = {
+            'poll_id': new_poll.id,
+            'message_id': poll_message.id,
+            'room_id': room.id,
+            'user_id': current_user.id,
+            'user_name': current_user.name,
+            'user_profile_pic': current_user.profile_pic or 'default.jpg',
+            'question': new_poll.question,
+            'options': [{'id': opt.id, 'text': opt.text, 'votes': 0} for opt in new_poll.options],
+            'timestamp': poll_message.timestamp.isoformat() + "Z",
+        }
+
+        emit('new_poll', poll_data_to_emit, to=room_id)
+
+    @socketio.on('poll_vote')
+    def poll_vote(data):
+        if not current_user.is_authenticated:
+            return
+
+        option_id = data.get('option_id')
+        option = PollOption.query.get(option_id)
+        if not option:
+            return
+
+        poll = option.poll
+        room = poll.room
+
+        if not is_user_authorized_for_room(current_user, room):
+            return
+
+        # Check if user has already voted
+        existing_vote = PollVote.query.join(PollOption).filter(
+            PollOption.poll_id == poll.id,
+            PollVote.user_id == current_user.id
+        ).first()
+
+        if existing_vote:
+            # If they voted for the same option, do nothing (or retract vote - simple for now)
+            if existing_vote.option_id == option_id:
+                return
+            # If they voted for a different option, update their vote
+            else:
+                existing_vote.option_id = option_id
+        else:
+            # New vote
+            new_vote = PollVote(option_id=option_id, user_id=current_user.id)
+            db.session.add(new_vote)
+
+        db.session.commit()
+
+        # Recalculate vote counts
+        options_with_votes = []
+        for opt in poll.options:
+            vote_count = PollVote.query.filter_by(option_id=opt.id).count()
+            options_with_votes.append({'id': opt.id, 'text': opt.text, 'votes': vote_count})
+
+        emit('poll_update', {
+            'poll_id': poll.id,
+            'room_id': room.id,
+            'options': options_with_votes
+        }, to=room.id)

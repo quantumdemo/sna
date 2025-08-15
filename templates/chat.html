@@ -4,7 +4,7 @@
 
 {% block styles %}
 <style>
-    footer {
+    header, footer {
         display: none;
     }
     body, html {
@@ -171,9 +171,10 @@
 
     .chat-bottom-bar {
         display: flex;
-        align-items: center;
+        flex-direction: column;
+        align-items: stretch;
         padding: 0.5rem 1rem;
-        background-color: #1F262D;
+        background-color: #14191D;
         position: fixed;
         bottom: 0;
         left: 0;
@@ -198,10 +199,144 @@
         color: white;
         margin: 0 0.5rem;
     }
+
+    /* Poll Modal Styles */
+    .poll-modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 2000;
+        display: none; /* Hidden by default */
+        justify-content: center;
+        align-items: center;
+    }
+    .poll-modal-content {
+        background-color: #1F262D;
+        padding: 2rem;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .poll-modal-content h3 {
+        margin-top: 0;
+        color: #FFFFFF;
+    }
+    .poll-modal-content input {
+        width: 100%;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+        border-radius: 10px;
+        border: 1px solid #808080;
+        background-color: #2A343D;
+        color: white;
+        box-sizing: border-box;
+    }
+    .poll-options-container .poll-option {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    .poll-options-container input {
+        margin-bottom: 0;
+        flex-grow: 1;
+    }
+    .poll-modal-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    .poll-modal-buttons button {
+        padding: 0.5rem 1.5rem;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    #create-poll-submit-btn {
+        background-color: #007BFF;
+        color: white;
+    }
+    #cancel-poll-btn, .remove-option-btn {
+        background-color: #808080;
+        color: white;
+    }
+    .remove-option-btn {
+        margin-left: 0.5rem;
+        padding: 0.5rem;
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    /* Poll Display Styles */
+    .poll-container {
+        padding: 15px;
+        border: 1px solid #808080;
+        border-radius: 15px;
+        background-color: #2A343D;
+    }
+    .poll-question {
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+    }
+    .poll-option-bar {
+        background-color: #1F262D;
+        border: 1px solid #808080;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    .poll-option-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: #007BFF;
+        opacity: 0.3;
+        z-index: 1;
+        transition: width 0.3s ease-in-out;
+    }
+    .poll-option-text {
+        position: relative;
+        z-index: 2;
+    }
+    .poll-option-votes {
+        position: relative;
+        z-index: 2;
+        float: right;
+        font-weight: bold;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
+<div id="poll-modal-backdrop" class="poll-modal-backdrop">
+    <div class="poll-modal-content">
+        <h3>Create a Poll</h3>
+        <input type="text" id="poll-question" placeholder="Enter your poll question">
+        <div id="poll-options-container" class="poll-options-container">
+            <div class="poll-option">
+                <input type="text" class="poll-option-input" placeholder="Option 1">
+            </div>
+            <div class="poll-option">
+                <input type="text" class="poll-option-input" placeholder="Option 2">
+            </div>
+        </div>
+        <button id="add-poll-option-btn" style="background: none; border: 1px dashed #808080; color: #B0B0B0; width: 100%; padding: 0.5rem; margin-top: 0.5rem; border-radius: 10px;">+ Add Option</button>
+        <div class="poll-modal-buttons">
+            <button id="cancel-poll-btn">Cancel</button>
+            <button id="create-poll-submit-btn">Create Poll</button>
+        </div>
+    </div>
+</div>
 <div class="chat-page-container">
     <div class="chat-top-bar">
         <a href="{{ url_for('main.chat_list') }}">&larr;</a>
@@ -222,20 +357,24 @@
         <!-- Messages will be dynamically inserted here -->
     </div>
 
-    <div class="chat-bottom-bar" style="position: relative; flex-direction: column; align-items: stretch;">
+    <div class="chat-bottom-bar">
         <div id="reply-banner" style="display: none; padding: 5px; background-color: #2A343D; border-radius: 10px; margin-bottom: 5px;">
             <div id="reply-banner-text"></div>
             <button id="cancel-reply-btn" style="background: none; border: none; color: white; float: right;">&times;</button>
         </div>
-        <div style="display: flex; align-items: center;">
+        <div class="chat-input-container" style="display: flex; align-items: center; width: 100%;">
             <div id="mentions-autocomplete" class="autocomplete-items" style="display: none; bottom: 100%; left: 0; position: absolute; background-color: #2A343D; border: 1px solid #808080; border-radius: 10px;"></div>
             <input type="file" id="file-input" style="display: none;" multiple>
-        <button id="media-btn">🖼️</button>
-        <button id="doc-btn">📄</button>
-        <button id="emoji-btn">😀</button>
-        <textarea id="message-input" placeholder="Type your message..." rows="1" style="resize: none; overflow-y: hidden;"></textarea>
-        <button id="mic-btn">🎤</button>
-    </div>
+            <button id="media-btn">🖼️</button>
+            <button id="doc-btn">📄</button>
+            <button id="poll-btn">📊</button>
+            <button id="emoji-btn">😀</button>
+            <textarea id="message-input" placeholder="Type your message..." rows="1" style="resize: none; overflow-y: hidden;"></textarea>
+            <button id="mic-btn">🎤</button>
+            <button id="send-btn" style="padding: 0.5rem 1rem; margin-left: 5px; background-color: #007BFF; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-paper-plane" style="color: white; font-size: 1.2rem;"></i>
+            </button>
+        </div>
     <emoji-picker style="display: none; position: absolute; bottom: 60px; right: 20px; z-index: 1002;"></emoji-picker>
 </div>
 {% endblock %}
@@ -258,12 +397,76 @@ document.addEventListener('DOMContentLoaded', function() {
     const emojiBtn = document.getElementById('emoji-btn');
     const emojiPicker = document.querySelector('emoji-picker');
     const micBtn = document.getElementById('mic-btn');
+    const sendBtn = document.getElementById('send-btn');
     const mentionsAutocomplete = document.getElementById('mentions-autocomplete');
     const replyBanner = document.getElementById('reply-banner');
     const replyBannerText = document.getElementById('reply-banner-text');
     const cancelReplyBtn = document.getElementById('cancel-reply-btn');
+    const pollBtn = document.getElementById('poll-btn');
+    const pollModalBackdrop = document.getElementById('poll-modal-backdrop');
+    const cancelPollBtn = document.getElementById('cancel-poll-btn');
+    const addPollOptionBtn = document.getElementById('add-poll-option-btn');
+    const pollOptionsContainer = document.getElementById('poll-options-container');
+    const createPollSubmitBtn = document.getElementById('create-poll-submit-btn');
+    const pollQuestionInput = document.getElementById('poll-question');
+
     let usersInRoom = [];
     let repliedToMessage = null;
+
+    // --- Poll UI Handlers ---
+    pollBtn.addEventListener('click', () => {
+        pollModalBackdrop.style.display = 'flex';
+    });
+
+    cancelPollBtn.addEventListener('click', () => {
+        pollModalBackdrop.style.display = 'none';
+    });
+
+    addPollOptionBtn.addEventListener('click', () => {
+        const optionCount = pollOptionsContainer.children.length;
+        const newOption = document.createElement('div');
+        newOption.classList.add('poll-option');
+        newOption.innerHTML = `
+            <input type="text" class="poll-option-input" placeholder="Option ${optionCount + 1}">
+            <button class="remove-option-btn">&times;</button>
+        `;
+        pollOptionsContainer.appendChild(newOption);
+        newOption.querySelector('.remove-option-btn').addEventListener('click', (e) => {
+            e.target.parentElement.remove();
+        });
+    });
+
+    pollOptionsContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-option-btn')) {
+            e.target.parentElement.remove();
+        }
+    });
+
+    createPollSubmitBtn.addEventListener('click', () => {
+        const question = pollQuestionInput.value.trim();
+        const options = [...pollOptionsContainer.querySelectorAll('.poll-option-input')]
+            .map(input => input.value.trim())
+            .filter(option => option !== '');
+
+        if (!question || options.length < 2) {
+            alert('Please enter a question and at least two options for the poll.');
+            return;
+        }
+
+        socket.emit('create_poll', {
+            room_id: currentRoomId,
+            question: question,
+            options: options
+        });
+
+        // Reset and hide modal
+        pollQuestionInput.value = '';
+        pollOptionsContainer.innerHTML = `
+            <div class="poll-option"><input type="text" class="poll-option-input" placeholder="Option 1"></div>
+            <div class="poll-option"><input type="text" class="poll-option-input" placeholder="Option 2"></div>
+        `;
+        pollModalBackdrop.style.display = 'none';
+    });
 
     // --- SocketIO Event Handlers ---
     socket.on('connect', () => {
@@ -310,13 +513,30 @@ document.addEventListener('DOMContentLoaded', function() {
     socket.on('message_deleted', (data) => {
         if (data.room_id == currentRoomId) {
             const messageContainer = document.getElementById(`message-${data.message_id}`);
-            messageContainer.innerHTML = '<div class="message-bubble"><i>Message deleted</i></div>';
+            if (messageContainer) {
+                messageContainer.innerHTML = '<div class="message-bubble"><i>Message deleted</i></div>';
+            }
+        }
+    });
+
+    socket.on('new_poll', (data) => {
+        if (data.room_id == currentRoomId) {
+            addPoll(data);
+        }
+    });
+
+    socket.on('poll_update', (data) => {
+        if (data.room_id == currentRoomId) {
+            updatePoll(data);
         }
     });
 
     // --- UI Event Listeners ---
     messageWindow.addEventListener('click', function(e) {
-        if (e.target.classList.contains('react-btn')) {
+        if (e.target.classList.contains('poll-option-button')) {
+            const optionId = e.target.dataset.optionId;
+            socket.emit('poll_vote', { option_id: optionId });
+        } else if (e.target.classList.contains('react-btn')) {
             const messageId = e.target.dataset.messageId;
             const popover = document.getElementById(`popover-${messageId}`);
             popover.style.display = popover.style.display === 'none' ? 'flex' : 'none';
@@ -376,6 +596,11 @@ document.addEventListener('DOMContentLoaded', function() {
             sendMessage();
             this.style.height = 'auto';
         }
+    });
+
+    sendBtn.addEventListener('click', () => {
+        sendMessage();
+        messageInput.style.height = 'auto';
     });
 
     mediaBtn.addEventListener('click', () => {
@@ -446,6 +671,64 @@ document.addEventListener('DOMContentLoaded', function() {
         repliedToMessage = null;
         replyBanner.style.display = 'none';
     });
+
+    function addPoll(data) {
+        const messageContainer = document.createElement('div');
+        messageContainer.id = `message-${data.message_id}`;
+        messageContainer.classList.add('message-container');
+        messageContainer.classList.add(data.user_id === currentUserId ? 'sender' : 'receiver');
+
+        const bubble = document.createElement('div');
+        bubble.classList.add('message-bubble');
+
+        const profilePicUrl = `/static/profile_pics/${data.user_profile_pic || 'default.jpg'}`;
+        const ts = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        let optionsHtml = '';
+        for (const option of data.options) {
+            optionsHtml += `
+                <div class="poll-option-bar poll-option-button" data-option-id="${option.id}">
+                    <div class="poll-option-fill" style="width: 0%;"></div>
+                    <span class="poll-option-text">${option.text}</span>
+                    <span class="poll-option-votes">0 votes</span>
+                </div>
+            `;
+        }
+
+        bubble.innerHTML = `
+            <div class="author">
+                <img src="${profilePicUrl}" alt="${data.user_name}" style="width: 20px; height: 20px; border-radius: 50%; margin-right: 8px; vertical-align: middle;">
+                ${data.user_name}
+            </div>
+            <div class="poll-container" id="poll-${data.poll_id}">
+                <div class="poll-question">${data.question}</div>
+                <div class="poll-options">
+                    ${optionsHtml}
+                </div>
+            </div>
+            <div class="timestamp">${ts}</div>
+        `;
+
+        messageContainer.appendChild(bubble);
+        messageWindow.appendChild(messageContainer);
+        messageWindow.scrollTop = messageWindow.scrollHeight;
+    }
+
+    function updatePoll(data) {
+        const pollContainer = document.getElementById(`poll-${data.poll_id}`);
+        if (!pollContainer) return;
+
+        const totalVotes = data.options.reduce((sum, opt) => sum + opt.votes, 0);
+
+        for (const option of data.options) {
+            const optionBar = pollContainer.querySelector(`[data-option-id="${option.id}"]`);
+            if (optionBar) {
+                const percentage = totalVotes > 0 ? (option.votes / totalVotes) * 100 : 0;
+                optionBar.querySelector('.poll-option-fill').style.width = `${percentage}%`;
+                optionBar.querySelector('.poll-option-votes').textContent = `${option.votes} votes`;
+            }
+        }
+    }
 
     function sendMessage() {
         const content = messageInput.value.trim();
