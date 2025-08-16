@@ -852,16 +852,13 @@ body:has(.custom-footer) > footer {
 
 
 /* Responsive adjustments */
-@media (max-width: 992px) {
+@media (max-width: 1024px) {
     .hero-content h1 {
         font-size: 3rem;
     }
     .about-section .container {
         flex-direction: column;
     }
-}
-
-@media (max-width: 768px) {
     .nav-container {
         flex-wrap: wrap;
     }
