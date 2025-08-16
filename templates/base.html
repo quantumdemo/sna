@@ -10,32 +10,32 @@
 </head>
 <body>
     <header>
-        <nav>
-            <a href="{{ url_for('main.home') }}">Home</a>
-            <a href="{{ url_for('main.courses') }}">Courses</a>
-
-            {% if current_user.is_authenticated %}
-                {% if current_user.role == 'admin' %}
-                    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
-                    <a href="{{ url_for('main.chat_list') }}">Chat</a>
-                {% elif current_user.role == 'instructor' %}
-                    {% if current_user.approved %}
+        <div class="nav-container">
+            <a href="{{ url_for('main.home') }}" class="logo">
+                <!-- In a real app, this would be an <img> tag -->
+                <span class="logo-text-blue">Scholars</span><span class="logo-text-gold">Novara</span>
+            </a>
+            <nav>
+                <a href="{{ url_for('main.home') }}">Home</a>
+                <a href="{{ url_for('main.courses') }}">Courses</a>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'admin' %}
+                        <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+                    {% elif current_user.role == 'instructor' %}
                         <a href="{{ url_for('instructor.dashboard') }}">Dashboard</a>
-                        <a href="{{ url_for('main.chat_list') }}">Chat</a>
-                    {% else %}
-                        <a href="{{ url_for('main.pending_approval') }}">Status</a>
+                    {% elif current_user.role == 'student' %}
+                        <a href="{{ url_for('main.student_dashboard') }}">Dashboard</a>
                     {% endif %}
-                {% elif current_user.role == 'student' %}
-                    <a href="{{ url_for('main.student_dashboard') }}">Dashboard</a>
-                    <a href="{{ url_for('main.chat_list') }}">Chat</a>
+                    <a href="{{ url_for('main.logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('main.login') }}">Login</a>
+                    <a href="{{ url_for('main.register') }}">Register</a>
                 {% endif %}
-                <a href="{{ url_for('main.profile') }}">Profile</a>
-                <a href="{{ url_for('main.logout') }}">Logout</a>
-            {% else %}
-                <a href="{{ url_for('main.login') }}">Login</a>
-                <a href="{{ url_for('main.register') }}">Register</a>
-            {% endif %}
-        </nav>
+            </nav>
+            <div class="search-icon">
+                <i class="fas fa-search"></i>
+            </div>
+        </div>
     </header>
 
     <main>
