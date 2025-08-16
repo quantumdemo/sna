@@ -95,6 +95,8 @@ header {
     display: flex;
     gap: 25px;
     align-items: center;
+    max-height: none;
+    overflow: visible;
 }
 
 .nav-links a {
@@ -866,16 +868,20 @@ body:has(.custom-footer) > footer {
         display: block; /* Show hamburger on mobile */
     }
     .nav-links {
-        display: none; /* Hide nav links by default */
         flex-direction: column;
         width: 100%;
         text-align: center;
         background-color: rgba(255, 255, 255, 0.98);
-        padding: 20px 0;
         border-top: 1px solid #EDEFF2;
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+        padding: 0; /* No padding when closed */
     }
     .nav-links.active {
-        display: flex; /* Show nav links when active */
+        display: flex;
+        max-height: 500px; /* Animate to a height large enough for content */
+        padding: 20px 0; /* Add padding back when open */
     }
     .nav-links a {
         padding: 15px 0;
