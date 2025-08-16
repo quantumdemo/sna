@@ -2,93 +2,102 @@
 
 {% block title %}{{ user.name }}'s Profile{% endblock %}
 
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card">
-                <img src="{{ url_for('static', filename='profile_pics/' + (user.profile_pic or 'default.jpg')) }}" class="card-img-top" alt="Profile Picture">
-                <div class="card-body text-center">
-                    <h5 class="card-title">{{ user.name }}</h5>
-                    <p class="card-text text-muted">{{ user.role | capitalize }}</p>
+<div class="profile-container">
+    <div class="profile-layout">
+        <!-- Left Column -->
+        <aside class="profile-left-column">
+            <div class="glass-card profile-header">
+                <div class="profile-pic">
+                    <img src="{{ url_for('static', filename='profile_pics/' + (user.profile_pic if user.profile_pic else 'default.jpg')) }}" alt="Profile Picture">
                 </div>
+                <h1 class="student-name">{{ user.name }}</h1>
+                <p class="student-role">{{ user.role | capitalize }}</p>
             </div>
-        </div>
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">About Me</h5>
-                    <p class="card-text">{{ user.bio or 'No bio provided.' }}</p>
-                    <hr>
-                    <h5 class="card-title">Contact Information</h5>
-                    <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
-                </div>
+            <div class="glass-card profile-section">
+                <h3>About Me</h3>
+                <p class="profile-bio {{ 'placeholder' if not user.bio }}">{{ user.bio or 'No bio provided. You can add one by editing your profile.' }}</p>
+            </div>
+        </aside>
+
+        <!-- Right Column -->
+        <main class="profile-right-column">
+            <div class="glass-card profile-section">
+                <h3>Contact Information</h3>
+                <ul class="contact-info">
+                    <li><i class="fas fa-envelope"></i> {{ user.email }}</li>
+                    {# Add other contact info here if available in the model #}
+                </ul>
             </div>
 
-            {% if user.id == current_user.id %}
-            <div class="card mt-4">
-                <div class="card-body">
-                    <h3>My Certificates</h3>
-                    <div class="certificates-list">
-                        {% if certificates %}
-                            <ul>
-                                {% for cert in certificates %}
-                                <li>
-                                    <strong>{{ cert.course.title }}</strong> - Issued on {{ cert.issued_at.strftime('%Y-%m-%d') }}
-                                    <a href="{{ url_for('static', filename=cert.file_path) }}" class="btn-small" target="_blank">Download PDF</a>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
+            <div class="glass-card profile-section">
+                <h3>My Certificates</h3>
+                <div class="certificates-grid">
+                    {% if certificates %}
+                        {% for cert in certificates %}
+                        <div class="glass-card certificate-card">
+                            <p class="course-name">{{ cert.course.title }}</p>
+                            <p class="completion-date">Issued: {{ cert.issued_at.strftime('%b %d, %Y') }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="certificates-placeholder">
+                            <i class="fas fa-medal"></i>
                             <p>You have not earned any certificates yet.</p>
-                        {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="glass-card profile-section profile-form">
+                <h3>Edit Profile</h3>
+                <form action="{{ url_for('main.edit_profile') }}" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" value="{{ user.name }}">
                     </div>
-                </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" value="{{ user.email }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="bio">Bio</label>
+                        <textarea name="bio" id="bio" rows="5">{{ user.bio or '' }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="profile_pic">Update Profile Picture</label>
+                        <input type="file" name="profile_pic" id="profile_pic">
+                    </div>
+                    <button type="submit" class="btn-submit">Update Profile</button>
+                </form>
             </div>
 
-            <div class="card mt-4">
-                <div class="card-body">
-                    <h2>Edit Profile</h2>
-                    <form action="{{ url_for('main.edit_profile') }}" method="post" enctype="multipart/form-data">
-                        <div>
-                            <label for="name">Name:</label>
-                            <input type="text" id="name" name="name" value="{{ user.name }}">
-                        </div>
-                        <div>
-                            <label for="email">Email:</label>
-                            <input type="email" id="email" name="email" value="{{ user.email }}">
-                        </div>
-                        <div>
-                            <label for="bio">Bio:</label>
-                            <textarea name="bio" id="bio" rows="4">{{ user.bio or '' }}</textarea>
-                        </div>
-                        <div>
-                            <label for="profile_pic">Update Profile Picture:</label>
-                            <input type="file" name="profile_pic" id="profile_pic">
-                        </div>
-                        <button type="submit" class="btn">Update Profile</button>
-                    </form>
-                </div>
+            <div class="glass-card profile-section profile-form">
+                <h3>Change Password</h3>
+                <form action="{{ url_for('main.change_password') }}" method="post">
+                    <div class="form-group">
+                        <label for="old_password">Old Password</label>
+                        <input type="password" name="old_password" id="old_password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new_password">New Password</label>
+                        <input type="password" name="new_password" id="new_password" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Change Password</button>
+                </form>
             </div>
-
-            <div class="card mt-4">
-                <div class="card-body">
-                    <h2>Change Password</h2>
-                    <form action="{{ url_for('main.change_password') }}" method="post">
-                        <div>
-                            <label for="old_password">Old Password:</label>
-                            <input type="password" name="old_password" id="old_password" required>
-                        </div>
-                        <div>
-                            <label for="new_password">New Password:</label>
-                            <input type="password" name="new_password" id="new_password" required>
-                        </div>
-                        <button type="submit" class="btn">Change Password</button>
-                    </form>
-                </div>
-            </div>
-            {% endif %}
-        </div>
+        </main>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        document.body.classList.add('profile-body');
+    </script>
 {% endblock %}
