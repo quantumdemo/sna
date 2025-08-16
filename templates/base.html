@@ -11,28 +11,26 @@
 <body>
     <header>
         <div class="nav-container">
-            <a href="{{ url_for('main.home') }}" class="logo">
-                <!-- In a real app, this would be an <img> tag -->
+            <div class="logo">
                 <span class="logo-text-blue">Scholars</span><span class="logo-text-gold">Novara</span>
-            </a>
+            </div>
             <div class="hamburger">
                 <i class="fas fa-bars"></i>
             </div>
             <nav class="nav-links">
                 {% if current_user.is_authenticated %}
                     {# Logged-in Users #}
+                    <a href="{{ url_for('main.profile') }}">Profile</a>
                     {% if current_user.role == 'admin' %}
-                        <a href="{{ url_for('main.profile') }}">Profile</a>
                         <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
                         <a href="{{ url_for('main.chat_list') }}">Chat</a>
                     {% elif current_user.role == 'instructor' %}
-                        <a href="{{ url_for('main.profile') }}">Profile</a>
                         <a href="{{ url_for('instructor.dashboard') }}">Dashboard</a>
                         <a href="{{ url_for('main.courses') }}">Courses (manage)</a>
                         <a href="{{ url_for('main.chat_list') }}">Chat</a>
                         <a href="{{ url_for('main.library') }}">Library (upload)</a>
                     {% elif current_user.role == 'student' %}
-                        <a href="{{ url_for('main.student_dashboard') }}">Profile Dashboard</a>
+                        <a href="{{ url_for('main.student_dashboard') }}">Dashboard</a>
                         <a href="{{ url_for('main.courses') }}">Courses</a>
                         <a href="{{ url_for('main.chat_list') }}">Chat</a>
                         <a href="{{ url_for('main.library') }}">Library</a>
@@ -46,9 +44,6 @@
                     <a href="{{ url_for('main.register') }}" class="register-link">Register</a>
                 {% endif %}
             </nav>
-            <div class="search-icon">
-                <i class="fas fa-search"></i>
-            </div>
         </div>
     </header>
 
@@ -67,19 +62,6 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer>
-        <div class="footer-links">
-            <a href="#">About Us</a>
-            <a href="#">Contact</a>
-            <a href="{{ url_for('main.faq') }}">FAQ</a>
-        </div>
-        <div class="social-media">
-            <a href="#">Facebook</a>
-            <a href="#">Twitter</a>
-            <a href="#">LinkedIn</a>
-        </div>
-        <p>&copy; 2024 E-Learning Platform. All rights reserved.</p>
-    </footer>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
