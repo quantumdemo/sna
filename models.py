@@ -25,7 +25,7 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(50), nullable=False, default='student')
     approved = db.Column(db.Boolean, default=False)
     is_banned = db.Column(db.Boolean, default=False)
-    profile_pic = db.Column(db.String(150), nullable=True)
+    profile_pic = db.Column(db.String(150), nullable=False, default='default.jpg')
     bio = db.Column(db.Text, nullable=True)
 
     courses_taught = db.relationship('Course', backref='instructor', lazy='dynamic')
