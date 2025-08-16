@@ -65,7 +65,16 @@ def get_course_progress(user, course):
 @main.route('/')
 def home():
     # For the "Featured Courses" section on the home page
-    featured_courses = Course.query.filter_by(approved=True).limit(3).all()
+    # Fetch one course for each of the 5 main categories if possible
+    category_names = ['Science Courses', 'Humanities', 'Commercial', 'Digital Skills', 'Programming']
+    featured_courses = {}
+    for name in category_names:
+        category = Category.query.filter_by(name=name).first()
+        if category:
+            course = Course.query.filter_by(approved=True, category_id=category.id).first()
+            if course:
+                featured_courses[name] = course
+
     return render_template('index.html', featured_courses=featured_courses)
 
 @main.route('/courses')
@@ -1036,10 +1045,29 @@ def student_dashboard():
     # Course Enrollments
     enrollments = current_user.enrollments.all()
     enrollment_data = []
+    active_courses_count = 0
+    completed_courses_count = 0
+
     for enrollment in enrollments:
         progress_data = None
         if enrollment.status == 'approved':
             progress_data = get_course_progress(current_user, enrollment.course)
+
+            # Calculate progress percentage
+            total_items = len(progress_data['quizzes']) + len(progress_data['assignments'])
+            completed_items = 0
+            if total_items > 0:
+                completed_items += sum(1 for q in progress_data['quizzes'] if q['passed'])
+                completed_items += sum(1 for a in progress_data['assignments'] if a['approved'])
+                progress_data['percentage'] = (completed_items / total_items) * 100
+            else:
+                progress_data['percentage'] = 0
+
+            # Update counts
+            if progress_data['can_request_certificate']:
+                completed_courses_count += 1
+            else:
+                active_courses_count += 1
 
         enrollment_data.append({
             'enrollment': enrollment,
@@ -1049,9 +1077,29 @@ def student_dashboard():
     # Library Purchases
     library_purchases = current_user.library_purchases.order_by(LibraryPurchase.timestamp.desc()).all()
 
+    # Certificate Count
+    certificates_count = Certificate.query.filter_by(user_id=current_user.id).count()
+
+    # Unread Messages Count
+    unread_messages_count = 0
+    member_room_ids = [m.chat_room_id for m in current_user.chat_memberships]
+    for room_id in member_room_ids:
+        last_read = UserLastRead.query.filter_by(user_id=current_user.id, room_id=room_id).first()
+        last_read_time = last_read.last_read_timestamp if last_read else datetime.min
+        unread_messages_count += db.session.query(ChatMessage).filter(
+            ChatMessage.room_id == room_id,
+            ChatMessage.timestamp > last_read_time,
+            ChatMessage.user_id != current_user.id
+        ).count()
+
+
     return render_template('student_dashboard.html',
                            enrollment_data=enrollment_data,
-                           library_purchases=library_purchases)
+                           library_purchases=library_purchases,
+                           active_courses_count=active_courses_count,
+                           completed_courses_count=completed_courses_count,
+                           certificates_count=certificates_count,
+                           unread_messages_count=unread_messages_count)
 
 @main.route('/library/<int:material_id>/download')
 @login_required

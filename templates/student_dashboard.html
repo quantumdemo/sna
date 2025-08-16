@@ -2,115 +2,115 @@
 
 {% block title %}Student Dashboard{% endblock %}
 
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
 {% block content %}
-<section id="student-dashboard">
-    <h1>Your Dashboard</h1>
-    <p>Welcome, {{ current_user.name }}.</p>
+<div class="dashboard-container">
+    <!-- Welcome Area -->
+    <section class="welcome-area">
+        <div class="profile-pic">
+            <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_pic) }}" alt="Profile Picture">
+        </div>
+        <div class="greeting">
+            <h1>Welcome back, {{ current_user.name }}!</h1>
+            <p>"The beautiful thing about learning is that no one can take it away from you." - B.B. King</p>
+        </div>
+    </section>
 
-    <div class="dashboard-actions">
-        <a href="{{ url_for('main.courses') }}" class="btn">Browse More Courses</a>
-    </div>
+    <!-- Quick Indicators -->
+    <section class="quick-indicators">
+        <div class="glass-card indicator-card">
+            <div class="indicator-icon"><i class="fas fa-book-open"></i></div>
+            <div class="indicator-text">
+                <span class="indicator-value">{{ active_courses_count }}</span>
+                <span class="indicator-label">Active Courses</span>
+            </div>
+        </div>
+        <div class="glass-card indicator-card">
+            <div class="indicator-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="indicator-text">
+                <span class="indicator-value">{{ completed_courses_count }}</span>
+                <span class="indicator-label">Completed Courses</span>
+            </div>
+        </div>
+        <div class="glass-card indicator-card">
+            <div class="indicator-icon"><i class="fas fa-certificate"></i></div>
+            <div class="indicator-text">
+                <span class="indicator-value">{{ certificates_count }}</span>
+                <span class="indicator-label">Certificates Earned</span>
+            </div>
+        </div>
+        <div class="glass-card indicator-card">
+            <div class="indicator-icon"><i class="fas fa-envelope"></i></div>
+            <div class="indicator-text">
+                <span class="indicator-value">{{ unread_messages_count }}</span>
+                <span class="indicator-label">New Messages</span>
+            </div>
+        </div>
+    </section>
 
-    <h2>Your Course Enrollments</h2>
-    <div class="course-grid-full">
-        {% if enrollment_data %}
+    <!-- Browse Courses Section -->
+    <section class="course-section">
+        <h2 class="section-title">Browse Your Courses</h2>
+        <div class="dashboard-grid">
             {% for data in enrollment_data %}
                 {% set enrollment = data.enrollment %}
                 {% set progress = data.progress %}
-                <div class="course-card">
-                    <h3>{{ enrollment.course.title }}</h3>
-                    <p>Instructor: {{ enrollment.course.instructor.name }}</p>
-                    <p><strong>Enrollment Status:</strong> <span class="status-{{ enrollment.status }}">{{ enrollment.status.title() }}</span></p>
-
-                    {% if enrollment.status == 'approved' and progress %}
-                        <div class="progress-section">
-                            <h4>Course Progress</h4>
-                            <ul>
-                                {% for quiz_item in progress.quizzes %}
-                                    <li>
-                                        {{ quiz_item.quiz.module.title }} Quiz:
-                                        {% if quiz_item.passed %}
-                                            <span class="status-passed">Passed</span>
-                                        {% elif quiz_item.submission %}
-                                            <span class="status-failed">Failed ({{ "%.2f"|format(quiz_item.submission.score) }}%)</span>
-                                            <a href="{{ url_for('main.take_quiz', quiz_id=quiz_item.quiz.id) }}" class="btn-small btn-retake">Retake</a>
-                                        {% else %}
-                                            <span class="status-pending">Not Taken</span>
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                                {% for assignment_item in progress.assignments %}
-                                    <li>
-                                        {{ assignment_item.assignment.title }}:
-                                        {% if assignment_item.approved %}
-                                            <span class="status-passed">Approved</span>
-                                        {% elif assignment_item.submission %}
-                                            <span class="status-failed">Not Approved</span>
-                                            <a href="{{ url_for('main.view_assignment', assignment_id=assignment_item.assignment.id) }}" class="btn-small btn-retake">Resubmit</a>
-                                        {% else %}
-                                            <span class="status-pending">Not Submitted</span>
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                            </ul>
+                <div class="glass-card course-card">
+                    <div class="course-card-image" style="background-image: url('{{ url_for('static', filename='images/course_placeholder.jpg') }}');"></div>
+                    <div class="course-card-content">
+                        <h3 class="course-title">{{ enrollment.course.title }}</h3>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: {{ progress.percentage | default(0) }}%;"></div>
                         </div>
-
-                        <div class="card-actions">
-                            <a href="{{ url_for('main.course_detail', course_id=enrollment.course.id) }}" class="btn">Go to Course</a>
-                            {% if enrollment.course.final_exam_enabled %}
-                                {% if progress.all_prerequisites_met and enrollment.course.final_exam %}
-                                    <a href="{{ url_for('main.take_exam', exam_id=enrollment.course.final_exam.id) }}" class="btn">Take Final Exam</a>
-                                {% elif enrollment.course.final_exam %}
-                                    <button class="btn-disabled" disabled title="Complete all quizzes and assignments to unlock. Missing: {{ progress.reasons|join(', ') }}">Final Exam Locked</button>
-                                {% endif %}
-
-                                {% if progress.final_exam and not progress.final_exam.passed and progress.final_exam.exam.retake_allowed %}
-                                     <a href="{{ url_for('main.take_exam', exam_id=enrollment.course.final_exam.id) }}" class="btn btn-retake">Retake Final Exam</a>
-                                {% endif %}
-
-                            {% endif %}
-
+                        <div class="card-footer">
+                            <span class="status-badge status-{{ 'completed' if progress.can_request_certificate else 'ongoing' }}">
+                                {{ 'Completed' if progress.can_request_certificate else 'Ongoing' }}
+                            </span>
                             {% if progress.can_request_certificate %}
-                                <form action="{{ url_for('main.request_certificate', course_id=enrollment.course.id) }}" method="POST" style="display: inline;">
-                                    <button type="submit" class="btn">Request Certificate</button>
-                                </form>
+                                <a href="#" class="btn-glow request-cert-btn">Request Certificate</a>
                             {% else %}
-                                <button class="btn-disabled" disabled title="Complete all requirements to unlock. Missing: {{ progress.reasons|join(', ') }}">Request Certificate</button>
+                                <a href="{{ url_for('main.course_detail', course_id=enrollment.course.id) }}" class="btn-glow">Continue</a>
                             {% endif %}
                         </div>
-
-                    {% elif enrollment.status == 'rejected' %}
-                        <a href="{{ url_for('main.enroll', course_id=enrollment.course.id) }}" class="btn">Re-Submit Payment</a>
-                    {% endif %}
+                    </div>
                 </div>
+            {% else %}
+                <p>You are not enrolled in any courses yet. <a href="{{ url_for('main.courses') }}">Browse courses</a> to get started.</p>
             {% endfor %}
-        {% else %}
-            <p>You have not enrolled in any courses yet.</p>
-        {% endif %}
-    </div>
+        </div>
+    </section>
 
-    <hr>
+    <!-- Browse Library Section -->
+    <section class="library-section">
+        <h2 class="section-title">Browse Library</h2>
+        <div class="dashboard-grid">
+            {% for purchase in library_purchases %}
+                {% if purchase.status == 'approved' %}
+                <div class="glass-card library-card">
+                    <div class="library-card-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="library-card-content">
+                        <h3 class="library-title">{{ purchase.material.title }}</h3>
+                        <p class="library-category">{{ purchase.material.category.name if purchase.material.category else 'General' }}</p>
+                    </div>
+                    <a href="{{ url_for('main.download_library_material', material_id=purchase.material.id) }}" class="btn-glow">View / Open</a>
+                </div>
+                {% endif %}
+            {% else %}
+                <p>You have not purchased any library materials yet. <a href="{{ url_for('main.library') }}">Visit the library</a>.</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}
 
-    <h2>My Library</h2>
-    <div class="item-list">
-        {% if library_purchases %}
-            <ul>
-                {% for purchase in library_purchases %}
-                <li>
-                    <strong>{{ purchase.material.title }}</strong>
-                    <p>Status: <span class="status-{{ purchase.status }}">{{ purchase.status.title() }}</span></p>
-                    {% if purchase.status == 'rejected' and purchase.rejection_reason %}
-                        <p class="rejection-reason">Reason: {{ purchase.rejection_reason }}</p>
-                        <a href="{{ url_for('main.purchase_library_material', material_id=purchase.material_id) }}" class="btn-small">Re-Submit Payment</a>
-                    {% elif purchase.status == 'approved' %}
-                        <a href="{{ url_for('main.download_library_material', material_id=purchase.material_id) }}" class="btn-small">Download</a>
-                    {% endif %}
-                </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>You have not purchased any library materials yet. <a href="{{ url_for('main.library') }}">Browse library</a>.</p>
-        {% endif %}
-    </div>
-</section>
+{% block scripts %}
+    {{ super() }}
+    <script>
+        document.body.classList.add('dashboard-body');
+    </script>
 {% endblock %}

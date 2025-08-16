@@ -21,17 +21,18 @@
             <nav class="nav-links">
                 {% if current_user.is_authenticated %}
                     {# Logged-in Users #}
-                    <a href="{{ url_for('main.profile') }}">Profile</a>
                     {% if current_user.role == 'admin' %}
+                        <a href="{{ url_for('main.profile') }}">Profile</a>
                         <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
                         <a href="{{ url_for('main.chat_list') }}">Chat</a>
                     {% elif current_user.role == 'instructor' %}
+                        <a href="{{ url_for('main.profile') }}">Profile</a>
                         <a href="{{ url_for('instructor.dashboard') }}">Dashboard</a>
                         <a href="{{ url_for('main.courses') }}">Courses (manage)</a>
                         <a href="{{ url_for('main.chat_list') }}">Chat</a>
                         <a href="{{ url_for('main.library') }}">Library (upload)</a>
                     {% elif current_user.role == 'student' %}
-                        <a href="{{ url_for('main.student_dashboard') }}">Dashboard</a>
+                        <a href="{{ url_for('main.student_dashboard') }}">Profile Dashboard</a>
                         <a href="{{ url_for('main.courses') }}">Courses</a>
                         <a href="{{ url_for('main.chat_list') }}">Chat</a>
                         <a href="{{ url_for('main.library') }}">Library</a>

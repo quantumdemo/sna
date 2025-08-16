@@ -51,51 +51,23 @@
     <div class="container">
         <h2 class="section-title">Explore Our Courses</h2>
         <div class="course-grid">
-            <!-- Science Courses -->
-            <div class="course-card">
-                <img src="{{ url_for('static', filename='images/course1.jpg') }}" alt="Science Students in a lab">
-                <div class="course-card-content">
-                    <h3>Science Courses</h3>
-                    <p>Unlock the secrets of the universe, from biology to physics.</p>
-                    <a href="{{ url_for('main.courses', category='science') }}" class="btn btn-gold">View Courses</a>
+            {% set categories = ['Science Courses', 'Humanities', 'Commercial', 'Digital Skills', 'Programming'] %}
+            {% for category_name in categories %}
+                {% set course = featured_courses.get(category_name) %}
+                <div class="course-card">
+                    <img src="{{ url_for('static', filename='images/' + (course.image_file if course and course.image_file else 'course_placeholder.jpg')) }}" alt="{{ category_name }}">
+                    <div class="course-card-content">
+                        <h3>{{ category_name }}</h3>
+                        {% if course %}
+                            <p>{{ course.description | truncate(80) }}</p>
+                            <a href="{{ url_for('main.course_detail', course_id=course.id) }}" class="btn btn-gold">View Course</a>
+                        {% else %}
+                            <p>Exciting new courses coming soon in this category!</p>
+                            <a href="{{ url_for('main.courses') }}" class="btn btn-gold">View All Courses</a>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-            <!-- Humanities -->
-            <div class="course-card">
-                <img src="{{ url_for('static', filename='images/course2.jpg') }}" alt="Students in a library">
-                <div class="course-card-content">
-                    <h3>Humanities</h3>
-                    <p>Explore human culture, history, and the arts.</p>
-                    <a href="{{ url_for('main.courses', category='humanities') }}" class="btn btn-gold">View Courses</a>
-                </div>
-            </div>
-            <!-- Commercial -->
-            <div class="course-card">
-                <img src="{{ url_for('static', filename='images/course3.jpg') }}" alt="Business meeting">
-                <div class="course-card-content">
-                    <h3>Commercial</h3>
-                    <p>Master the world of business, finance, and marketing.</p>
-                    <a href="{{ url_for('main.courses', category='commercial') }}" class="btn btn-gold">View Courses</a>
-                </div>
-            </div>
-            <!-- Digital Skills -->
-            <div class="course-card">
-                <img src="{{ url_for('static', filename='images/course_placeholder.jpg') }}" alt="Person using a tablet">
-                <div class="course-card-content">
-                    <h3>Digital Skills</h3>
-                    <p>Thrive in the digital age with our tech-focused courses.</p>
-                    <a href="{{ url_for('main.courses', category='digital') }}" class="btn btn-gold">View Courses</a>
-                </div>
-            </div>
-            <!-- Programming -->
-            <div class="course-card">
-                <img src="{{ url_for('static', filename='images/course_placeholder.jpg') }}" alt="Laptop with code on screen">
-                <div class="course-card-content">
-                    <h3>Programming</h3>
-                    <p>Learn to code and build the future of technology.</p>
-                    <a href="{{ url_for('main.courses', category='programming') }}" class="btn btn-gold">View Courses</a>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 </section>
