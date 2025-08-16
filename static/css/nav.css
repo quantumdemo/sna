@@ -1,0 +1,178 @@
+/* --- Global Navigation Bar --- */
+
+/* 1. Main Header Container */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid #EDEFF2;
+    font-family: 'Poppins', 'Inter', 'Roboto', sans-serif;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 95%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 0;
+}
+
+/* 2. Logo */
+.site-logo {
+    font-size: 1.5rem; /* 24px */
+    font-weight: 700;
+    color: #0D1B4C;
+}
+
+/* 3. Navigation Links (Desktop & Tablet) */
+.main-nav {
+    display: flex;
+    align-items: center;
+    gap: 2rem; /* 32px */
+}
+
+.main-nav a {
+    position: relative;
+    text-decoration: none;
+    font-size: 1.125rem; /* 18px */
+    font-weight: 500;
+    color: #0D1B4C;
+    transition: color 0.3s ease;
+    padding-bottom: 0.5rem; /* Space for underline */
+}
+
+/* Hover effect: glowing underline */
+.main-nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #FFD700;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    box-shadow: 0 0 10px #FFD700;
+}
+
+.main-nav a:hover::after,
+.main-nav a:focus::after {
+    transform: scaleX(1);
+}
+
+/* Active link styling */
+.main-nav a.active {
+    font-weight: 700;
+    color: #0D1B4C;
+}
+.main-nav a.active::after {
+    transform: scaleX(1);
+    background-color: #0D1B4C; /* Bolder underline for active */
+    box-shadow: none;
+}
+
+/* Special link styling */
+.main-nav a.nav-login,
+.main-nav a.nav-register {
+    font-weight: 600;
+    color: #A78BFA; /* Purple Accent */
+}
+
+.main-nav a.nav-logout {
+    color: #D9534F; /* Red Accent */
+    font-weight: 600;
+}
+
+/* 4. Mobile Navigation (Hamburger) */
+.nav-toggle {
+    display: none; /* Hidden on desktop */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.nav-toggle .icon-bar {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: #0D1B4C;
+    margin: 5px 0;
+    transition: all 0.3s ease-in-out;
+}
+
+/* --- Media Queries for Responsiveness --- */
+
+/* Tablet (still shows horizontal menu) */
+@media (max-width: 1023px) {
+    .main-nav {
+        gap: 1.5rem; /* Tighter spacing */
+    }
+    .main-nav a {
+        font-size: 1rem; /* 16px */
+    }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .nav-toggle {
+        display: block; /* Show hamburger */
+    }
+
+    .main-nav {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        width: 80%;
+        max-width: 300px;
+        flex-direction: column;
+        align-items: stretch;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-left: 1px solid #EDEFF2;
+        border-bottom: 1px solid #EDEFF2;
+
+        /* Slide animation */
+        transform: translateX(100%);
+        transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+
+        gap: 0;
+        padding: 1rem 0;
+    }
+
+    .main-nav.is-open {
+        transform: translateX(0);
+    }
+
+    .main-nav a {
+        padding: 1rem 1.5rem;
+        text-align: left;
+        border-bottom: 1px solid #EDEFF2;
+    }
+
+    .main-nav a:last-child {
+        border-bottom: none;
+    }
+
+    .main-nav a::after {
+        display: none; /* Disable underline hover on mobile links */
+    }
+
+    .main-nav a:hover,
+    .main-nav a:focus {
+        background-color: rgba(13, 27, 76, 0.05); /* Subtle hover background */
+    }
+
+    .main-nav a.active {
+        background-color: rgba(255, 215, 0, 0.1);
+        font-weight: 700;
+    }
+}
