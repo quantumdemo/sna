@@ -1,0 +1,273 @@
+/* --- Auth Page: Global Styles --- */
+.auth-body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #0c0a1a;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+.auth-body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(125deg, #0d1b4c, #a78bfa, #ff7e5f, #feb47b);
+    background-size: 400% 400%;
+    animation: gradient-mist 30s ease infinite;
+    opacity: 0.6;
+    z-index: -1;
+}
+
+@keyframes gradient-mist {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Base glass card for forms */
+.auth-form-container {
+    background: rgba(13, 27, 76, 0.2);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 3rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px; /* Default for mobile-first */
+}
+
+/* --- Typography --- */
+.auth-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #a78bfa, #ffffff, #ff7e5f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.auth-header p {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 2.5rem;
+}
+
+/* --- Base Form Styling --- */
+.auth-form .form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.auth-form .form-input {
+    width: 100%;
+    height: 58px;
+    padding: 0 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.auth-form .form-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(167, 139, 250, 0.8);
+    box-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
+}
+
+/* --- CTA Button --- */
+.btn-auth {
+    width: 100%;
+    height: 58px;
+    border: none;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: #fff;
+    background: linear-gradient(90deg, #0d1b4c, #a78bfa, #ff7e5f);
+    background-size: 200% 200%;
+    transition: all 0.4s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-auth:hover {
+    background-position: right center;
+    transform: scale(1.03);
+    box-shadow: 0 6px 25px rgba(167, 139, 250, 0.4);
+}
+
+/* --- Helper Links --- */
+.auth-links {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.auth-links a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.auth-links a:hover {
+    color: #FFD700;
+    text-decoration: underline;
+}
+
+/* --- Form Options (Remember me switch, etc.) --- */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.custom-switch {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.custom-switch input {
+    display: none; /* Hide native checkbox */
+}
+
+.custom-switch label {
+    color: rgba(255, 255, 255, 0.7);
+    user-select: none;
+}
+
+.custom-switch label::before {
+    content: '';
+    display: inline-block;
+    width: 38px;
+    height: 22px;
+    border-radius: 11px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease;
+    vertical-align: middle;
+    margin-right: 0.5rem;
+}
+
+.custom-switch label::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #fff;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.3s ease;
+}
+
+.custom-switch input:checked + label::before {
+    background-color: #a78bfa;
+}
+
+.custom-switch input:checked + label::after {
+    transform: translateX(16px);
+}
+
+.forgot-password {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+}
+.forgot-password:hover {
+    color: #FFD700;
+}
+
+/* --- Password Toggle Icon --- */
+.password-wrapper {
+    position: relative;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    top: 50%;
+    right: 1.5rem;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.password-toggle-icon:hover {
+    color: #fff;
+}
+
+/* --- Custom Select --- */
+.custom-select-wrapper {
+    position: relative;
+}
+
+.custom-select-wrapper::after {
+    content: '▼';
+    position: absolute;
+    top: 50%;
+    right: 1.5rem;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+    font-size: 0.8rem;
+}
+
+.custom-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 3rem; /* Make space for arrow */
+}
+
+/* --- Decorative Elements --- */
+.decorative-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+}
+
+.orb1 {
+    width: 400px;
+    height: 400px;
+    background: rgba(167, 139, 250, 0.3);
+    top: -100px;
+    left: -150px;
+    animation: drift 25s infinite alternate ease-in-out;
+}
+
+.orb2 {
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 126, 95, 0.3);
+    bottom: -80px;
+    right: -120px;
+    animation: drift 35s infinite alternate ease-in-out;
+}
+
+@keyframes drift {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    100% {
+        transform: translate(100px, 50px) rotate(30deg);
+    }
+}

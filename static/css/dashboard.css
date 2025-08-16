@@ -213,3 +213,17 @@
     color: #0D1B4C !important;
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
 }
+
+.btn-disabled {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    color: rgba(255, 255, 255, 0.4) !important;
+    cursor: not-allowed;
+    box-shadow: none !important;
+}
+
+.btn-disabled:hover {
+    transform: none;
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    color: rgba(255, 255, 255, 0.4) !important;
+    box-shadow: none !important;
+}

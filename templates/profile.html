@@ -42,6 +42,7 @@
                         <div class="glass-card certificate-card">
                             <p class="course-name">{{ cert.course.title }}</p>
                             <p class="completion-date">Issued: {{ cert.issued_at.strftime('%b %d, %Y') }}</p>
+                            <a href="{{ url_for('static', filename=cert.file_path) }}" class="btn-submit" target="_blank" style="margin-top: 1rem; font-size: 0.9rem; padding: 0.5rem 1rem;">View</a>
                         </div>
                         {% endfor %}
                     {% else %}
