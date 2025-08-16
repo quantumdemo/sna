@@ -3,7 +3,7 @@
 /* ------------------------- */
 
 .dashboard-body {
-    color: #fff;
+    color: #2b2b2b; /* Change default body text to dark color */
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(-45deg, #E0E7FF, #F0F9FF, #E0F2FE, #D6FCFF);
     background-size: 400% 400%;
@@ -59,42 +59,157 @@
     margin: 0 auto;
 }
 
+/* ------------------------- */
+/* --- Typography & Text --- */
+/* ------------------------- */
+
+.section-title, .welcome-area h1 {
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.welcome-area p {
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    font-size: 1.1rem;
+    max-width: 600px;
+}
+
+.dashboard-grid a, .library-section a {
+    color: #0D1B4C; /* Brand Blue */
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.dashboard-grid a:hover, .library-section a:hover {
+    text-decoration: underline;
+    color: #FFD700; /* Brand Gold */
+}
+
+
 /* -------------------- */
 /* --- Reusable Glass Card --- */
 /* -------------------- */
 
 .glass-card {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
     transition: all 0.3s ease;
+    padding: 1.5rem;
 }
 
 .glass-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 16px 40px 0 rgba(31, 38, 135, 0.2);
-    border-color: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.6);
 }
 
-.section-title {
-    font-size: 2.5rem;
+/* --- Welcome Area --- */
+.welcome-area {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+.profile-pic img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.8);
+    margin-right: 1.5rem;
+}
+
+/* --- Quick Indicators --- */
+.quick-indicators {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+}
+.indicator-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.indicator-icon i {
+    font-size: 2rem;
+    color: #2b2b2b;
+}
+.indicator-text {
+    display: flex;
+    flex-direction: column;
+}
+.indicator-value {
+    font-size: 1.75rem;
     font-weight: 700;
-    margin-bottom: 40px;
-    position: relative;
-    padding-bottom: 15px;
-    display: inline-block;
+    color: #2b2b2b;
+}
+.indicator-label {
+    font-size: 0.9rem;
+    color: #2b2b2b;
 }
 
-.section-title::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, rgba(255,215,0,0.8), rgba(167,139,250,0.8));
-    box-shadow: 0 0 15px rgba(255,215,0,0.5);
+/* --- Course & Library Grids --- */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.course-card-content, .library-card-content {
+    color: #2b2b2b;
+}
+.course-title, .library-title {
+    color: #1a1a1a;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.progress-bar-container {
+    height: 8px;
+    background-color: rgba(0,0,0,0.1);
+    border-radius: 4px;
+    margin: 1rem 0;
+}
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #A78BFA, #FFD700);
+    border-radius: 4px;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+.status-badge {
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    color: #1a1a1a;
+}
+.status-ongoing { background-color: rgba(255, 215, 0, 0.5); }
+.status-completed { background-color: rgba(167, 139, 250, 0.5); }
+
+.btn-glow {
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    background-color: #0D1B4C;
+    color: #fff !important;
+    text-decoration: none;
+    box-shadow: 0 0 15px rgba(13, 27, 76, 0.4);
+}
+.btn-glow:hover {
+    text-decoration: none;
+    background-color: #FFD700;
+    color: #0D1B4C !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
 }
