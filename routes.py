@@ -1082,7 +1082,9 @@ def student_dashboard():
 
     # Unread Messages Count
     unread_messages_count = 0
-    member_room_ids = [m.chat_room_id for m in current_user.chat_memberships]
+    # Querying ChatRoomMember directly is more robust than relying on the backref
+    memberships = ChatRoomMember.query.filter_by(user_id=current_user.id).all()
+    member_room_ids = [m.chat_room_id for m in memberships]
     for room_id in member_room_ids:
         last_read = UserLastRead.query.filter_by(user_id=current_user.id, room_id=room_id).first()
         last_read_time = last_read.last_read_timestamp if last_read else datetime.min

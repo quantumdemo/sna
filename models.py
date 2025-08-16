@@ -284,7 +284,7 @@ class ChatRoomMember(db.Model):
     chat_room_id = db.Column(db.Integer, db.ForeignKey('chat_room.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     role_in_room = db.Column(db.String(50), nullable=False, default='member') # e.g., member, admin
-    user = db.relationship('User')
+    user = db.relationship('User', backref=db.backref('chat_memberships', lazy='dynamic'))
     __table_args__ = (db.UniqueConstraint('chat_room_id', 'user_id', name='_room_user_uc'),)
 
 
