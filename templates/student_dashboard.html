@@ -70,9 +70,11 @@
                                 {{ 'Completed' if progress.can_request_certificate else 'Ongoing' }}
                             </span>
                             {% if progress.can_request_certificate %}
-                                <a href="#" class="btn-glow request-cert-btn">Request Certificate</a>
+                                <form action="{{ url_for('main.request_certificate', course_id=enrollment.course.id) }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn-glow request-cert-btn">Request Certificate</button>
+                                </form>
                             {% else %}
-                                <a href="{{ url_for('main.course_detail', course_id=enrollment.course.id) }}" class="btn-glow">Continue</a>
+                                <a class="btn-glow btn-disabled" title="Complete all requirements to unlock. Missing: {{ progress.reasons|join(', ') }}">Request Certificate</a>
                             {% endif %}
                         </div>
                     </div>
