@@ -11,7 +11,7 @@
     <!-- Welcome Area -->
     <section class="welcome-area">
         <div class="profile-pic">
-            <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_pic) }}" alt="Profile Picture">
+            <img src="{{ url_for('static', filename='profile_pics/' + (current_user.profile_pic if current_user.profile_pic else 'default.jpg')) }}" alt="Profile Picture">
         </div>
         <div class="greeting">
             <h1>Welcome back, {{ current_user.name }}!</h1>
