@@ -1,70 +1,149 @@
 {% extends "base.html" %}
 
-{% block title %}Library{% endblock %}
+{% block title %}Library of Knowledge{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/library.css') }}">
+{% endblock %}
 
 {% block content %}
-<section id="library-page">
-    <h1>Library</h1>
-    <p>Browse our collection of downloadable materials.</p>
-
-    <aside class="filters">
-        <form method="GET" action="{{ url_for('main.library') }}">
-            <div class="filter-group">
-                <input type="search" name="search" placeholder="Search by keyword..." value="{{ search_values.get('search', '') }}">
+<div class="library-page-container">
+    <!-- 1. Hero Section -->
+    <section class="library-hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Library of Knowledge</h1>
+            <p class="hero-subtitle">Browse and download curated learning resources.</p>
+            <div class="hero-search-wrapper">
+                <form action="{{ url_for('main.library') }}" method="get" class="hero-search-form">
+                    <input type="search" name="search" class="hero-search-input" placeholder="Search for resources..." value="{{ request.args.get('search', '') }}">
+                    <button type="submit" class="hero-search-button"><i class="fas fa-search"></i></button>
+                </form>
             </div>
-            <div class="filter-group">
-                <label for="category">Category</label>
-                <select name="category" id="category">
-                    <option value="">All</option>
-                    {% for cat in categories %}
-                    <option value="{{ cat.id }}" {% if search_values.get('category') == cat.id|string %}selected{% endif %}>{{ cat.name }}</option>
+        </div>
+    </section>
+
+    <!-- Mobile Filter Toggle -->
+    <button class="mobile-filter-toggle">
+        <i class="fas fa-filter"></i> Filters
+    </button>
+
+    <!-- Main Content Layout -->
+    <div class="library-layout">
+        <!-- 2. Filter Panel -->
+        <aside class="filters-panel-wrapper">
+            <div class="filters-panel glass-card">
+                <h3 class="filter-title">Filters</h3>
+                <form action="{{ url_for('main.library') }}" method="get">
+                    <!-- Category Filter -->
+                    <div class="filter-group">
+                        <label for="category" class="filter-label">Category</label>
+                        <div class="custom-select-wrapper">
+                            <select name="category" id="category" class="filter-input">
+                                <option value="">All Categories</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.id }}" {% if request.args.get('category') == cat.id|string %}selected{% endif %}>{{ cat.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Price Filter -->
+                    <div class="filter-group">
+                        <label class="filter-label">Price</label>
+                        <div class="pill-toggle">
+                            <input type="radio" id="price_all" name="price" value="" {% if not request.args.get('price') %}checked{% endif %}>
+                            <label for="price_all">All</label>
+                            <input type="radio" id="price_free" name="price" value="free" {% if request.args.get('price') == 'free' %}checked{% endif %}>
+                            <label for="price_free">Free</label>
+                            <input type="radio" id="price_paid" name="price" value="paid" {% if request.args.get('price') == 'paid' %}checked{% endif %}>
+                            <label for="price_paid">Paid</label>
+                        </div>
+                    </div>
+
+                    <!-- Sort By Filter -->
+                    <div class="filter-group">
+                        <label for="sort" class="filter-label">Sort by</label>
+                        <div class="custom-select-wrapper">
+                             <select name="sort" id="sort" class="filter-input">
+                                <option value="newest" {% if request.args.get('sort', 'newest') == 'newest' %}selected{% endif %}>Newest</option>
+                                <option value="popular" {% if request.args.get('sort') == 'popular' %}selected{% endif %}>Most Popular</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-filter-apply">Apply Filters</button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- 3. Library Materials Grid -->
+        <main class="materials-grid-container">
+            {% if materials.items %}
+                <div class="materials-grid">
+                    {% for item in materials.items %}
+                    <div class="material-card-item glass-card">
+                        <div class="material-thumbnail">
+                            <i class="fas fa-book-reader"></i>
+                        </div>
+                        <div class="material-card-content">
+                            <span class="category-tag">{{ item.category.name }}</span>
+                            <h4 class="material-card-title">{{ item.title }}</h4>
+                            <p class="material-card-desc">{{ item.description | truncate(100) }}</p>
+                            <div class="material-card-footer">
+                                <span class="price-badge">
+                                    {% if item.price_naira == 0 %}Free{% else %}₦{{ "{:,.0f}".format(item.price_naira) }}{% endif %}
+                                </span>
+                                {% if item.price_naira == 0 %}
+                                    <a href="{{ url_for('main.download_library_material', material_id=item.id) }}" class="btn-action">Download <i class="fas fa-download"></i></a>
+                                {% else %}
+                                    <a href="{{ url_for('main.purchase_library_material', material_id=item.id) }}" class="btn-action">Purchase <i class="fas fa-shopping-cart"></i></a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
                     {% endfor %}
-                </select>
-            </div>
-            <div class="filter-group">
-                <label>Price</label>
-                <input type="radio" name="price" value="" id="price_all" {% if not search_values.get('price') %}checked{% endif %}> <label for="price_all">All</label>
-                <input type="radio" name="price" value="free" id="price_free" {% if search_values.get('price') == 'free' %}checked{% endif %}> <label for="price_free">Free</label>
-                <input type="radio" name="price" value="paid" id="price_paid" {% if search_values.get('price') == 'paid' %}checked{% endif %}> <label for="price_paid">Paid</label>
-            </div>
-            <div class="filter-group">
-                <label for="sort">Sort by</label>
-                <select name="sort" id="sort">
-                    <option value="newest" {% if search_values.get('sort', 'newest') == 'newest' %}selected{% endif %}>Newest</option>
-                    <option value="popular" {% if search_values.get('sort') == 'popular' %}selected{% endif %}>Most Popular</option>
-                </select>
-            </div>
-            <button type="submit" class="btn">Filter</button>
-        </form>
-    </aside>
-
-    <div class="library-grid">
-        {% if materials %}
-            {% for item in materials %}
-            <div class="library-card">
-                <h3>{{ item.title }}</h3>
-                <p class="category-tag">{{ item.category.name }}</p>
-                <p>{{ item.description }}</p>
-                <p>Uploaded by: {{ item.uploader.name }}</p>
-                <p>Price:
-                    {% if item.price_naira == 0 %}
-                        <strong>Free</strong>
-                    {% else %}
-                        <strong>₦{{ "{:,.2f}".format(item.price_naira) }}</strong>
-                    {% endif %}
-                </p>
-                <div class="card-actions">
-                    {% if item.price_naira == 0 %}
-                        <a href="{{ url_for('main.download_library_material', material_id=item.id) }}" class="btn">Download</a>
-                    {% else %}
-                        <a href="{{ url_for('main.purchase_library_material', material_id=item.id) }}" class="btn">Purchase</a>
-                    {% endif %}
                 </div>
+            {% else %}
+                <!-- 4. Empty State -->
+                <div class="empty-state">
+                    <i class="fas fa-search-minus empty-state-icon"></i>
+                    <h3 class="empty-state-title">No Materials Found</h3>
+                    <p class="empty-state-text">Try adjusting your search or filter criteria.</p>
+                    <a href="{{ url_for('main.library') }}" class="btn-action">Reset Filters</a>
+                </div>
+            {% endif %}
+
+            <!-- 5. Pagination -->
+            {% if materials.pages > 1 %}
+            <div class="pagination-container">
+                {% if materials.has_prev %}
+                    <a href="{{ url_for('main.library', page=materials.prev_num, **request.args) }}" class="pagination-arrow prev">&laquo;</a>
+                {% endif %}
+
+                <div class="page-numbers">
+                    {% for page_num in materials.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                        {% if page_num %}
+                            <a href="{{ url_for('main.library', page=page_num, **request.args) }}" class="page-number {{ 'active' if page_num == materials.page else '' }}">{{ page_num }}</a>
+                        {% else %}
+                            <span class="page-ellipsis">...</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                {% if materials.has_next %}
+                    <a href="{{ url_for('main.library', page=page_num, **request.args) }}" class="pagination-arrow next">&raquo;</a>
+                {% endif %}
             </div>
-            {% endfor %}
-        {% else %}
-            <p>No library materials match your criteria.</p>
-        {% endif %}
+            {% endif %}
+        </main>
     </div>
-</section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        document.body.classList.add('library-body');
+    </script>
+    <script src="{{ url_for('static', filename='js/library.js') }}"></script>
 {% endblock %}

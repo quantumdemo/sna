@@ -482,11 +482,12 @@ def library():
     else: # 'newest' is default
         query = query.order_by(LibraryMaterial.id.desc())
 
-    materials = query.all()
+    page = request.args.get('page', 1, type=int)
+    materials_pagination = query.paginate(page=page, per_page=12)
     categories = Category.query.all()
 
     return render_template('library.html',
-                           materials=materials,
+                           materials=materials_pagination,
                            categories=categories,
                            search_values=request.args)
 
