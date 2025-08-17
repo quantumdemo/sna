@@ -20,5 +20,6 @@ def generate_certificate_pdf(certificate, user, course, app):
     HTML(string=rendered_html).write_pdf(file_path)
 
     # The path should be relative to the static folder for url_for to work
-    certificate.file_path = os.path.join('certificates', f'{certificate.certificate_uid}.pdf')
+    # and must use forward slashes for URL compatibility.
+    certificate.file_path = f"certificates/{certificate.certificate_uid}.pdf"
     return certificate
