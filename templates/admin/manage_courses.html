@@ -3,40 +3,78 @@
 {% block title %}Manage Courses{% endblock %}
 
 {% block content %}
-<section id="manage-courses">
-    <h1>Course Management</h1>
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Course Management</h1>
+        <p>Approve, organize, and oversee all courses on the platform.</p>
+    </div>
 
-    <h2>Courses Pending Approval</h2>
-    <div class="course-list">
-        {% if pending_courses %}
-            <ul>
-                {% for course in pending_courses %}
-                <li>
-                    <strong>{{ course.title }}</strong> by {{ course.instructor.name }}
-                    <form action="{{ url_for('admin.approve_course', course_id=course.id) }}" method="post" style="display: inline;">
-                        <button type="submit" class="btn-small">Approve</button>
-                    </form>
-                                <form action="{{ url_for('admin.delete_course', course_id=course.id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this course? This action cannot be undone.');">
-                        <button type="submit" class="btn-small btn-danger">Delete</button>
-                    </form>
-                </li>
+    <div class="manage-courses-layout">
+        <!-- Main Content: Course Grid -->
+        <main class="course-grid-main">
+            <div class="course-grid">
+                {% for course in all_courses %}
+                <div class="course-card-admin">
+                    <img src="{{ url_for('static', filename='uploads/images/' + course.cover_image) if course.cover_image else url_for('static', filename='images/course_placeholder.jpg') }}" alt="Course cover for {{ course.title }}">
+                    <div class="course-card-content">
+                        <h3 class="course-title">{{ course.title }}</h3>
+                        <p class="instructor-name">by {{ course.instructor.name }}</p>
+                        <div class="course-status">
+                            {% if not course.approved %}
+                                <span class="status-badge pending">Pending Approval</span>
+                            {% else %}
+                                <span class="status-badge approved">Approved</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="course-card-actions">
+                        {% if not course.approved %}
+                            <form action="{{ url_for('admin.approve_course', course_id=course.id) }}" method="post">
+                                <button type="submit" class="btn-glass approve">Approve</button>
+                            </form>
+                        {% endif %}
+                        <a href="#" class="btn-glass info">Edit</a>
+                        <form action="{{ url_for('admin.delete_course', course_id=course.id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
+                            <button type="submit" class="btn-glass reject">Delete</button>
+                        </form>
+                    </div>
+                </div>
                 {% endfor %}
-            </ul>
-        {% else %}
-            <p>No courses are currently pending approval.</p>
-        {% endif %}
-    </div>
+            </div>
+        </main>
 
-    <h2>All Courses</h2>
-    <div class="course-list">
-        <ul>
-            {% for course in all_courses %}
-            <li>
-                <strong>{{ course.title }}</strong> by {{ course.instructor.name }} -
-                Status: {% if course.approved %}Approved{% else %}Pending{% endif %}
-            </li>
-            {% endfor %}
-        </ul>
+        <!-- Sidebar: Create/Edit Form -->
+        <aside class="course-form-panel">
+            <div class="form-wrapper">
+                <h3>Create New Course</h3>
+                <!-- This form is a placeholder for now, as the functionality is on the instructor side.
+                     It can be wired up later if admins need to create courses directly. -->
+                <form>
+                    <div class="form-group">
+                        <label for="course-title">Course Title</label>
+                        <input type="text" id="course-title" name="title" placeholder="e.g., Advanced Python">
+                    </div>
+                    <div class="form-group">
+                        <label for="course-category">Category</label>
+                        <select id="course-category" name="category">
+                            <!-- Categories would be populated from the database -->
+                            <option>Programming</option>
+                            <option>Design</option>
+                            <option>Marketing</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="course-instructor">Instructor</label>
+                        <select id="course-instructor" name="instructor">
+                            <!-- Instructors would be populated from the database -->
+                            <option>John Doe</option>
+                            <option>Jane Smith</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-glass approve full-width">Create Course</button>
+                </form>
+            </div>
+        </aside>
     </div>
-</section>
+</div>
 {% endblock %}

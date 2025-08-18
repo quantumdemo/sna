@@ -265,9 +265,30 @@ def toggle_course_chat_lock(room_id):
 
 @admin_bp.route('/users')
 def manage_users():
+    role_filter = request.args.get('role_filter', 'all')
+
+    query = User.query
+
+    if role_filter == 'student':
+        query = query.filter_by(role='student')
+    elif role_filter == 'instructor':
+        query = query.filter_by(role='instructor', approved=True)
+    elif role_filter == 'admin':
+        query = query.filter_by(role='admin')
+    elif role_filter == 'pending':
+        query = query.filter_by(role='instructor', approved=False)
+
+    users_to_display = query.order_by(User.name).all()
+
+    # We still need this for the count in the sidebar
     pending_instructors = User.query.filter_by(role='instructor', approved=False).all()
-    all_users = User.query.order_by(User.id).all()
-    return render_template('admin/manage_users.html', pending_instructors=pending_instructors, all_users=all_users)
+
+    return render_template(
+        'admin/manage_users.html',
+        users_to_display=users_to_display,
+        pending_instructors=pending_instructors,
+        current_filter=role_filter
+    )
 
 @admin_bp.route('/user/<int:user_id>/approve', methods=['POST'])
 def approve_user(user_id):

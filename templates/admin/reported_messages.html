@@ -3,43 +3,44 @@
 {% block title %}Reported Chat Messages{% endblock %}
 
 {% block content %}
-<section id="reported-messages">
-    <h1>Reported Chat Messages</h1>
-    <p>Review messages reported by students for inappropriate content.</p>
-
-    <div class="item-list">
-        {% if reports %}
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Message Content</th>
-                        <th>Author</th>
-                        <th>Reported By</th>
-                        <th>Room</th>
-                        <th>Reported At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for report in reports %}
-                    <tr>
-                        <td>"{{ report.message.content }}"</td>
-                        <td>{{ report.message.author.name }}</td>
-                        <td>{{ report.reporter.name }}</td>
-                        <td>{{ report.message.room.name }}</td>
-                        <td>{{ report.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
-                        <td class="actions">
-                            {# In a real app, a delete button here would need JS to emit socket event #}
-                            {# For now, linking to user management is a good first step #}
-                            <a href="{{ url_for('admin.manage_users') }}" class="btn-small">Manage Users</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>There are no reported messages.</p>
-        {% endif %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Reported Messages</h1>
+        <p>Review messages reported by students for inappropriate content.</p>
     </div>
-</section>
+
+    <div class="glassy-table-wrapper">
+        <div class="glassy-table">
+            <!-- Table Header -->
+            <div class="table-header" style="grid-template-columns: 3fr 1.5fr 1.5fr 1.5fr 1.5fr 1fr;">
+                <div class="table-cell">Message</div>
+                <div class="table-cell">Author</div>
+                <div class="table-cell">Reported By</div>
+                <div class="table-cell">Room</div>
+                <div class="table-cell">Reported At</div>
+                <div class="table-cell">Actions</div>
+            </div>
+
+            <!-- Table Body -->
+            {% for report in reports %}
+            <div class="table-row-card">
+                <div class="table-row" style="grid-template-columns: 3fr 1.5fr 1.5fr 1.5fr 1.5fr 1fr;">
+                    <div class="table-cell" data-label="Message">"{{ report.message.content }}"</div>
+                    <div class="table-cell" data-label="Author">{{ report.message.author.name }}</div>
+                    <div class="table-cell" data-label="Reported By">{{ report.reporter.name }}</div>
+                    <div class="table-cell" data-label="Room">{{ report.message.room.name }}</div>
+                    <div class="table-cell" data-label="Reported At">{{ report.timestamp.strftime('%Y-%m-%d %H:%M') }}</div>
+                    <div class="table-cell actions-cell" data-label="Actions">
+                        <a href="{{ url_for('admin.manage_users') }}" class="btn-glass info compact-btn">Manage User</a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="glass-card full-width-card">
+                <p>There are no reported messages.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 {% endblock %}

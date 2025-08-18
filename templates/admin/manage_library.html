@@ -3,49 +3,71 @@
 {% block title %}Manage Library{% endblock %}
 
 {% block content %}
-<section id="manage-library">
-    <h1>Library Management</h1>
-    <p>Here you can approve and manage submitted library materials.</p>
-
-    <h2>Materials Pending Approval</h2>
-    <div class="item-list">
-        {% if pending_materials %}
-            <ul>
-                {% for item in pending_materials %}
-                <li>
-                    <strong>{{ item.title }}</strong> by {{ item.uploader.name }}
-                    <p>{{ item.description }}</p>
-                    <p>Category: {{ item.category.name }} | Price: ₦{{ item.price_naira }}</p>
-                    <div class="actions">
-                        <form action="{{ url_for('admin.approve_library_material', material_id=item.id) }}" method="post" style="display: inline;">
-                            <button type="submit" class="btn-small">Approve</button>
-                        </form>
-                        <form action="{{ url_for('admin.reject_library_material', material_id=item.id) }}" method="post" style="display: inline;">
-                            <input type="text" name="reason" placeholder="Reason for rejection" required>
-                            <button type="submit" class="btn-small btn-danger">Reject</button>
-                        </form>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No library materials are currently pending approval.</p>
-        {% endif %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Library Management</h1>
+        <p>Review, approve, and manage all library materials.</p>
     </div>
 
-    <h2>All Library Materials</h2>
-    <div class="item-list">
-        <ul>
-            {% for item in all_materials %}
-            <li>
-                <strong>{{ item.title }}</strong> by {{ item.uploader.name }} -
-                Status: {% if item.approved %}Approved{% elif item.rejection_reason %}Rejected{% else %}Pending{% endif %}
-                <form action="{{ url_for('admin.delete_library_material', material_id=item.id) }}" method="post" style="display: inline;">
-                    <button type="submit" class="btn-small btn-danger">Delete Permanently</button>
+    <!-- Search and Filter Bar -->
+    <div class="filter-bar">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search for materials...">
+        </div>
+        <div class="filter-dropdowns">
+            <select name="category">
+                <option value="">All Categories</option>
+                <!-- Populate categories from DB -->
+            </select>
+            <select name="status">
+                <option value="">All Statuses</option>
+                <option value="approved">Approved</option>
+                <option value="pending">Pending</option>
+                <option value="rejected">Rejected</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Library Items Grid -->
+    <div class="admin-grid library-grid">
+        {% for item in all_materials %}
+        <div class="glass-card library-item-card">
+            <div class="item-thumbnail">
+                <!-- Placeholder for thumbnail, e.g., first page of a PDF -->
+                <img src="{{ url_for('static', filename='images/course_placeholder.jpg') }}" alt="{{ item.title }} thumbnail">
+                <span class="item-price">₦{{ item.price_naira }}</span>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">{{ item.title }}</h3>
+                <p class="card-subtitle">by {{ item.uploader.name }}</p>
+                <div class="item-status">
+                     {% if not item.approved and not item.rejection_reason %}
+                        <span class="status-badge pending">Pending</span>
+                    {% elif item.rejection_reason %}
+                        <span class="status-badge banned">Rejected</span>
+                    {% else %}
+                        <span class="status-badge approved">Approved</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-footer">
+                {% if not item.approved and not item.rejection_reason %}
+                    <form action="{{ url_for('admin.approve_library_material', material_id=item.id) }}" method="post" style="display: inline;">
+                        <button type="submit" class="btn-glass approve compact-btn">Approve</button>
+                    </form>
+                    <button class="btn-glass reject compact-btn">Reject</button>
+                {% endif %}
+                 <form action="{{ url_for('admin.delete_library_material', material_id=item.id) }}" method="post" style="display: inline;">
+                    <button type="submit" class="btn-glass reject compact-btn"><i class="fas fa-trash"></i></button>
                 </form>
-            </li>
-            {% endfor %}
-        </ul>
+            </div>
+        </div>
+        {% else %}
+            <div class="glass-card full-width-card">
+                <p>No library materials found.</p>
+            </div>
+        {% endfor %}
     </div>
-</section>
+</div>
 {% endblock %}
