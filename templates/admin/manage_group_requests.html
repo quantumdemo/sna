@@ -36,18 +36,20 @@
             </div>
         </div>
 
-        <!-- Rejection Modal (one for each request, hidden by default) -->
+        <!-- Rejection Modal -->
         <div id="reject-modal-{{ request.id }}" class="modal-overlay" style="display: none;">
-            <div class="modal-content glass-card">
+            <div class="modal-content form-container-glassy">
+                <div class="form-header">
+                    <h4 class="form-title" style="font-size: 1.5rem;">Reject: {{ request.name }}</h4>
+                </div>
                 <form action="{{ url_for('admin.reject_group_request', request_id=request.id) }}" method="POST">
-                    <h4>Reject: {{ request.name }}</h4>
                     <div class="form-group">
                         <label for="rejection_reason-{{ request.id }}">Reason for Rejection (Optional)</label>
-                        <textarea class="form-control" id="rejection_reason-{{ request.id }}" name="rejection_reason" rows="4"></textarea>
+                        <textarea class="input-glassy" id="rejection_reason-{{ request.id }}" name="rejection_reason" rows="4"></textarea>
                     </div>
-                    <div class="modal-actions">
-                        <button type="button" class="btn-glass info" onclick="closeRejectModal('{{ request.id }}')">Cancel</button>
-                        <button type="submit" class="btn-glass reject">Confirm Rejection</button>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary-glass" onclick="closeRejectModal('{{ request.id }}')">Cancel</button>
+                        <button type="submit" class="btn-primary-glass">Confirm Rejection</button>
                     </div>
                 </form>
             </div>

@@ -71,10 +71,10 @@
                             </span>
                             {% if progress.can_request_certificate %}
                                 <form action="{{ url_for('main.request_certificate', course_id=enrollment.course.id) }}" method="POST" style="display: inline;">
-                                    <button type="submit" class="btn-glow request-cert-btn">Request Certificate</button>
+                                    <button type="submit" class="btn-primary-glass compact-btn">Request Certificate</button>
                                 </form>
                             {% else %}
-                                <a class="btn-glow btn-disabled" title="Complete all requirements to unlock. Missing: {{ progress.reasons|join(', ') }}">Request Certificate</a>
+                                <a class="btn-secondary-glass compact-btn btn-disabled" title="Complete all requirements to unlock. Missing: {{ progress.reasons|join(', ') }}">Request Certificate</a>
                             {% endif %}
                         </div>
                     </div>
@@ -99,7 +99,7 @@
                         <h3 class="library-title">{{ purchase.material.title }}</h3>
                         <p class="library-category">{{ purchase.material.category.name if purchase.material.category else 'General' }}</p>
                     </div>
-                    <a href="{{ url_for('main.download_library_material', material_id=purchase.material.id) }}" class="btn-glow">View / Open</a>
+                    <a href="{{ url_for('main.download_library_material', material_id=purchase.material.id) }}" class="btn-primary-glass compact-btn">View / Open</a>
                 </div>
                 {% endif %}
             {% else %}

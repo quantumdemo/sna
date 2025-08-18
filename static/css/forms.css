@@ -1,0 +1,221 @@
+/* static/css/forms.css */
+
+/* --- Universal Form Container --- */
+.form-container-glassy {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 24px;
+    padding: 3rem;
+    max-width: 800px;
+    margin: 2rem auto;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+}
+
+/* --- Form Headings --- */
+.form-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.form-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a2551;
+    display: inline-block;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.form-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #14b8a6);
+    box-shadow: 0 0 15px #14b8a6;
+    border-radius: 2px;
+}
+
+/* --- Form Layout --- */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 2rem;
+}
+
+.form-grid .full-span {
+    grid-column: 1 / -1;
+}
+
+/* --- Input Fields --- */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #4a557d;
+    margin-bottom: 0.75rem;
+}
+
+.input-glassy {
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid transparent;
+    border-image: linear-gradient(to right, #3b82f6, #14b8a6) 1;
+    border-radius: 16px; /* 2xl */
+    padding: 1rem 1.25rem;
+    color: #1a2551;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.input-glassy::placeholder {
+    color: rgba(74, 85, 125, 0.6);
+    transition: opacity 0.3s ease;
+}
+
+.input-glassy:focus {
+    outline: none;
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(20, 184, 166, 0.5);
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.input-glassy:focus::placeholder {
+    opacity: 0;
+}
+
+/* --- Responsiveness --- */
+@media (max-width: 1024px) {
+    .form-grid {
+        /* Still 2 columns on tablet, but maybe with less gap */
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .form-container-glassy {
+        padding: 1.5rem;
+    }
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    .form-title {
+        font-size: 2rem;
+    }
+}
+
+/* --- Universal Buttons --- */
+.btn-primary-glass {
+    background-image: linear-gradient(45deg, #2dd4bf, #3b82f6, #a855f7);
+    background-size: 200% auto;
+    border: none;
+    border-radius: 9999px; /* pill shape */
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 1rem 2.5rem;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
+    animation: pulse-off 2s infinite;
+}
+
+.btn-primary-glass:hover, .btn-primary-glass:focus {
+    background-position: right center;
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+    animation: pulse-on 1.5s infinite;
+}
+
+@keyframes pulse-on {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.btn-secondary-glass {
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 9999px;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary-glass:hover, .btn-secondary-glass:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    grid-column: 1 / -1; /* Make it span both columns in a grid */
+}
+
+/* --- Assessment Page Specific Styles --- */
+.timer-glassy {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #1a2551;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.question-glassy {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.question-text {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.option-item {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+.option-item:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.option-item input[type="radio"] {
+    margin-right: 1rem;
+}
+
+#calculator.glass-card {
+    position: fixed;
+    right: 2rem;
+    top: 150px;
+    width: 300px;
+}
+.violation-modal.glass-card {
+    max-width: 600px;
+    text-align: center;
+}

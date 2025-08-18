@@ -34,18 +34,18 @@
                         <span class="status-badge pending">Pending</span>
                     </div>
                     <div class="table-cell actions-cell" data-label="Actions">
-                        <a href="{{ url_for('admin.payment_proof', filename=enrollment.proof_of_payment_path) }}" target="_blank" class="btn-glass info compact-btn">View Proof</a>
-                        <form action="{{ url_for('admin.approve_payment', enrollment_id=enrollment.id) }}" method="post">
-                            <button type="submit" class="btn-glass approve compact-btn">Approve</button>
+                        <a href="{{ url_for('admin.payment_proof', filename=enrollment.proof_of_payment_path) }}" target="_blank" class="btn-secondary-glass compact-btn">View Proof</a>
+                        <form action="{{ url_for('admin.approve_payment', enrollment_id=enrollment.id) }}" method="post" style="display:inline;">
+                            <button type="submit" class="btn-primary-glass compact-btn">Approve</button>
                         </form>
-                        <button class="btn-glass reject compact-btn" onclick="toggleRejectForm('{{ enrollment.id }}')">Reject</button>
+                        <button class="btn-secondary-glass compact-btn" onclick="toggleRejectForm('{{ enrollment.id }}')">Reject</button>
                     </div>
                 </div>
                 <!-- Hidden Rejection Form -->
                 <div class="rejection-form" id="reject-form-{{ enrollment.id }}">
                     <form action="{{ url_for('admin.reject_payment', enrollment_id=enrollment.id) }}" method="post">
-                        <input type="text" name="reason" placeholder="Reason for rejection (required)" required>
-                        <button type="submit" class="btn-glass reject">Confirm Reject</button>
+                        <input type="text" name="reason" placeholder="Reason for rejection (required)" required class="input-glassy">
+                        <button type="submit" class="btn-primary-glass">Confirm Reject</button>
                     </form>
                 </div>
             </div>

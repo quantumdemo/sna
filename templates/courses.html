@@ -15,8 +15,8 @@
             <p class="hero-subtitle">Learn, grow, and unlock opportunities with world-class courses.</p>
             <div class="hero-search-wrapper">
                 <form action="{{ url_for('main.courses') }}" method="get" class="hero-search-form">
-                    <input type="text" name="search" class="hero-search-input" placeholder="What do you want to learn today?" value="{{ request.args.get('search', '') }}">
-                    <button type="submit" class="hero-search-button"><i class="fas fa-search"></i></button>
+                    <input type="text" name="search" class="input-glassy" placeholder="What do you want to learn today?" value="{{ request.args.get('search', '') }}" style="border-radius: 9999px;">
+                    <button type="submit" class="btn-primary-glass" style="padding: 0.8rem 1.5rem;"><i class="fas fa-search"></i></button>
                 </form>
             </div>
         </div>
@@ -31,17 +31,17 @@
     <div class="courses-layout">
         <!-- 2. Filter Panel -->
         <aside class="filters-panel-wrapper">
-            <div class="filters-panel glass-card">
+            <div class="filters-panel form-container-glassy" style="padding: 2rem; margin: 0;">
                 <h3 class="filter-title">Filters</h3>
                 <form action="{{ url_for('main.courses') }}" method="get">
                     <!-- Search inside filter panel -->
-                    <div class="filter-group">
+                    <div class="form-group">
                         <label for="search-filter" class="filter-label">Search</label>
-                        <input type="text" id="search-filter" name="search" placeholder="Search by title..." class="filter-input" value="{{ request.args.get('search', '') }}">
+                        <input type="text" id="search-filter" name="search" placeholder="Search by title..." class="input-glassy" value="{{ request.args.get('search', '') }}">
                     </div>
 
                     <!-- Category Filters -->
-                    <div class="filter-group">
+                    <div class="form-group">
                         <label class="filter-label">Category</label>
                         <div class="category-pills">
                             {% for category in categories %}
@@ -54,15 +54,15 @@
                     </div>
 
                     <!-- Price Filters -->
-                    <div class="filter-group">
+                    <div class="form-group">
                         <label class="filter-label">Price Range (₦)</label>
                         <div class="price-inputs">
-                            <input type="number" name="min_price" placeholder="Min" class="filter-input" value="{{ request.args.get('min_price', '') }}">
-                            <input type="number" name="max_price" placeholder="Max" class="filter-input" value="{{ request.args.get('max_price', '') }}">
+                            <input type="number" name="min_price" placeholder="Min" class="input-glassy" value="{{ request.args.get('min_price', '') }}">
+                            <input type="number" name="max_price" placeholder="Max" class="input-glassy" value="{{ request.args.get('max_price', '') }}">
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-filter-apply">Apply Filters</button>
+                    <button type="submit" class="btn-primary-glass" style="width: 100%; margin-top: 1rem;">Apply Filters</button>
                 </form>
             </div>
         </aside>
@@ -79,7 +79,7 @@
                             <p class="course-card-desc">{{ course.description | truncate(100) }}</p>
                             <div class="course-card-footer">
                                 <span class="price-badge">₦{{ "{:,.0f}".format(course.price_naira) }}</span>
-                                <a href="{{ url_for('main.course_detail', course_id=course.id) }}" class="btn-enroll">View Course <i class="fas fa-arrow-right"></i></a>
+                                <a href="{{ url_for('main.course_detail', course_id=course.id) }}" class="btn-primary-glass compact-btn">View Course <i class="fas fa-arrow-right"></i></a>
                             </div>
                         </div>
                     </div>

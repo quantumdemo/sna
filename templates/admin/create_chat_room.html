@@ -5,58 +5,77 @@
 {% block styles %}
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
-    .select2-container .select2-selection--multiple {
-        background-color: #f8f9fa;
-        border-color: #ced4da;
+    /* Custom Select2 Glassy Theme */
+    .select2-container--default .select2-selection--multiple {
+        background-color: rgba(255, 255, 255, 0.3);
+        border: 1px solid transparent;
+        border-image: linear-gradient(to right, #3b82f6, #14b8a6) 1;
+        border-radius: 16px;
+        padding: 0.5rem;
     }
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        background-color: #007bff;
+        background-color: #3b82f6;
+        border-color: #3b82f6;
         color: white;
-        border: none;
+        border-radius: 8px;
     }
     .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-        color: white;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    .select2-dropdown {
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Create New Chat Room</h2>
+<div class="form-container-glassy">
+    <div class="form-header">
+        <h2 class="form-title">Create New Chat Room</h2>
+    </div>
     <form method="POST" action="{{ url_for('admin.create_chat_room') }}" enctype="multipart/form-data">
-        <div class="form-group mb-3">
-            <label for="name">Room Name</label>
-            <input type="text" class="form-control" id="name" name="name" required>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="name">Room Name</label>
+                <input type="text" class="input-glassy" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="cover_image">Cover Image</label>
+                <input type="file" class="input-glassy" id="cover_image" name="cover_image">
+            </div>
+            <div class="form-group full-span">
+                <label for="description">Description</label>
+                <textarea class="input-glassy" id="description" name="description" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="room_type">Room Type</label>
+                <select class="input-glassy" id="room_type" name="room_type">
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="speech_enabled">Options</label>
+                <div class="radio-group-glassy">
+                    <input type="checkbox" class="form-check-input" id="speech_enabled" name="speech_enabled" checked>
+                    <label class="form-check-label" for="speech_enabled">Enable Speech-to-Text</label>
+                </div>
+            </div>
+            <div class="form-group full-span" id="members-select-container" style="display: none;">
+                <label for="members">Select Members for Private Room</label>
+                <select id="members" name="members" multiple="multiple" style="width: 100%;">
+                    {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.name }} ({{ user.email }})</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
-        <div class="form-group mb-3">
-            <label for="cover_image">Cover Image</label>
-            <input type="file" class="form-control" id="cover_image" name="cover_image">
+        <div class="form-actions">
+            <a href="{{ url_for('admin.manage_chat') }}" class="btn-secondary-glass">Cancel</a>
+            <button type="submit" class="btn-primary-glass">Create Room</button>
         </div>
-        <div class="form-group mb-3">
-            <label for="description">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-        </div>
-        <div class="form-group mb-3">
-            <label for="room_type">Room Type</label>
-            <select class="form-control" id="room_type" name="room_type">
-                <option value="public">Public</option>
-                <option value="private">Private</option>
-            </select>
-        </div>
-        <div class="form-group form-check mb-3">
-            <input type="checkbox" class="form-check-input" id="speech_enabled" name="speech_enabled" checked>
-            <label class="form-check-label" for="speech_enabled">Enable Speech-to-Text</label>
-        </div>
-        <div class="form-group mb-3" id="members-select-container" style="display: none;">
-            <label for="members">Select Members for Private Room</label>
-            <select class="form-control" id="members" name="members" multiple="multiple">
-                {% for user in users %}
-                <option value="{{ user.id }}">{{ user.name }} ({{ user.email }})</option>
-                {% endfor %}
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary">Create Room</button>
-        <a href="{{ url_for('admin.manage_chat') }}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
 {% endblock %}
@@ -68,7 +87,8 @@
 $(document).ready(function() {
     $('#members').select2({
         placeholder: "Select members",
-        allowClear: true
+        allowClear: true,
+        width: 'resolve'
     });
 
     $('#room_type').on('change', function() {
@@ -77,7 +97,7 @@ $(document).ready(function() {
         } else {
             $('#members-select-container').hide();
         }
-    });
+    }).trigger('change');
 });
 </script>
 {% endblock %}

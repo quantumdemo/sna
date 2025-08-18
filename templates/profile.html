@@ -30,7 +30,6 @@
                 <h3>Contact Information</h3>
                 <ul class="contact-info">
                     <li><i class="fas fa-envelope"></i> {{ user.email }}</li>
-                    {# Add other contact info here if available in the model #}
                 </ul>
             </div>
 
@@ -42,7 +41,7 @@
                         <div class="glass-card certificate-card">
                             <p class="course-name">{{ cert.course.title }}</p>
                             <p class="completion-date">Issued: {{ cert.issued_at.strftime('%b %d, %Y') }}</p>
-                            <a href="{{ url_for('static', filename=cert.file_path) }}" class="btn-submit" target="_blank" style="margin-top: 1rem; font-size: 0.9rem; padding: 0.5rem 1rem;">View</a>
+                            <a href="{{ url_for('static', filename=cert.file_path) }}" class="btn-secondary-glass" target="_blank">View</a>
                         </div>
                         {% endfor %}
                     {% else %}
@@ -54,41 +53,55 @@
                 </div>
             </div>
 
-            <div class="glass-card profile-section profile-form">
-                <h3>Edit Profile</h3>
+            <!-- Edit Profile Form -->
+            <div class="form-container-glassy">
+                <div class="form-header">
+                    <h2 class="form-title">Edit Profile</h2>
+                </div>
                 <form action="{{ url_for('main.edit_profile') }}" method="post" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" name="name" value="{{ user.name }}">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" value="{{ user.name }}" class="input-glassy">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" value="{{ user.email }}" class="input-glassy">
+                        </div>
+                        <div class="form-group full-span">
+                            <label for="bio">Bio</label>
+                            <textarea name="bio" id="bio" rows="5" class="input-glassy">{{ user.bio or '' }}</textarea>
+                        </div>
+                        <div class="form-group full-span">
+                            <label for="profile_pic">Update Profile Picture</label>
+                            <input type="file" name="profile_pic" id="profile_pic" class="input-glassy">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" value="{{ user.email }}">
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary-glass">Update Profile</button>
                     </div>
-                    <div class="form-group">
-                        <label for="bio">Bio</label>
-                        <textarea name="bio" id="bio" rows="5">{{ user.bio or '' }}</textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="profile_pic">Update Profile Picture</label>
-                        <input type="file" name="profile_pic" id="profile_pic">
-                    </div>
-                    <button type="submit" class="btn-submit">Update Profile</button>
                 </form>
             </div>
 
-            <div class="glass-card profile-section profile-form">
-                <h3>Change Password</h3>
+            <!-- Change Password Form -->
+            <div class="form-container-glassy">
+                <div class="form-header">
+                    <h2 class="form-title">Change Password</h2>
+                </div>
                 <form action="{{ url_for('main.change_password') }}" method="post">
-                    <div class="form-group">
-                        <label for="old_password">Old Password</label>
-                        <input type="password" name="old_password" id="old_password" required>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="old_password">Old Password</label>
+                            <input type="password" name="old_password" id="old_password" required class="input-glassy">
+                        </div>
+                        <div class="form-group">
+                            <label for="new_password">New Password</label>
+                            <input type="password" name="new_password" id="new_password" required class="input-glassy">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="new_password">New Password</label>
-                        <input type="password" name="new_password" id="new_password" required>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary-glass">Change Password</button>
                     </div>
-                    <button type="submit" class="btn-submit">Change Password</button>
                 </form>
             </div>
         </main>

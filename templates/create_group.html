@@ -2,130 +2,96 @@
 
 {% block title %}Create New Group{% endblock %}
 
-{% block styles %}
-<style>
-    .form-container {
-        max-width: 600px;
-        margin: 2rem auto;
-        padding: 2rem;
-        background-color: #1F262D;
-        border-radius: 10px;
-        color: white;
-    }
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: bold;
-    }
-    .form-group input[type="text"],
-    .form-group textarea {
-        width: 100%;
-        padding: 0.75rem;
-        border-radius: 5px;
-        border: 1px solid #808080;
-        background-color: #2A343D;
-        color: white;
-    }
-    .form-group textarea {
-        resize: vertical;
-    }
-    .form-group .radio-group {
-        display: flex;
-        gap: 1rem;
-    }
-    .btn-submit {
-        width: 100%;
-        padding: 0.75rem;
-        border: none;
-        border-radius: 5px;
-        background-color: #007BFF;
-        color: white;
-        font-size: 1rem;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-    .btn-submit:hover {
-        background-color: #0056b3;
-    }
-    .user-list {
-        max-height: 200px;
-        overflow-y: auto;
-        border: 1px solid #808080;
-        border-radius: 5px;
-        padding: 0.5rem;
-        margin-top: 0.5rem;
-    }
-    .user-item {
-        display: flex;
-        align-items: center;
-        padding: 0.5rem;
-    }
-    .user-item:hover {
-        background-color: #2A343D;
-    }
-    .user-item input[type="checkbox"] {
-        margin-right: 0.5rem;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="form-container">
-    <h2>Create New Group</h2>
+<div class="form-container-glassy">
+    <div class="form-header">
+        <h2 class="form-title">Create New Group</h2>
+    </div>
     <form action="{{ url_for('main.create_group') }}" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="group_name">Group Name</label>
-            <input type="text" id="group_name" name="group_name" required>
-        </div>
-        <div class="form-group">
-            <label for="group_description">Group Description</label>
-            <textarea id="group_description" name="group_description" rows="3"></textarea>
-        </div>
-        <div class="form-group">
-            <label for="group_icon">Group Icon</label>
-            <input type="file" id="group_icon" name="group_icon" accept="image/*">
-        </div>
-        <div class="form-group">
-            <label>Group Type</label>
-            <div class="radio-group">
-                <label>
-                    <input type="radio" name="group_type" value="public" checked> Public
-                </label>
-                <label>
-                    <input type="radio" name="group_type" value="private"> Private
-                </label>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="group_name">Group Name</label>
+                <input type="text" id="group_name" name="group_name" required class="input-glassy">
             </div>
-        </div>
-        <div class="form-group">
-            <label>Add Members</label>
-            <input type="text" id="member-search" placeholder="Search for users...">
-            <div class="user-list">
-                {% for user in users %}
-                <div class="user-item">
-                    <input type="checkbox" name="members" value="{{ user.id }}" id="user-{{ user.id }}">
-                    <label for="user-{{ user.id }}">{{ user.name }}</label>
+            <div class="form-group">
+                <label for="group_icon">Group Icon</label>
+                <input type="file" id="group_icon" name="group_icon" accept="image/*" class="input-glassy">
+            </div>
+            <div class="form-group full-span">
+                <label for="group_description">Group Description</label>
+                <textarea id="group_description" name="group_description" rows="3" class="input-glassy"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Group Type</label>
+                <div class="radio-group-glassy">
+                    <label>
+                        <input type="radio" name="group_type" value="public" checked> Public
+                    </label>
+                    <label>
+                        <input type="radio" name="group_type" value="private"> Private
+                    </label>
                 </div>
-                {% endfor %}
+            </div>
+            <div class="form-group full-span">
+                <label>Add Members</label>
+                <input type="text" id="member-search" placeholder="Search for users..." class="input-glassy">
+                <div class="user-list-glassy">
+                    {% for user in users %}
+                    <div class="user-item-glassy">
+                        <input type="checkbox" name="members" value="{{ user.id }}" id="user-{{ user.id }}">
+                        <label for="user-{{ user.id }}">{{ user.name }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
-        <button type="submit" class="btn-submit">Create Group</button>
+        <div class="form-actions">
+            <button type="submit" class="btn-primary-glass">Create Group</button>
+        </div>
     </form>
 </div>
+
+<style>
+.user-list-glassy {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+}
+.user-item-glassy {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 8px;
+}
+.user-item-glassy:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+.user-item-glassy input[type="checkbox"] {
+    margin-right: 1rem;
+}
+.radio-group-glassy {
+    display: flex;
+    gap: 1.5rem;
+    background: rgba(255,255,255,0.1);
+    padding: 1rem;
+    border-radius: 12px;
+}
+</style>
 {% endblock %}
 
 {% block scripts %}
 <script>
     document.getElementById('member-search').addEventListener('keyup', function() {
         let filter = this.value.toLowerCase();
-        let users = document.querySelectorAll('.user-item');
+        let users = document.querySelectorAll('.user-item-glassy');
         users.forEach(user => {
             let label = user.querySelector('label');
             if (label.textContent.toLowerCase().includes(filter)) {
-                user.style.display = '';
+                user.style.display = 'flex';
             } else {
                 user.style.display = 'none';
             }

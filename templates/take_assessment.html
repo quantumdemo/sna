@@ -4,48 +4,46 @@
 
 {% block content %}
 <div id="assessment-container">
-    <section id="assessment-page">
-        <h1>{{ assessment.title or 'Assessment' }}</h1>
+    <section id="assessment-page" class="form-container-glassy">
+        <div class="form-header">
+            <h1 class="form-title">{{ assessment.title or 'Assessment' }}</h1>
+        </div>
 
         {% if time_limit %}
-        <div id="timer">Time Remaining: <span id="time">{{ time_limit }}:00</span></div>
+        <div id="timer" class="timer-glassy">Time Remaining: <span id="time">{{ time_limit }}:00</span></div>
         {% endif %}
 
         <form id="assessment-form" action="{{ submit_url }}" method="post">
             {% for question in assessment.questions %}
-            <div class="question">
-                {# Check if question is from new DB model or old JSON structure #}
-                {% if question.question_text %}
-                    <p><strong>Question {{ loop.index }}:</strong> {{ question.question_text }}</p>
-                    <div class="options">
+            <div class="form-group question-glassy">
+                <p class="question-text"><strong>Question {{ loop.index }}:</strong> {{ question.question_text if question.question_text else question.q }}</p>
+                <div class="options">
+                    {% if question.choices %}
                         {% for choice in question.choices %}
-                        <div>
+                        <div class="option-item">
                             <input type="radio" name="q_{{ question.id }}" id="q_{{ question.id }}_c_{{ choice.id }}" value="{{ choice.id }}" required>
                             <label for="q_{{ question.id }}_c_{{ choice.id }}">{{ choice.choice_text }}</label>
                         </div>
                         {% endfor %}
-                    </div>
-                {% else %}
-                    {# Fallback for old JSON-based quizzes #}
-                    <p><strong>Question {{ loop.index }}:</strong> {{ question.q }}</p>
-                    <div class="options">
+                    {% else %}
                         {% for option in question.options %}
-                        <div>
+                        <div class="option-item">
                             <input type="radio" name="q_{{ loop.parent.index }}" id="q_{{ loop.parent.index }}_o_{{ loop.index }}" value="{{ loop.index - 1 }}" required>
                             <label for="q_{{ loop.parent.index }}_o_{{ loop.index }}">{{ option }}</label>
                         </div>
                         {% endfor %}
-                    </div>
-                {% endif %}
+                    {% endif %}
+                </div>
             </div>
-            <hr>
             {% endfor %}
-            <button type="submit" class="btn">Submit Answers</button>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary-glass">Submit Answers</button>
+            </div>
         </form>
     </section>
 
     {% if assessment.calculator_allowed %}
-    <aside id="calculator">
+    <aside id="calculator" class="glass-card">
         <div id="calc-display">0</div>
         <div class="calc-keys">
             <button class="calc-btn" data-key="clear">C</button>
@@ -73,8 +71,8 @@
 </div>
 
 <div id="violation-overlay" style="display: none;">
-    <div class="violation-modal">
-        <h2>Exam Locked</h2>
+    <div class="violation-modal glass-card">
+        <h2 class="form-title">Exam Locked</h2>
         <p>You have been locked out of the exam due to leaving the page. This incident has been logged.</p>
         <p>You may appeal this decision after the exam period has concluded.</p>
         <p>Violations logged: <span id="violation-count">1</span></p>

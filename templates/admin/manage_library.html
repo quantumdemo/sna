@@ -13,14 +13,14 @@
     <div class="filter-bar">
         <div class="search-box">
             <i class="fas fa-search"></i>
-            <input type="text" placeholder="Search for materials...">
+            <input type="text" placeholder="Search for materials..." class="input-glassy" style="border-radius: 9999px; padding-left: 2.5rem;">
         </div>
         <div class="filter-dropdowns">
-            <select name="category">
+            <select name="category" class="input-glassy">
                 <option value="">All Categories</option>
                 <!-- Populate categories from DB -->
             </select>
-            <select name="status">
+            <select name="status" class="input-glassy">
                 <option value="">All Statuses</option>
                 <option value="approved">Approved</option>
                 <option value="pending">Pending</option>
@@ -54,12 +54,12 @@
             <div class="card-footer">
                 {% if not item.approved and not item.rejection_reason %}
                     <form action="{{ url_for('admin.approve_library_material', material_id=item.id) }}" method="post" style="display: inline;">
-                        <button type="submit" class="btn-glass approve compact-btn">Approve</button>
+                        <button type="submit" class="btn-primary-glass compact-btn">Approve</button>
                     </form>
-                    <button class="btn-glass reject compact-btn">Reject</button>
+                    <button class="btn-secondary-glass compact-btn">Reject</button>
                 {% endif %}
                  <form action="{{ url_for('admin.delete_library_material', material_id=item.id) }}" method="post" style="display: inline;">
-                    <button type="submit" class="btn-glass reject compact-btn"><i class="fas fa-trash"></i></button>
+                    <button type="submit" class="btn-secondary-glass compact-btn"><i class="fas fa-trash"></i></button>
                 </form>
             </div>
         </div>

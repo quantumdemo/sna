@@ -3,9 +3,11 @@
 {% block title %}Exam Appeal{% endblock %}
 
 {% block content %}
-<section id="exam-appeal-page">
-    <h1>Exam Locked: {{ submission.final_exam.course.title }}</h1>
-    <p>Your exam has been locked due to a suspected violation (e.g., leaving the exam tab).</p>
+<div class="form-container-glassy">
+    <div class="form-header">
+        <h1 class="form-title">Exam Locked: {{ submission.final_exam.course.title }}</h1>
+        <p>Your exam has been locked due to a suspected violation (e.g., leaving the exam tab).</p>
+    </div>
 
     <div class="violation-details">
         <h3>Violation Log</h3>
@@ -20,7 +22,7 @@
         {% endif %}
     </div>
 
-    <hr>
+    <hr style="border-color: rgba(255,255,255,0.2); margin: 2rem 0;">
 
     {% if submission.appeal_status == 'pending' %}
         <div class="alert alert-info">Your appeal is currently pending review by the instructor.</div>
@@ -34,19 +36,40 @@
             {% endif %}
         </div>
     {% else %}
-        <h3>Submit an Appeal</h3>
-        <p>If you believe this was a mistake, you can submit an appeal to your instructor for review.</p>
+        <div class="form-header">
+            <h3 class="form-title" style="font-size: 1.8rem;">Submit an Appeal</h3>
+            <p>If you believe this was a mistake, you can submit an appeal to your instructor for review.</p>
+        </div>
         <form action="{{ url_for('main.submit_appeal', submission_id=submission.id) }}" method="post">
-            <div>
+            <div class="form-group">
                 <label for="appeal_text">Your Explanation:</label>
-                <textarea name="appeal_text" id="appeal_text" rows="5" required placeholder="Please explain why the violation occurred (e.g., unstable internet connection, accidental click, etc.)."></textarea>
+                <textarea name="appeal_text" id="appeal_text" rows="5" required placeholder="Please explain why the violation occurred (e.g., unstable internet connection, accidental click, etc.)." class="input-glassy"></textarea>
             </div>
-            <button type="submit" class="btn">Submit Appeal</button>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary-glass">Submit Appeal</button>
+            </div>
         </form>
     {% endif %}
 
-    <div style="margin-top: 20px;">
-        <a href="{{ url_for('main.student_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    <div style="margin-top: 20px; text-align: center;">
+        <a href="{{ url_for('main.student_dashboard') }}" class="btn-secondary-glass">Back to Dashboard</a>
     </div>
-</section>
+</div>
+
+<style>
+.violation-details {
+    background: rgba(255,255,255,0.1);
+    padding: 1.5rem;
+    border-radius: 12px;
+}
+.alert {
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+}
+.alert-info { background: rgba(59, 130, 246, 0.2); color: #dbeafe;}
+.alert-success { background: rgba(34, 197, 94, 0.2); color: #dcfce7;}
+.alert-danger { background: rgba(239, 68, 68, 0.2); color: #fee2e2;}
+</style>
 {% endblock %}
