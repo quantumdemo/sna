@@ -3,10 +3,13 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
-<section id="admin-dashboard">
-    <h1>Admin Dashboard</h1>
-    <p>Welcome, {{ current_user.name }}.</p>
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Admin Dashboard</h1>
+        <p>Welcome back, {{ current_user.name }}.</p>
+    </div>
 
+    <!-- Admin Stats and Charts -->
     <div class="admin-stats">
         <div class="stat-card">
             <h3>Total Users</h3>
@@ -30,20 +33,74 @@
         <canvas id="userRolesChart"></canvas>
     </div>
 
-    <hr>
+    <hr class="admin-divider">
 
-    <nav class="admin-nav">
-        <a href="{{ url_for('admin.manage_users') }}" class="btn">Manage Users</a>
-        <a href="{{ url_for('admin.manage_courses') }}" class="btn">Manage Courses</a>
-        <a href="{{ url_for('admin.manage_categories') }}" class="btn">Manage Categories</a>
-        <a href="{{ url_for('admin.manage_library') }}" class="btn">Manage Library</a>
-        <a href="{{ url_for('admin.pending_payments') }}" class="btn">Course Payments</a>
-        <a href="{{ url_for('admin.library_payments') }}" class="btn">Library Payments</a>
-        <a href="{{ url_for('admin.manage_certificate_requests') }}" class="btn">Certificate Requests</a>
-        <a href="{{ url_for('admin.reported_messages') }}" class="btn">Reported Messages</a>
-        <a href="{{ url_for('admin.manage_chat') }}" class="btn">Manage Chat</a>
-    </nav>
-</section>
+    <!-- Admin Action Grid -->
+    <div class="admin-grid">
+        <!-- Manage Users -->
+        <a href="{{ url_for('admin.manage_users') }}" class="glass-card glow-blue">
+            <div class="card-icon"><i class="fas fa-users-cog"></i></div>
+            <h3 class="card-title">Manage Users</h3>
+            <p class="card-subtitle">Add, remove, and edit user profiles.</p>
+        </a>
+
+        <!-- Manage Courses -->
+        <a href="{{ url_for('admin.manage_courses') }}" class="glass-card glow-green">
+            <div class="card-icon"><i class="fas fa-book-open"></i></div>
+            <h3 class="card-title">Manage Courses</h3>
+            <p class="card-subtitle">Create, edit, and manage course content.</p>
+        </a>
+
+        <!-- Manage Chat -->
+        <a href="{{ url_for('admin.manage_chat') }}" class="glass-card glow-purple">
+            <div class="card-icon"><i class="fas fa-comments"></i></div>
+            <h3 class="card-title">Manage Chat</h3>
+            <p class="card-subtitle">Oversee chat rooms and communications.</p>
+        </a>
+
+        <!-- Manage Group Requests -->
+        <a href="{{ url_for('admin.manage_group_requests') }}" class="glass-card glow-teal">
+            <div class="card-icon"><i class="fas fa-user-friends"></i></div>
+            <h3 class="card-title">Group Requests</h3>
+            <p class="card-subtitle">Approve or deny group memberships.</p>
+        </a>
+
+        <!-- Manage Library -->
+        <a href="{{ url_for('admin.manage_library') }}" class="glass-card glow-indigo">
+            <div class="card-icon"><i class="fas fa-book-reader"></i></div>
+            <h3 class="card-title">Manage Library</h3>
+            <p class="card-subtitle">Upload and organize library materials.</p>
+        </a>
+
+        <!-- Pending Payments -->
+        <a href="{{ url_for('admin.pending_payments') }}" class="glass-card glow-orange">
+            <div class="card-icon"><i class="fas fa-credit-card"></i></div>
+            <h3 class="card-title">Pending Payments</h3>
+            <p class="card-subtitle">Review and confirm course payments.</p>
+        </a>
+
+        <!-- Certificate Requests -->
+        <a href="{{ url_for('admin.manage_certificate_requests') }}" class="glass-card glow-yellow">
+            <div class="card-icon"><i class="fas fa-graduation-cap"></i></div>
+            <h3 class="card-title">Certificate Requests</h3>
+            <p class="card-subtitle">Issue certificates to qualified students.</p>
+        </a>
+
+        <!-- Reported Messages -->
+        <a href="{{ url_for('admin.reported_messages') }}" class="glass-card glow-red">
+            <div class="card-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3 class="card-title">Reported Messages</h3>
+            <p class="card-subtitle">Review and take action on reports.</p>
+        </a>
+
+        <!-- Manage Categories -->
+        <a href="{{ url_for('admin.manage_categories') }}" class="glass-card glow-cyan">
+            <div class="card-icon"><i class="fas fa-sitemap"></i></div>
+            <h3 class="card-title">Manage Categories</h3>
+            <p class="card-subtitle">Organize courses into categories.</p>
+        </a>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -66,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 borderColor: [
                     'rgba(255, 99, 132, 1)',
                     'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)'
+                    'rgba(255, 206, 86,.8)'
                 ],
                 borderWidth: 1
             }]

@@ -1,0 +1,276 @@
+/* static/css/admin_dashboard.css */
+
+/* --- Base Admin Body Styling --- */
+body.admin-page {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f0f8ff; /* AliceBlue - Fallback */
+    background: linear-gradient(
+        -45deg,
+        #f5f5f5, /* Pearl White */
+        #f8f8ff, /* Icy White */
+        #e0f7fa, /* Aqua Blue */
+        #e6e6fa  /* Soft Sky (Lavender) */
+    );
+    background-size: 400% 400%;
+    animation: gradientBG 20s ease infinite;
+    color: #333;
+    position: relative;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* --- Floating Particles --- */
+/* (Keep existing particle styles) */
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    animation: float 25s infinite ease-in-out;
+}
+/* (Keep existing particle child styles) */
+
+/* --- Admin Navigation Bar --- */
+.admin-page .site-header {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.admin-page .site-logo,
+.admin-page .main-nav a {
+    color: #0D1B4C !important;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.admin-page .main-nav a::after {
+    background-color: #0D1B4C !important;
+    box-shadow: 0 0 8px #0D1B4C !important;
+}
+
+/* --- Admin Layout & Typography --- */
+.admin-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.admin-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.admin-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a2551;
+    margin-bottom: 0.5rem;
+}
+
+.admin-header p {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #4a557d;
+}
+
+/* --- Glass Card Grid --- */
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+/* --- Glass Card Styling --- */
+.glass-card {
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 24px; /* 2xl */
+    padding: 2rem;
+    text-align: center;
+    text-decoration: none;
+    color: #1a2551;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+        inset 0 0 2px 0 rgba(255,255,255,0.7), /* inner */
+        0 8px 32px 0 rgba(31, 38, 135, 0.1);  /* outer */
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(224, 247, 250, 0.2), rgba(255, 255, 255, 0) 70%);
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.card-icon {
+    font-size: 40px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.card-subtitle {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4a557d;
+}
+
+/* --- Card Hover & Focus Effects --- */
+.glass-card:hover, .glass-card:focus {
+    transform: translateY(-10px);
+    box-shadow:
+        inset 0 0 4px 1px rgba(255,255,255,0.9), /* inner */
+        0 16px 45px 0 rgba(31, 38, 135, 0.15); /* outer */
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+.glass-card:hover::before {
+    opacity: 1;
+}
+
+.glass-card:hover .card-icon {
+    transform: scale(1.1);
+}
+
+/* --- Card Glow Colors --- */
+@keyframes neon-glow {
+    from { text-shadow: 0 0 5px, 0 0 10px, 0 0 15px; }
+    to { text-shadow: 0 0 10px, 0 0 20px, 0 0 30px; }
+}
+
+.glass-card:hover .card-icon {
+    animation: neon-glow 1.5s ease-in-out infinite alternate;
+}
+
+.glow-blue:hover .card-icon { color: #3b82f6; text-shadow: 0 0 20px #3b82f6; }
+.glow-green:hover .card-icon { color: #22c55e; text-shadow: 0 0 20px #22c55e; }
+.glow-purple:hover .card-icon { color: #a855f7; text-shadow: 0 0 20px #a855f7; }
+.glow-teal:hover .card-icon { color: #14b8a6; text-shadow: 0 0 20px #14b8a6; }
+.glow-indigo:hover .card-icon { color: #6366f1; text-shadow: 0 0 20px #6366f1; }
+.glow-orange:hover .card-icon { color: #f97316; text-shadow: 0 0 20px #f97316; }
+.glow-yellow:hover .card-icon { color: #eab308; text-shadow: 0 0 20px #eab308; }
+.glow-red:hover .card-icon { color: #ef4444; text-shadow: 0 0 20px #ef4444; }
+.glow-cyan:hover .card-icon { color: #06b6d4; text-shadow: 0 0 20px #06b6d4; }
+
+/* --- General Purpose Glass Button --- */
+.btn-glass {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    color: #1a2551;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(31, 38, 135, 0.1);
+}
+
+.btn-glass:hover, .btn-glass:focus {
+    background: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 6px 20px rgba(31, 38, 135, 0.2);
+    transform: translateY(-2px);
+}
+
+.btn-glass.approve { box-shadow: 0 0 15px #22c55e; }
+.btn-glass.reject { box-shadow: 0 0 15px #ef4444; }
+.btn-glass.info { box-shadow: 0 0 15px #3b82f6; }
+
+
+/* --- Stats and Charts --- */
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.stat-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #4a557d;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card p {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a2551;
+}
+
+.admin-charts {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.admin-divider {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.75), rgba(0, 0, 0, 0));
+    margin: 3rem 0;
+}
+
+/* --- Responsiveness --- */
+@media (max-width: 1024px) {
+    .admin-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    .admin-grid {
+        grid-template-columns: 1fr;
+    }
+    .admin-container {
+        padding: 1rem;
+    }
+    .admin-header h1 {
+        font-size: 2rem;
+    }
+}
