@@ -18,8 +18,24 @@
 
     <!-- Page-specific styles -->
     {% block styles %}{% endblock %}
+
+    <!-- Load admin-specific styles if on an admin page -->
+    {% if request.endpoint and request.endpoint.startswith('admin.') %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+    {% endif %}
 </head>
-<body>
+<body class="{{ 'admin-page' if request.endpoint and request.endpoint.startswith('admin.') else '' }}">
+    <!-- Particle background for admin -->
+    {% if request.endpoint and request.endpoint.startswith('admin.') %}
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    {% endif %}
+
     <header class="site-header" role="banner">
         <div class="nav-container">
             <div class="site-logo">ScholarsNovara</div>
