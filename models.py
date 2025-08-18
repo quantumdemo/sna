@@ -362,6 +362,19 @@ class Poll(db.Model):
     message_id = db.Column(db.Integer, db.ForeignKey('chat_message.id'))
     message = db.relationship('ChatMessage', back_populates='poll')
 
+class GroupRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    cover_image = db.Column(db.String(150), nullable=True)
+    room_type = db.Column(db.String(50), nullable=False, default='public')
+    requested_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    status = db.Column(db.String(50), nullable=False, default='pending') # pending, approved, rejected
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    rejection_reason = db.Column(db.Text, nullable=True)
+
+    requester = db.relationship('User', backref='group_requests')
+
 class PollOption(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     poll_id = db.Column(db.Integer, db.ForeignKey('poll.id'), nullable=False)

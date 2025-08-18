@@ -61,6 +61,7 @@
                         <a href="{{ nav_links.library }}" class="{{ 'active' if request.endpoint == 'main.library' }}">Library <small>(upload)</small></a>
                     {% elif current_user.role == 'admin' %}
                         <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if request.endpoint == 'admin.dashboard' }}">Dashboard</a>
+                        <a href="{{ url_for('admin.manage_group_requests') }}" class="{{ 'active' if request.endpoint == 'admin.manage_group_requests' }}">Group Requests</a>
                         <a href="{{ nav_links.profile }}" class="{{ 'active' if request.endpoint == 'main.profile' }}">Profile</a>
                         <a href="{{ nav_links.chat }}" class="{{ 'active' if request.endpoint == 'main.chat_list' }}">Chat</a>
                     {% endif %}
