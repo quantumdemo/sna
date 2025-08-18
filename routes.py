@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
 import random
 import secrets
-from models import User, Course, Category, Comment, Lesson, LibraryMaterial, Assignment, AssignmentSubmission, Quiz, FinalExam, QuizSubmission, ExamSubmission, Enrollment, LessonCompletion, Module, Certificate, CertificateRequest, LibraryPurchase, ChatRoom, ChatRoomMember, UserLastRead, ChatMessage, ExamViolation
+from models import User, Course, Category, Comment, Lesson, LibraryMaterial, Assignment, AssignmentSubmission, Quiz, FinalExam, QuizSubmission, ExamSubmission, Enrollment, LessonCompletion, Module, Certificate, CertificateRequest, LibraryPurchase, ChatRoom, ChatRoomMember, UserLastRead, ChatMessage, ExamViolation, GroupRequest
 from extensions import db
 from utils import save_chat_file
 
@@ -709,49 +709,58 @@ def create_group():
         group_name = request.form.get('group_name')
         group_description = request.form.get('group_description')
         group_type = request.form.get('group_type')
-        members = request.form.getlist('members')
+        members = request.form.getlist('members') # This will be handled upon approval for non-admins
 
-        new_room = ChatRoom(
-            name=group_name,
-            description=group_description,
-            room_type=group_type,
-            created_by_id=current_user.id
-        )
-
+        icon_path = None
         if 'group_icon' in request.files:
             file = request.files['group_icon']
             if file.filename != '':
                 icon_path = save_group_icon(file)
-                new_room.cover_image = icon_path
 
-        if group_type == 'public':
-            new_room.join_token = secrets.token_urlsafe(16)
+        # Admin role creates the group directly
+        if current_user.role == 'admin':
+            new_room = ChatRoom(
+                name=group_name,
+                description=group_description,
+                room_type=group_type,
+                created_by_id=current_user.id,
+                cover_image=icon_path
+            )
+            if group_type == 'public':
+                new_room.join_token = secrets.token_urlsafe(16)
 
-        db.session.add(new_room)
-        db.session.commit()
+            db.session.add(new_room)
+            db.session.commit()
 
-        # Add creator as admin
-        creator_member = ChatRoomMember(
-            chat_room_id=new_room.id,
-            user_id=current_user.id,
-            role_in_room='admin'
-        )
-        db.session.add(creator_member)
+            # Add creator as admin
+            creator_member = ChatRoomMember(chat_room_id=new_room.id, user_id=current_user.id, role_in_room='admin')
+            db.session.add(creator_member)
 
-        # Add selected members
-        for user_id in members:
-            if int(user_id) != current_user.id:
-                member = ChatRoomMember(
-                    chat_room_id=new_room.id,
-                    user_id=int(user_id),
-                    role_in_room='member'
-                )
-                db.session.add(member)
+            # Add selected members
+            for user_id in members:
+                if int(user_id) != current_user.id:
+                    member = ChatRoomMember(chat_room_id=new_room.id, user_id=int(user_id), role_in_room='member')
+                    db.session.add(member)
 
-        db.session.commit()
-        flash('Group created successfully!', 'success')
-        return redirect(url_for('main.chat_room', room_id=new_room.id))
+            db.session.commit()
+            flash('Group created successfully!', 'success')
+            return redirect(url_for('main.chat_room', room_id=new_room.id))
 
+        # Instructor and Student roles submit a request
+        else:
+            new_request = GroupRequest(
+                name=group_name,
+                description=group_description,
+                room_type=group_type,
+                requested_by_id=current_user.id,
+                cover_image=icon_path
+            )
+            db.session.add(new_request)
+            db.session.commit()
+            flash('Your group request has been sent for Admin approval.', 'success')
+            return redirect(url_for('main.chat_list'))
+
+    # For GET request
     users = User.query.filter(User.id != current_user.id).all()
     return render_template('create_group.html', users=users)
 

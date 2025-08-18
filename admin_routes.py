@@ -2,10 +2,11 @@ from flask import Blueprint, render_template, abort, flash, redirect, url_for, r
 from flask_login import login_required, current_user
 import os
 
-from models import User, Course, Category, LibraryMaterial, PlatformSetting, Enrollment, CertificateRequest, Certificate, LibraryPurchase, ChatRoom, ChatRoomMember, MutedUser, ReportedMessage, AdminLog
+from models import User, Course, Category, LibraryMaterial, PlatformSetting, Enrollment, CertificateRequest, Certificate, LibraryPurchase, ChatRoom, ChatRoomMember, MutedUser, ReportedMessage, AdminLog, GroupRequest
 from extensions import db
 from pdf_generator import generate_certificate_pdf
 from utils import save_chat_room_cover_image
+import secrets
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -49,6 +50,59 @@ def dashboard():
 def manage_chat():
     all_rooms = ChatRoom.query.order_by(ChatRoom.name).all()
     return render_template('admin/manage_chat.html', rooms=all_rooms)
+
+@admin_bp.route('/group-requests')
+def manage_group_requests():
+    pending_requests = GroupRequest.query.filter_by(status='pending').order_by(GroupRequest.created_at.desc()).all()
+    return render_template('admin/manage_group_requests.html', requests=pending_requests)
+
+@admin_bp.route('/group-request/<int:request_id>/approve', methods=['POST'])
+def approve_group_request(request_id):
+    group_request = GroupRequest.query.get_or_404(request_id)
+
+    # Create the chat room
+    new_room = ChatRoom(
+        name=group_request.name,
+        description=group_request.description,
+        room_type=group_request.room_type,
+        created_by_id=group_request.requested_by_id,
+        cover_image=group_request.cover_image
+    )
+    if new_room.room_type == 'public':
+        new_room.join_token = secrets.token_urlsafe(16)
+
+    db.session.add(new_room)
+    db.session.commit()
+
+    # Add the requester as an admin of the new group
+    creator_member = ChatRoomMember(
+        chat_room_id=new_room.id,
+        user_id=group_request.requested_by_id,
+        role_in_room='admin'
+    )
+    db.session.add(creator_member)
+
+    # Update the request status
+    group_request.status = 'approved'
+    db.session.commit()
+
+    flash(f"Group request for '{group_request.name}' has been approved.", 'success')
+    return redirect(url_for('admin.manage_group_requests'))
+
+@admin_bp.route('/group-request/<int:request_id>/reject', methods=['POST'])
+def reject_group_request(request_id):
+    group_request = GroupRequest.query.get_or_404(request_id)
+
+    rejection_reason = request.form.get('rejection_reason')
+
+    group_request.status = 'rejected'
+    if rejection_reason:
+        group_request.rejection_reason = rejection_reason
+
+    db.session.commit()
+
+    flash(f"Group request for '{group_request.name}' has been rejected.", 'success')
+    return redirect(url_for('admin.manage_group_requests'))
 
 @admin_bp.route('/chat/create', methods=['GET', 'POST'])
 def create_chat_room():
