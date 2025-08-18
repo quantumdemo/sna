@@ -53,7 +53,7 @@
             {% if is_enrolled and course.final_exam %}
                 <hr>
                 <h3>Final Exam</h3>
-                <a href="{{ url_for('main.take_exam', exam_id=course.final_exam.id) }}" class="btn">Take Final Exam</a>
+                <a href="{{ url_for('main.take_exam', exam_id=course.final_exam.id) }}" class="btn-primary-glass">Take Final Exam</a>
             {% endif %}
         </div>
 
@@ -61,28 +61,34 @@
             <div class="enroll-box">
                 {% if is_enrolled %}
                     <p>You are enrolled in this course.</p>
-                    <a href="#" class="btn">Go to Dashboard</a> {# Link to student dashboard lesson #}
+                    <a href="#" class="btn-secondary-glass">Go to Dashboard</a> {# Link to student dashboard lesson #}
                 {% else %}
                     <h2>Price: ₦{{ "{:,.2f}".format(course.price_naira) }}</h2>
-                    <a href="{{ url_for('main.enroll', course_id=course.id) }}" class="btn">Enroll Now</a>
+                    <a href="{{ url_for('main.enroll', course_id=course.id) }}" class="btn-primary-glass">Enroll Now</a>
                 {% endif %}
             </div>
         </aside>
     </div>
 
-    <div class="course-comments">
-        <h2>Comments</h2>
+    <div class="course-comments form-container-glassy">
+        <div class="form-header">
+            <h2 class="form-title">Leave a Review</h2>
+        </div>
         {% if is_enrolled %}
             <form action="{{ url_for('main.post_comment', course_id=course.id) }}" method="post">
-                <div>
-                    <label for="rating">Your Rating (1-5):</label>
-                    <input type="number" name="rating" id="rating" min="1" max="5" required>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="rating">Your Rating (1-5):</label>
+                        <input type="number" name="rating" id="rating" min="1" max="5" required class="input-glassy">
+                    </div>
+                    <div class="form-group full-span">
+                        <label for="comment_body">Your Review:</label>
+                        <textarea name="comment_body" id="comment_body" rows="4" placeholder="Write a review..." required class="input-glassy"></textarea>
+                    </div>
                 </div>
-                <div>
-                    <label for="comment_body">Your Review:</label>
-                    <textarea name="comment_body" id="comment_body" rows="4" placeholder="Write a review..." required></textarea>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary-glass">Submit Review</button>
                 </div>
-                <button type="submit" class="btn">Submit Review</button>
             </form>
         {% else %}
             <p>You must be enrolled to post comments.</p>

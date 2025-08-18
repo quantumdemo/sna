@@ -5,30 +5,42 @@
 {% block styles %}
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
-    .select2-container .select2-selection--multiple {
-        background-color: #f8f9fa;
-        border-color: #ced4da;
+    /* Custom Select2 Glassy Theme */
+    .select2-container--default .select2-selection--multiple {
+        background-color: rgba(255, 255, 255, 0.3);
+        border: 1px solid transparent;
+        border-image: linear-gradient(to right, #3b82f6, #14b8a6) 1;
+        border-radius: 16px;
+        padding: 0.5rem;
     }
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        background-color: #007bff;
+        background-color: #3b82f6;
+        border-color: #3b82f6;
         color: white;
-        border: none;
+        border-radius: 8px;
     }
     .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-        color: white;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    .select2-dropdown {
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Manage Members for Room: <strong>{{ room.name }}</strong></h2>
-    <p>This room is private. Only selected users will have access.</p>
+<div class="form-container-glassy">
+    <div class="form-header">
+        <h2 class="form-title">Manage Members for: {{ room.name }}</h2>
+        <p>This room is private. Only selected users will have access.</p>
+    </div>
 
     <form method="POST" action="{{ url_for('admin.manage_chat_members', room_id=room.id) }}">
-        <div class="form-group mb-3">
+        <div class="form-group">
             <label for="members">Select Members</label>
-            <select class="form-control" id="members" name="members" multiple="multiple">
+            <select id="members" name="members" multiple="multiple" style="width: 100%;">
                 {% for user in users %}
                 <option value="{{ user.id }}" {% if user.id in member_ids %}selected{% endif %}>
                     {{ user.name }} ({{ user.email }})
@@ -36,8 +48,10 @@
                 {% endfor %}
             </select>
         </div>
-        <button type="submit" class="btn btn-primary">Update Members</button>
-        <a href="{{ url_for('admin.manage_chat') }}" class="btn btn-secondary">Back to Room List</a>
+        <div class="form-actions">
+            <a href="{{ url_for('admin.manage_chat') }}" class="btn-secondary-glass">Back to Room List</a>
+            <button type="submit" class="btn-primary-glass">Update Members</button>
+        </div>
     </form>
 </div>
 {% endblock %}
@@ -49,7 +63,8 @@
 $(document).ready(function() {
     $('#members').select2({
         placeholder: "Select members",
-        allowClear: true
+        allowClear: true,
+        width: 'resolve'
     });
 });
 </script>

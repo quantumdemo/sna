@@ -3,31 +3,46 @@
 {% block title %}Manage Categories{% endblock %}
 
 {% block content %}
-<section id="manage-categories">
-    <h1>Category Management</h1>
-
-    <div class="add-category-form">
-        <h2>Add New Category</h2>
+<div class="admin-container">
+    <div class="form-container-glassy">
+        <div class="form-header">
+            <h2 class="form-title">Add New Category</h2>
+        </div>
         <form action="{{ url_for('admin.add_category') }}" method="post">
-            <input type="text" name="name" placeholder="Category Name" required>
-            <button type="submit" class="btn">Add Category</button>
+            <div class="form-group">
+                <label for="name" class="sr-only">Category Name</label>
+                <input type="text" name="name" placeholder="Category Name" required class="input-glassy">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary-glass">Add Category</button>
+            </div>
         </form>
     </div>
 
-    <h2>Existing Categories</h2>
-    <div class="category-list">
-        <ul>
+    <div class="glassy-table-wrapper" style="margin-top: 2rem;">
+        <div class="form-header">
+            <h2 class="form-title">Existing Categories</h2>
+        </div>
+        <div class="glassy-table">
+             <div class="table-header" style="grid-template-columns: 3fr 1fr;">
+                <div class="table-cell">Category Name</div>
+                <div class="table-cell">Actions</div>
+            </div>
             {% for category in categories %}
-            <li>
-                {{ category.name }}
-                <form action="{{ url_for('admin.delete_category', category_id=category.id) }}" method="post" style="display: inline;">
-                    <button type="submit" class="btn-small btn-danger">Delete</button>
-                </form>
-            </li>
+            <div class="table-row-card">
+                <div class="table-row" style="grid-template-columns: 3fr 1fr;">
+                    <div class="table-cell" data-label="Category Name">{{ category.name }}</div>
+                    <div class="table-cell" data-label="Actions">
+                        <form action="{{ url_for('admin.delete_category', category_id=category.id) }}" method="post" style="display: inline;">
+                            <button type="submit" class="btn-secondary-glass compact-btn">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
             {% else %}
-            <li>No categories found.</li>
+            <div class="glass-card full-width-card"><p>No categories found.</p></div>
             {% endfor %}
-        </ul>
+        </div>
     </div>
-</section>
+</div>
 {% endblock %}

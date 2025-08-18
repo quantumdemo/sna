@@ -3,17 +3,25 @@
 {% block title %}Assignment: {{ assignment.title }}{% endblock %}
 
 {% block content %}
-<section id="assignment-page">
-    <h1>Assignment: {{ assignment.title }}</h1>
-    <p>From course: <a href="{{ url_for('main.course_detail', course_id=assignment.module.course.id) }}">{{ assignment.module.course.title }}</a></p>
-    <hr>
+<div class="form-container-glassy">
+    <div class="form-header">
+        <h1 class="form-title">Assignment: {{ assignment.title }}</h1>
+        <p>From course: <a href="{{ url_for('main.course_detail', course_id=assignment.module.course.id) }}">{{ assignment.module.course.title }}</a></p>
+    </div>
 
-    <h2>Description</h2>
-    <p>{{ assignment.description }}</p>
+    <hr style="border-color: rgba(255,255,255,0.2); margin: 2rem 0;">
 
-    <hr>
+    <div class="assignment-details">
+        <h2>Description</h2>
+        <p>{{ assignment.description }}</p>
+    </div>
 
-    <h2>Your Submission</h2>
+    <hr style="border-color: rgba(255,255,255,0.2); margin: 2rem 0;">
+
+    <div class="form-header">
+        <h2 class="form-title" style="font-size: 1.8rem;">Your Submission</h2>
+    </div>
+
     {% if submission %}
         <div class="submission-details">
             <p><strong>Submitted on:</strong> {{ submission.submitted_at.strftime('%Y-%m-%d %H:%M') }}</p>
@@ -25,29 +33,47 @@
                 </div>
             {% endif %}
             {% if submission.file_path %}
-                <p><strong>Submitted File:</strong> <a href="{{ url_for('static', filename='assignments/' + submission.file_path) }}" target="_blank">Download File</a></p>
+                <p><strong>Submitted File:</strong> <a href="{{ url_for('static', filename='assignments/' + submission.file_path) }}" target="_blank" class="btn-secondary-glass">Download File</a></p>
             {% endif %}
         </div>
     {% else %}
         <form action="{{ url_for('main.submit_assignment', assignment_id=assignment.id) }}" method="post" enctype="multipart/form-data">
-            {% if assignment.submission_type in ['text', 'both'] %}
-            <div>
-                <label for="text_submission">Text Submission:</label>
-                <textarea name="text_submission" id="text_submission" rows="10" {% if assignment.submission_type == 'text' %}required{% endif %}></textarea>
-            </div>
-            {% endif %}
+            <div class="form-grid">
+                {% if assignment.submission_type in ['text', 'both'] %}
+                <div class="form-group full-span">
+                    <label for="text_submission">Text Submission:</label>
+                    <textarea name="text_submission" id="text_submission" rows="10" {% if assignment.submission_type == 'text' %}required{% endif %} class="input-glassy"></textarea>
+                </div>
+                {% endif %}
 
-            {% if assignment.submission_type in ['file', 'both'] %}
-            <div>
-                <label for="file_submission">File Upload:</label>
-                <input type="file" name="file_submission" id="file_submission" {% if assignment.submission_type == 'file' %}required{% endif %}>
-                {% if assignment.max_file_size %}
-                <small>Maximum file size: {{ assignment.max_file_size }}MB</small>
+                {% if assignment.submission_type in ['file', 'both'] %}
+                <div class="form-group full-span">
+                    <label for="file_submission">File Upload:</label>
+                    <input type="file" name="file_submission" id="file_submission" {% if assignment.submission_type == 'file' %}required{% endif %} class="input-glassy">
+                    {% if assignment.max_file_size %}
+                    <small>Maximum file size: {{ assignment.max_file_size }}MB</small>
+                    {% endif %}
+                </div>
                 {% endif %}
             </div>
-            {% endif %}
-            <button type="submit" class="btn">Submit Assignment</button>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary-glass">Submit Assignment</button>
+            </div>
         </form>
     {% endif %}
-</section>
+</div>
+
+<style>
+.assignment-details, .submission-details {
+    background: rgba(255,255,255,0.1);
+    padding: 1.5rem;
+    border-radius: 12px;
+}
+.submission-text-box {
+    background: rgba(0,0,0,0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    white-space: pre-wrap;
+}
+</style>
 {% endblock %}

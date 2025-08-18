@@ -29,23 +29,31 @@
 
     <hr>
 
-    <h2>Contact Support</h2>
-    <p>If you can't find the answer here, please feel free to contact us.</p>
-    <form action="{{ url_for('main.support') }}" method="post">
-        <div>
-            <label for="name">Your Name:</label>
-            <input type="text" id="name" name="name" required>
+    <div class="form-container-glassy">
+        <div class="form-header">
+            <h2 class="form-title">Contact Support</h2>
+            <p>If you can't find the answer here, please feel free to contact us.</p>
         </div>
-        <div>
-            <label for="email">Your Email:</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        <div>
-            <label for="message">Message:</label>
-            <textarea id="message" name="message" rows="5" required></textarea>
-        </div>
-        <button type="submit" class="btn">Send Message</button>
-    </form>
+        <form action="{{ url_for('main.support') }}" method="post">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="name">Your Name:</label>
+                    <input type="text" id="name" name="name" required class="input-glassy">
+                </div>
+                <div class="form-group">
+                    <label for="email">Your Email:</label>
+                    <input type="email" id="email" name="email" required class="input-glassy">
+                </div>
+                <div class="form-group full-span">
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" rows="5" required class="input-glassy"></textarea>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary-glass">Send Message</button>
+            </div>
+        </form>
+    </div>
 
 </section>
 {% endblock %}

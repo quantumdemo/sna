@@ -29,13 +29,13 @@
                     </div>
                     <div class="course-card-actions">
                         {% if not course.approved %}
-                            <form action="{{ url_for('admin.approve_course', course_id=course.id) }}" method="post">
-                                <button type="submit" class="btn-glass approve">Approve</button>
+                            <form action="{{ url_for('admin.approve_course', course_id=course.id) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn-primary-glass compact-btn">Approve</button>
                             </form>
                         {% endif %}
-                        <a href="#" class="btn-glass info">Edit</a>
-                        <form action="{{ url_for('admin.delete_course', course_id=course.id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
-                            <button type="submit" class="btn-glass reject">Delete</button>
+                        <a href="#" class="btn-secondary-glass compact-btn">Edit</a>
+                        <form action="{{ url_for('admin.delete_course', course_id=course.id) }}" method="POST" onsubmit="return confirm('Are you sure?');" style="display:inline;">
+                            <button type="submit" class="btn-secondary-glass compact-btn">Delete</button>
                         </form>
                     </div>
                 </div>
@@ -45,19 +45,18 @@
 
         <!-- Sidebar: Create/Edit Form -->
         <aside class="course-form-panel">
-            <div class="form-wrapper">
-                <h3>Create New Course</h3>
-                <!-- This form is a placeholder for now, as the functionality is on the instructor side.
-                     It can be wired up later if admins need to create courses directly. -->
+            <div class="form-wrapper form-container-glassy" style="padding: 2rem; margin: 0;">
+                <div class="form-header" style="margin-bottom: 1.5rem;">
+                    <h3 class="form-title" style="font-size: 1.5rem;">Create New Course</h3>
+                </div>
                 <form>
                     <div class="form-group">
                         <label for="course-title">Course Title</label>
-                        <input type="text" id="course-title" name="title" placeholder="e.g., Advanced Python">
+                        <input type="text" id="course-title" name="title" placeholder="e.g., Advanced Python" class="input-glassy">
                     </div>
                     <div class="form-group">
                         <label for="course-category">Category</label>
-                        <select id="course-category" name="category">
-                            <!-- Categories would be populated from the database -->
+                        <select id="course-category" name="category" class="input-glassy">
                             <option>Programming</option>
                             <option>Design</option>
                             <option>Marketing</option>
@@ -65,13 +64,14 @@
                     </div>
                     <div class="form-group">
                         <label for="course-instructor">Instructor</label>
-                        <select id="course-instructor" name="instructor">
-                            <!-- Instructors would be populated from the database -->
+                        <select id="course-instructor" name="instructor" class="input-glassy">
                             <option>John Doe</option>
                             <option>Jane Smith</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn-glass approve full-width">Create Course</button>
+                    <div class="form-actions" style="margin-top: 1.5rem;">
+                        <button type="submit" class="btn-primary-glass full-width">Create Course</button>
+                    </div>
                 </form>
             </div>
         </aside>

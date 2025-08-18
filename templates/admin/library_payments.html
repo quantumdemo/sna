@@ -29,23 +29,23 @@
                     <div class="table-cell" data-label="Submitted At">{{ purchase.timestamp.strftime('%Y-%m-%d %H:%M') }}</div>
                     <div class="table-cell" data-label="Proof">
                         {% if purchase.proof_of_payment_path %}
-                            <a href="{{ url_for('admin.payment_proof', filename=purchase.proof_of_payment_path) }}" target="_blank" class="btn-glass info compact-btn">View</a>
+                            <a href="{{ url_for('admin.payment_proof', filename=purchase.proof_of_payment_path) }}" target="_blank" class="btn-secondary-glass compact-btn">View</a>
                         {% else %}
                             N/A
                         {% endif %}
                     </div>
                     <div class="table-cell actions-cell" data-label="Actions">
                          <form action="{{ url_for('admin.approve_library_payment', purchase_id=purchase.id) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="btn-glass approve compact-btn">Approve</button>
+                            <button type="submit" class="btn-primary-glass compact-btn">Approve</button>
                         </form>
-                        <button class="btn-glass reject compact-btn" onclick="toggleRejectForm('{{ purchase.id }}')">Reject</button>
+                        <button class="btn-secondary-glass compact-btn" onclick="toggleRejectForm('{{ purchase.id }}')">Reject</button>
                     </div>
                 </div>
                  <!-- Hidden Rejection Form -->
                 <div class="rejection-form" id="reject-form-{{ purchase.id }}">
                     <form action="{{ url_for('admin.reject_library_payment', purchase_id=purchase.id) }}" method="post">
-                        <input type="text" name="reason" placeholder="Reason for rejection (required)" required>
-                        <button type="submit" class="btn-glass reject">Confirm Reject</button>
+                        <input type="text" name="reason" placeholder="Reason for rejection (required)" required class="input-glassy">
+                        <button type="submit" class="btn-primary-glass">Confirm Reject</button>
                     </form>
                 </div>
             </div>

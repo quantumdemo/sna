@@ -27,15 +27,15 @@
                     <div class="table-cell" data-label="Requested At">{{ req.requested_at.strftime('%Y-%m-%d %H:%M') }}</div>
                     <div class="table-cell actions-cell" data-label="Actions">
                         <form action="{{ url_for('admin.approve_certificate_request', request_id=req.id) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="btn-glass approve compact-btn">Approve</button>
+                            <button type="submit" class="btn-primary-glass compact-btn">Approve</button>
                         </form>
-                        <button class="btn-glass reject compact-btn" onclick="toggleRejectForm('{{ req.id }}')">Reject</button>
+                        <button class="btn-secondary-glass compact-btn" onclick="toggleRejectForm('{{ req.id }}')">Reject</button>
                     </div>
                 </div>
                 <div class="rejection-form" id="reject-form-{{ req.id }}">
                     <form action="{{ url_for('admin.reject_certificate_request', request_id=req.id) }}" method="POST">
-                        <input type="text" name="rejection_reason" placeholder="Reason for rejection" required>
-                        <button type="submit" class="btn-glass reject">Confirm Reject</button>
+                        <input type="text" name="rejection_reason" placeholder="Reason for rejection" required class="input-glassy">
+                        <button type="submit" class="btn-primary-glass">Confirm Reject</button>
                     </form>
                 </div>
             </div>

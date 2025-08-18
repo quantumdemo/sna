@@ -3,46 +3,44 @@
 {% block title %}Review Submissions for {{ assignment.title }}{% endblock %}
 
 {% block content %}
-<section id="review-assignment-submissions-page">
-    <h1>Review Assignment Submissions</h1>
-    <h2>For Assignment: <em>{{ assignment.title }}</em></h2>
-    <a href="{{ url_for('instructor.manage_course', course_id=assignment.module.course.id) }}" class="btn-small btn-secondary">Back to Course</a>
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Review Assignment Submissions</h1>
+        <h2>For Assignment: <em>{{ assignment.title }}</em></h2>
+        <a href="{{ url_for('instructor.manage_course', course_id=assignment.module.course.id) }}" class="btn-secondary-glass">Back to Course</a>
+    </div>
 
-    <div class="submission-list">
-        {% if submissions %}
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Submitted At</th>
-                        <th>Grade</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for sub in submissions %}
-                    <tr>
-                        <td>{{ sub.student.name }}</td>
-                        <td>{{ sub.submitted_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                        <td>{{ sub.grade or 'Not Graded' }}</td>
-                        <td>
-                            <button class="btn-small" onclick="document.getElementById('submission-modal-{{ sub.id }}').style.display='block'">View Submission</button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>There are no submissions for this assignment yet.</p>
-        {% endif %}
+    <div class="glassy-table-wrapper">
+        <div class="glassy-table">
+             <div class="table-header" style="grid-template-columns: 2fr 2fr 1fr 1fr;">
+                <div class="table-cell">Student</div>
+                <div class="table-cell">Submitted At</div>
+                <div class="table-cell">Grade</div>
+                <div class="table-cell">Actions</div>
+            </div>
+            {% for sub in submissions %}
+            <div class="table-row-card">
+                <div class="table-row" style="grid-template-columns: 2fr 2fr 1fr 1fr;">
+                    <div class="table-cell" data-label="Student">{{ sub.student.name }}</div>
+                    <div class="table-cell" data-label="Submitted At">{{ sub.submitted_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                    <div class="table-cell" data-label="Grade">{{ sub.grade or 'Not Graded' }}</div>
+                    <div class="table-cell" data-label="Actions">
+                        <button class="btn-primary-glass compact-btn" onclick="document.getElementById('submission-modal-{{ sub.id }}').style.display='flex'">View Submission</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 
     <!-- Submission Modals -->
     {% for sub in submissions %}
-    <div id="submission-modal-{{ sub.id }}" class="modal" style="display:none;">
-        <div class="modal-content-large">
-            <span class="close" onclick="document.getElementById('submission-modal-{{ sub.id }}').style.display='none'">&times;</span>
-            <h3>Submission from {{ sub.student.name }}</h3>
+    <div id="submission-modal-{{ sub.id }}" class="modal-overlay" style="display:none;">
+        <div class="modal-content form-container-glassy" style="max-width: 900px;">
+            <div class="form-header">
+                <h3 class="form-title" style="font-size: 1.5rem;">Submission from {{ sub.student.name }}</h3>
+                <span class="close-btn" onclick="document.getElementById('submission-modal-{{ sub.id }}').style.display='none'">&times;</span>
+            </div>
 
             <div class="submission-review-grid">
                 {% if sub.text_submission %}
@@ -59,24 +57,49 @@
                     <h4>File Submission</h4>
                     {% set file_ext = sub.file_path.rsplit('.', 1)[1].lower() %}
                     {% if file_ext in ['jpg', 'jpeg', 'png', 'gif'] %}
-                        <img src="{{ url_for('static', filename='assignments/' + sub.file_path) }}" alt="Submitted Image" style="max-width: 100%; height: auto;">
+                        <img src="{{ url_for('static', filename='assignments/' + sub.file_path) }}" alt="Submitted Image" style="max-width: 100%; height: auto; border-radius: 12px;">
                     {% else %}
                         <p>This file type cannot be previewed.</p>
                     {% endif %}
-                    <a href="{{ url_for('static', filename='assignments/' + sub.file_path) }}" target="_blank" class="btn-small">Download File</a>
+                    <a href="{{ url_for('static', filename='assignments/' + sub.file_path) }}" target="_blank" class="btn-secondary-glass" style="margin-top:1rem;">Download File</a>
                 </div>
                 {% endif %}
             </div>
 
-            <hr>
-            <h4>Grade Submission</h4>
-            <form action="{{ url_for('instructor.grade_submission', submission_id=sub.id) }}" method="post">
+            <hr style="border-color: rgba(255,255,255,0.2); margin: 2rem 0;">
+            <div class="form-header">
+                <h4 class="form-title" style="font-size: 1.2rem;">Grade Submission</h4>
+            </div>
+            <form action="{{ url_for('instructor.grade_submission', submission_id=sub.id) }}" method="post" style="display:flex; gap:1rem; align-items:center;">
                 <label for="grade-{{ sub.id }}">Grade:</label>
-                <input type="text" name="grade" id="grade-{{ sub.id }}" value="{{ sub.grade or '' }}" required>
-                <button type="submit" class="btn">Save Grade</button>
+                <input type="text" name="grade" id="grade-{{ sub.id }}" value="{{ sub.grade or '' }}" required class="input-glassy" style="flex-grow:1;">
+                <button type="submit" class="btn-primary-glass">Save Grade</button>
             </form>
         </div>
     </div>
     {% endfor %}
-</section>
+</div>
+
+<style>
+.close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 2rem;
+    cursor: pointer;
+}
+.submission-review-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+.text-box {
+    background: rgba(0,0,0,0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    max-height: 400px;
+    overflow-y: auto;
+}
+</style>
 {% endblock %}
