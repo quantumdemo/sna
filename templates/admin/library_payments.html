@@ -3,51 +3,69 @@
 {% block title %}Manage Library Payments{% endblock %}
 
 {% block content %}
-<section id="manage-library-payments">
-    <h1>Manage Library Payments</h1>
-    <p>Here you can approve and reject payments for library materials.</p>
-
-    <div class="item-list">
-        {% if pending_purchases %}
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Material</th>
-                        <th>Submitted At</th>
-                        <th>Proof of Payment</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for purchase in pending_purchases %}
-                    <tr>
-                        <td>{{ purchase.user.name }}</td>
-                        <td>{{ purchase.material.title }}</td>
-                        <td>{{ purchase.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
-                        <td>
-                            {% if purchase.proof_of_payment_path %}
-                                <a href="{{ url_for('admin.payment_proof', filename=purchase.proof_of_payment_path) }}" target="_blank">View Proof</a>
-                            {% else %}
-                                N/A
-                            {% endif %}
-                        </td>
-                        <td class="actions">
-                            <form action="{{ url_for('admin.approve_library_payment', purchase_id=purchase.id) }}" method="POST" style="display:inline;">
-                                <button type="submit" class="btn btn-success">Approve</button>
-                            </form>
-                            <form action="{{ url_for('admin.reject_library_payment', purchase_id=purchase.id) }}" method="POST" style="display:inline;">
-                                <input type="text" name="reason" placeholder="Reason for rejection" required>
-                                <button type="submit" class="btn btn-danger">Reject</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No pending library payments.</p>
-        {% endif %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Library Material Payments</h1>
+        <p>Approve and reject payments for library materials.</p>
     </div>
-</section>
+
+    <div class="glassy-table-wrapper">
+        <div class="glassy-table">
+            <!-- Table Header -->
+            <div class="table-header" style="grid-template-columns: 2fr 2fr 1.5fr 1fr 2fr;">
+                <div class="table-cell">Student</div>
+                <div class="table-cell">Material</div>
+                <div class="table-cell">Submitted At</div>
+                <div class="table-cell">Proof</div>
+                <div class="table-cell">Actions</div>
+            </div>
+
+            <!-- Table Body -->
+            {% for purchase in pending_purchases %}
+            <div class="table-row-card">
+                <div class="table-row" style="grid-template-columns: 2fr 2fr 1.5fr 1fr 2fr;">
+                    <div class="table-cell" data-label="Student">{{ purchase.user.name }}</div>
+                    <div class="table-cell" data-label="Material">{{ purchase.material.title }}</div>
+                    <div class="table-cell" data-label="Submitted At">{{ purchase.timestamp.strftime('%Y-%m-%d %H:%M') }}</div>
+                    <div class="table-cell" data-label="Proof">
+                        {% if purchase.proof_of_payment_path %}
+                            <a href="{{ url_for('admin.payment_proof', filename=purchase.proof_of_payment_path) }}" target="_blank" class="btn-glass info compact-btn">View</a>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    <div class="table-cell actions-cell" data-label="Actions">
+                         <form action="{{ url_for('admin.approve_library_payment', purchase_id=purchase.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn-glass approve compact-btn">Approve</button>
+                        </form>
+                        <button class="btn-glass reject compact-btn" onclick="toggleRejectForm('{{ purchase.id }}')">Reject</button>
+                    </div>
+                </div>
+                 <!-- Hidden Rejection Form -->
+                <div class="rejection-form" id="reject-form-{{ purchase.id }}">
+                    <form action="{{ url_for('admin.reject_library_payment', purchase_id=purchase.id) }}" method="post">
+                        <input type="text" name="reason" placeholder="Reason for rejection (required)" required>
+                        <button type="submit" class="btn-glass reject">Confirm Reject</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="glass-card full-width-card">
+                <p>No pending library payments.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleRejectForm(purchaseId) {
+    const form = document.getElementById('reject-form-' + purchaseId);
+    if (form.style.display === 'block') {
+        form.style.display = 'none';
+    } else {
+        form.style.display = 'block';
+    }
+}
+</script>
 {% endblock %}

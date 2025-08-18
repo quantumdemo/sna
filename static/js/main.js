@@ -18,4 +18,33 @@ document.addEventListener('DOMContentLoaded', () => {
             link.classList.add('active-link');
         }
     });
+
+    // Admin Course Form Accordion
+    const courseFormPanel = document.querySelector('.course-form-panel');
+    if (courseFormPanel) {
+        const formToggle = courseFormPanel.querySelector('h3');
+        formToggle.addEventListener('click', () => {
+            courseFormPanel.classList.toggle('is-open');
+        });
+    }
+
+    // Admin Chat Mobile View Toggle
+    const chatContainer = document.querySelector('.admin-chat-container');
+    if (chatContainer) {
+        const chatListItems = chatContainer.querySelectorAll('.chat-list-item');
+        const backBtn = chatContainer.querySelector('.back-to-list-btn');
+
+        chatListItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                chatContainer.classList.add('chat-view-active');
+            });
+        });
+
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                chatContainer.classList.remove('chat-view-active');
+            });
+        }
+    }
 });

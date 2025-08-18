@@ -3,45 +3,84 @@
 {% block title %}Manage Users{% endblock %}
 
 {% block content %}
-<section id="manage-users">
-    <h1>User Management</h1>
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>User Management</h1>
+        <p>Approve, monitor, and manage all user accounts.</p>
+    </div>
 
-    <h2>Instructors Pending Approval</h2>
-    <div class="user-list">
-        {% if pending_instructors %}
-            <ul>
-                {% for user in pending_instructors %}
-                <li>
-                    {{ user.name }} ({{ user.email }})
-                    <form action="{{ url_for('admin.approve_user', user_id=user.id) }}" method="post" style="display: inline;">
-                        <button type="submit" class="btn-small">Approve</button>
-                    </form>
-                </li>
+    <div class="manage-users-layout">
+        <!-- Sidebar for Filters -->
+        <aside class="sidebar-filters">
+            <h3>Filter by Role</h3>
+            <a href="{{ url_for('admin.manage_users', role_filter='all') }}" class="filter-btn active">All</a>
+            <a href="{{ url_for('admin.manage_users', role_filter='student') }}" class="filter-btn">Students</a>
+            <a href="{{ url_for('admin.manage_users', role_filter='instructor') }}" class="filter-btn">Instructors</a>
+            <a href="{{ url_for('admin.manage_users', role_filter='admin') }}" class="filter-btn">Admins</a>
+            <hr>
+            <h3>Pending Approval</h3>
+            <a href="{{ url_for('admin.manage_users', role_filter='pending') }}" class="filter-btn">Instructors ({{ pending_instructors|length }})</a>
+        </aside>
+
+        <!-- Main Content: User Table/Cards -->
+        <main class="user-list-main">
+            <div class="user-table" role="table">
+                <div class="user-table-header" role="rowgroup">
+                    <div class="table-cell" role="columnheader">User</div>
+                    <div class="table-cell" role="columnheader">Role</div>
+                    <div class="table-cell" role="columnheader">Status</div>
+                    <div class="table-cell" role="columnheader">Actions</div>
+                </div>
+
+                <!-- Users Loop -->
+                {% for user in users_to_display %}
+                <div class="user-card" role="rowgroup">
+                    <div class="user-info" role="row">
+                        <div class="table-cell user-details" role="cell" data-label="User">
+                            <img src="{{ url_for('static', filename='profile_pics/' + user.profile_pic) }}" alt="{{ user.name }}'s profile picture" class="user-avatar">
+                            <div>
+                                <span class="user-name">{{ user.name }}</span>
+                                <span class="user-email">{{ user.email }}</span>
+                            </div>
+                        </div>
+                        <div class="table-cell" role="cell" data-label="Role">{{ user.role|capitalize }}</div>
+                        <div class="table-cell" role="cell" data-label="Status">
+                            {% if user.is_banned %}
+                                <span class="status-badge banned">Banned</span>
+                            {% elif user.role == 'instructor' and not user.approved %}
+                                <span class="status-badge pending">Pending</span>
+                            {% else %}
+                                <span class="status-badge approved">Approved</span>
+                            {% endif %}
+                        </div>
+                        <div class="table-cell user-actions" role="cell" data-label="Actions">
+                            <div class="actions-wrapper">
+                                {% if user.role == 'instructor' and not user.approved %}
+                                    <form action="{{ url_for('admin.approve_user', user_id=user.id) }}" method="post">
+                                        <button type="submit" class="btn-glass approve">Approve</button>
+                                    </form>
+                                {% endif %}
+                                <a href="#" class="btn-glass info">Edit</a>
+                                {% if user.role != 'admin' %}
+                                    <form action="{{ url_for('admin.toggle_ban', user_id=user.id) }}" method="post">
+                                        <button type="submit" class="btn-glass {{ 'reject' if not user.is_banned else 'info' }}">
+                                            {% if user.is_banned %}Unban{% else %}Ban{% endif %}
+                                        </button>
+                                    </form>
+                                {% endif %}
+                                <div class="mobile-actions-menu">
+                                    <button class="dropdown-toggle">⋮</button>
+                                    <div class="dropdown-content">
+                                        <!-- Mobile actions will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {% endfor %}
-            </ul>
-        {% else %}
-            <p>No instructors are currently pending approval.</p>
-        {% endif %}
+            </div>
+        </main>
     </div>
-
-    <h2>All Users</h2>
-    <div class="user-list">
-        <ul>
-            {% for user in all_users %}
-            <li>
-                {{ user.name }} ({{ user.email }}) - Role: {{ user.role }} -
-                Status: {% if user.approved %}Approved{% else %}Pending{% endif %}
-                - Banned: {{ user.is_banned }}
-                {% if user.role != 'admin' %}
-                <form action="{{ url_for('admin.toggle_ban', user_id=user.id) }}" method="post" style="display: inline;">
-                    <button type="submit" class="btn-small btn-danger">
-                        {% if user.is_banned %}Unban{% else %}Ban{% endif %}
-                    </button>
-                </form>
-                {% endif %}
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-</section>
+</div>
 {% endblock %}

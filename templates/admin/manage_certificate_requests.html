@@ -3,102 +3,117 @@
 {% block title %}Manage Certificate Requests{% endblock %}
 
 {% block content %}
-<section id="manage-requests">
-    <h1>Manage Certificate Requests</h1>
-
-    <div class="requests-section">
-        <h2>Pending Requests</h2>
-        {% if pending_requests %}
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Course</th>
-                        <th>Requested At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for req in pending_requests %}
-                    <tr>
-                        <td>{{ req.user.name }} ({{ req.user.email }})</td>
-                        <td>{{ req.course.title }}</td>
-                        <td>{{ req.requested_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                        <td class="actions">
-                            <form action="{{ url_for('admin.approve_certificate_request', request_id=req.id) }}" method="POST" style="display:inline;">
-                                <button type="submit" class="btn btn-success">Approve</button>
-                            </form>
-                            <form action="{{ url_for('admin.reject_certificate_request', request_id=req.id) }}" method="POST" style="display:inline;" class="reject-form">
-                                <input type="text" name="rejection_reason" placeholder="Reason for rejection" required>
-                                <button type="submit" class="btn btn-danger">Reject</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No pending certificate requests.</p>
-        {% endif %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Manage Certificate Requests</h1>
+        <p>Review and process student requests for course certificates.</p>
     </div>
 
-    <hr>
-
-    <div class="requests-section">
-        <h2>Recently Approved Requests</h2>
-        {% if approved_requests %}
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Course</th>
-                        <th>Approved At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for req in approved_requests %}
-                    <tr>
-                        <td>{{ req.user.name }}</td>
-                        <td>{{ req.course.title }}</td>
-                        <td>{{ req.reviewed_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No requests have been approved recently.</p>
-        {% endif %}
+    <!-- Pending Requests -->
+    <h2 class="section-title">Pending Requests</h2>
+    <div class="glassy-table-wrapper">
+        <div class="glassy-table">
+            <div class="table-header" style="grid-template-columns: 2fr 2fr 1.5fr 2.5fr;">
+                <div class="table-cell">Student</div>
+                <div class="table-cell">Course</div>
+                <div class="table-cell">Requested At</div>
+                <div class="table-cell">Actions</div>
+            </div>
+            {% for req in pending_requests %}
+            <div class="table-row-card">
+                <div class="table-row" style="grid-template-columns: 2fr 2fr 1.5fr 2.5fr;">
+                    <div class="table-cell" data-label="Student">{{ req.user.name }}</div>
+                    <div class="table-cell" data-label="Course">{{ req.course.title }}</div>
+                    <div class="table-cell" data-label="Requested At">{{ req.requested_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                    <div class="table-cell actions-cell" data-label="Actions">
+                        <form action="{{ url_for('admin.approve_certificate_request', request_id=req.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn-glass approve compact-btn">Approve</button>
+                        </form>
+                        <button class="btn-glass reject compact-btn" onclick="toggleRejectForm('{{ req.id }}')">Reject</button>
+                    </div>
+                </div>
+                <div class="rejection-form" id="reject-form-{{ req.id }}">
+                    <form action="{{ url_for('admin.reject_certificate_request', request_id=req.id) }}" method="POST">
+                        <input type="text" name="rejection_reason" placeholder="Reason for rejection" required>
+                        <button type="submit" class="btn-glass reject">Confirm Reject</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="glass-card full-width-card"><p>No pending certificate requests.</p></div>
+            {% endfor %}
+        </div>
     </div>
 
-    <hr>
-
-    <div class="requests-section">
-        <h2>Recently Rejected Requests</h2>
-        {% if rejected_requests %}
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Course</th>
-                        <th>Rejected At</th>
-                        <th>Reason</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for req in rejected_requests %}
-                    <tr>
-                        <td>{{ req.user.name }}</td>
-                        <td>{{ req.course.title }}</td>
-                        <td>{{ req.reviewed_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                        <td>{{ req.rejection_reason }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No requests have been rejected recently.</p>
-        {% endif %}
+    <!-- Recently Approved -->
+    <h2 class="section-title">Recently Approved</h2>
+    <div class="glassy-table-wrapper">
+        <div class="glassy-table">
+            <div class="table-header" style="grid-template-columns: 2fr 2fr 1.5fr;">
+                <div class="table-cell">Student</div>
+                <div class="table-cell">Course</div>
+                <div class="table-cell">Approved At</div>
+            </div>
+            {% for req in approved_requests %}
+            <div class="table-row-card">
+                 <div class="table-row" style="grid-template-columns: 2fr 2fr 1.5fr;">
+                    <div class="table-cell" data-label="Student">{{ req.user.name }}</div>
+                    <div class="table-cell" data-label="Course">{{ req.course.title }}</div>
+                    <div class="table-cell" data-label="Approved At">{{ req.reviewed_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                </div>
+            </div>
+            {% else %}
+            <div class="glass-card full-width-card"><p>No requests have been approved recently.</p></div>
+            {% endfor %}
+        </div>
     </div>
 
-</section>
+    <!-- Recently Rejected -->
+    <h2 class="section-title">Recently Rejected</h2>
+    <div class="glassy-table-wrapper">
+        <div class="glassy-table">
+            <div class="table-header" style="grid-template-columns: 1.5fr 1.5fr 1.5fr 2fr;">
+                <div class="table-cell">Student</div>
+                <div class="table-cell">Course</div>
+                <div class="table-cell">Rejected At</div>
+                <div class="table-cell">Reason</div>
+            </div>
+            {% for req in rejected_requests %}
+            <div class="table-row-card">
+                <div class="table-row" style="grid-template-columns: 1.5fr 1.5fr 1.5fr 2fr;">
+                    <div class="table-cell" data-label="Student">{{ req.user.name }}</div>
+                    <div class="table-cell" data-label="Course">{{ req.course.title }}</div>
+                    <div class="table-cell" data-label="Rejected At">{{ req.reviewed_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                    <div class="table-cell" data-label="Reason">{{ req.rejection_reason }}</div>
+                </div>
+            </div>
+            {% else %}
+            <div class="glass-card full-width-card"><p>No requests have been rejected recently.</p></div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a2551;
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+</style>
+
+<script>
+function toggleRejectForm(reqId) {
+    const form = document.getElementById('reject-form-' + reqId);
+    if (form.style.display === 'block') {
+        form.style.display = 'none';
+    } else {
+        form.style.display = 'block';
+    }
+}
+</script>
 {% endblock %}

@@ -3,36 +3,69 @@
 {% block title %}Pending Payments{% endblock %}
 
 {% block content %}
-<section id="pending-payments-page">
-    <h1>Pending Payment Verifications</h1>
-
-    <div class="payment-list">
-        {% if pending_enrollments %}
-            <ul>
-                {% for enrollment in pending_enrollments %}
-                <li>
-                    <p>
-                        <strong>Student:</strong> {{ enrollment.student.name }}<br>
-                        <strong>Course:</strong> {{ enrollment.course.title }}<br>
-                        <strong>Price:</strong> ₦{{ "{:,.2f}".format(enrollment.course.price_naira) }}<br>
-                        <strong>Submitted:</strong> {{ enrollment.timestamp.strftime('%Y-%m-%d %H:%M') }}<br>
-                        <a href="{{ url_for('admin.payment_proof', filename=enrollment.proof_of_payment_path) }}" target="_blank">View Proof</a>
-                    </p>
-                    <div>
-                        <form action="{{ url_for('admin.approve_payment', enrollment_id=enrollment.id) }}" method="post" style="display: inline;">
-                            <button type="submit" class="btn-small">Approve</button>
-                        </form>
-                        <form action="{{ url_for('admin.reject_payment', enrollment_id=enrollment.id) }}" method="post" style="display: inline;">
-                            <input type="text" name="reason" placeholder="Reason for rejection (required)" required>
-                            <button type="submit" class="btn-small btn-danger">Reject</button>
-                        </form>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No payments are currently pending verification.</p>
-        {% endif %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Pending Payments</h1>
+        <p>Verify and process submitted proofs of payment for courses.</p>
     </div>
-</section>
+
+    <div class="glassy-table-wrapper">
+        <div class="glassy-table">
+            <!-- Table Header -->
+            <div class="table-header">
+                <div class="table-cell">User</div>
+                <div class="table-cell">Course</div>
+                <div class="table-cell">Amount</div>
+                <div class="table-cell">Status</div>
+                <div class="table-cell">Actions</div>
+            </div>
+
+            <!-- Table Body -->
+            {% for enrollment in pending_enrollments %}
+            <div class="table-row-card">
+                <div class="table-row">
+                    <div class="table-cell" data-label="User">
+                        <span class="user-name">{{ enrollment.student.name }}</span>
+                        <span class="user-email">{{ enrollment.student.email }}</span>
+                    </div>
+                    <div class="table-cell" data-label="Course">{{ enrollment.course.title }}</div>
+                    <div class="table-cell" data-label="Amount">₦{{ "{:,.2f}".format(enrollment.course.price_naira) }}</div>
+                    <div class="table-cell" data-label="Status">
+                        <span class="status-badge pending">Pending</span>
+                    </div>
+                    <div class="table-cell actions-cell" data-label="Actions">
+                        <a href="{{ url_for('admin.payment_proof', filename=enrollment.proof_of_payment_path) }}" target="_blank" class="btn-glass info compact-btn">View Proof</a>
+                        <form action="{{ url_for('admin.approve_payment', enrollment_id=enrollment.id) }}" method="post">
+                            <button type="submit" class="btn-glass approve compact-btn">Approve</button>
+                        </form>
+                        <button class="btn-glass reject compact-btn" onclick="toggleRejectForm('{{ enrollment.id }}')">Reject</button>
+                    </div>
+                </div>
+                <!-- Hidden Rejection Form -->
+                <div class="rejection-form" id="reject-form-{{ enrollment.id }}">
+                    <form action="{{ url_for('admin.reject_payment', enrollment_id=enrollment.id) }}" method="post">
+                        <input type="text" name="reason" placeholder="Reason for rejection (required)" required>
+                        <button type="submit" class="btn-glass reject">Confirm Reject</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="glass-card full-width-card">
+                <p>No payments are currently pending verification.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleRejectForm(enrollmentId) {
+    const form = document.getElementById('reject-form-' + enrollmentId);
+    if (form.style.display === 'block') {
+        form.style.display = 'none';
+    } else {
+        form.style.display = 'block';
+    }
+}
+</script>
 {% endblock %}
