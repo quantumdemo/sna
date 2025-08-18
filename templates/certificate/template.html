@@ -1,100 +1,173 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Certificate of Completion</title>
     <style>
+        /* --- Font Imports --- */
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Lato:wght@400;700&family=Playfair+Display:wght@700&family=Montserrat:wght@800&display=swap');
+
         @page {
             size: A4 landscape;
             margin: 0;
         }
+
         body {
-            font-family: sans-serif;
+            --gold: #CFAE2E;
+            --navy: #1A2B6D;
+            --gray: #444;
+            --parchment: #fcf8e8;
+
+            font-family: 'Lato', sans-serif;
             margin: 0;
-            padding: 20px;
-            text-align: center;
-            border: 10px solid #787878;
+            padding: 30px;
+            background-color: var(--parchment);
+            color: var(--gray);
             height: 100%;
             box-sizing: border-box;
             position: relative;
+
+            /* Double Border */
+            border: 1px solid var(--navy);
+            outline: 5px solid var(--gold);
+            outline-offset: -15px;
         }
+
         .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 100px;
-            color: rgba(0, 0, 0, 0.05);
+            font-size: 80px;
+            font-family: 'Playfair Display', serif;
+            color: rgba(0, 0, 0, 0.08);
             font-weight: bold;
             z-index: -1;
+            text-transform: uppercase;
+            letter-spacing: 10px;
         }
-        .header {
-            font-size: 36px;
-            font-weight: bold;
-            margin-bottom: 40px;
-        }
-        .subheader {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        .student-name {
-            font-size: 48px;
-            font-weight: bold;
-            margin: 40px 0;
-            color: #d4af37; /* Gold color */
-        }
-        .statement {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-        .course-name {
-            font-size: 28px;
-            font-style: italic;
-            margin-bottom: 40px;
-        }
-        .footer {
-            position: absolute;
-            bottom: 40px;
-            width: 100%;
-            left: 0;
+
+        .certificate-container {
             display: flex;
-            justify-content: space-around;
-            align-items: flex-end;
-        }
-        .signature, .details {
-            width: 40%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
             text-align: center;
         }
-        .signature p, .details p {
-            border-top: 1px solid #000;
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .institute-name {
+            font-family: 'Cinzel', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--navy);
+            letter-spacing: 2px;
+        }
+
+        .cert-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            color: var(--gold);
+            margin-top: 5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .main-body {
+            margin: 30px 0;
+        }
+
+        .intro-text {
+            font-family: 'Lato', sans-serif;
+            font-style: italic;
+            font-size: 18px;
+        }
+
+        .recipient-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 64px;
+            font-weight: 800;
+            color: var(--gold);
+            margin: 15px 0;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.2),
+                         -1px -1px 1px rgba(255,255,255,0.7);
+            text-transform: uppercase;
+        }
+
+        .course-text {
+            font-family: 'Lato', sans-serif;
+            font-size: 16px;
+        }
+
+        .course-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-style: italic;
+            color: var(--navy);
+            margin-top: 10px;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 50px;
+            width: calc(100% - 60px);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .footer-left, .footer-right {
+            width: 45%;
+            font-family: 'Lato', serif;
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .footer-left {
+            text-align: left;
+        }
+
+        .footer-right {
+            text-align: center;
+        }
+
+        .signature-line {
+            border-top: 1px solid var(--gray);
             padding-top: 5px;
-            margin: 0;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
     <div class="watermark">Scholars Novara Institute</div>
 
-    <div class="header">Scholars Novara Institute</div>
+    <div class="certificate-container">
+        <header class="header">
+            <div class="institute-name">Scholars Novara Institute</div>
+            <div class="cert-title">Certificate of Completion</div>
+        </header>
 
-    <div class="subheader">Certificate of Completion</div>
+        <section class="main-body">
+            <p class="intro-text">This is to certify that</p>
+            <div class="recipient-name">{{ student_name }}</div>
+            <p class="course-text">has successfully completed the course in</p>
+            <div class="course-name">"{{ course_name }}"</div>
+        </section>
 
-    <div class="statement">This is to certify that</div>
-
-    <div class="student-name">{{ student_name }}</div>
-
-    <div class="statement">has successfully completed the course</div>
-
-    <div class="course-name">"{{ course_name }}"</div>
-
-    <div class="footer">
-        <div class="details">
-            <p>Issued on: {{ completion_date }}</p>
-            <p>Certificate ID: {{ certificate_id }}</p>
-        </div>
-        <div class="signature">
-            <p>Authorized Signature</p>
-        </div>
+        <footer class="footer">
+            <div class="footer-left">
+                <p>Issued on: {{ completion_date }}</p>
+                <p>Certificate ID: {{ certificate_id }}</p>
+            </div>
+            <div class="footer-right">
+                <div class="signature-line">Authorized Signature</div>
+            </div>
+        </footer>
     </div>
 </body>
 </html>
