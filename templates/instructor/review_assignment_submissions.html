@@ -24,8 +24,8 @@
                     <div class="table-cell" data-label="Student">{{ sub.student.name }}</div>
                     <div class="table-cell" data-label="Submitted At">{{ sub.submitted_at.strftime('%Y-%m-%d %H:%M') }}</div>
                     <div class="table-cell" data-label="Grade">{{ sub.grade or 'Not Graded' }}</div>
-                    <div class="table-cell" data-label="Actions">
-                        <button class="btn-primary-glass compact-btn" onclick="document.getElementById('submission-modal-{{ sub.id }}').style.display='flex'">View Submission</button>
+                    <div class="table-cell action-buttons-container" data-label="Actions">
+                        <button class="btn-action btn-action-neutral" onclick="document.getElementById('submission-modal-{{ sub.id }}').style.display='flex'">View Submission</button>
                     </div>
                 </div>
             </div>
@@ -70,10 +70,10 @@
             <div class="form-header">
                 <h4 class="form-title" style="font-size: 1.2rem;">Grade Submission</h4>
             </div>
-            <form action="{{ url_for('instructor.grade_submission', submission_id=sub.id) }}" method="post" style="display:flex; gap:1rem; align-items:center;">
+            <form action="{{ url_for('instructor.grade_submission', submission_id=sub.id) }}" method="post" class="action-buttons-container">
                 <label for="grade-{{ sub.id }}">Grade:</label>
                 <input type="text" name="grade" id="grade-{{ sub.id }}" value="{{ sub.grade or '' }}" required class="input-glassy" style="flex-grow:1;">
-                <button type="submit" class="btn-primary-glass">Save Grade</button>
+                <button type="submit" class="btn-action btn-action-positive">Save Grade</button>
             </form>
         </div>
     </div>

@@ -47,4 +47,17 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
+
+    // More Actions Dropdown
+    document.addEventListener('click', (e) => {
+        const isDropdownButton = e.target.matches('.more-actions-toggle');
+        if (!isDropdownButton && e.target.closest('.mobile-actions') === null) {
+            document.querySelectorAll('.more-actions-dropdown').forEach(dropdown => {
+                dropdown.classList.remove('is-open');
+            });
+        } else if (isDropdownButton) {
+            const dropdown = e.target.nextElementSibling;
+            dropdown.classList.toggle('is-open');
+        }
+    });
 });

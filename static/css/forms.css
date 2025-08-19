@@ -163,6 +163,113 @@
     grid-column: 1 / -1; /* Make it span both columns in a grid */
 }
 
+/* --- Action Buttons (New) --- */
+.btn-action {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.btn-action-positive {
+    background: linear-gradient(45deg, #10b981, #22c55e);
+    color: white;
+}
+.btn-action-positive:hover {
+    box-shadow: 0 0 15px #22c55e;
+}
+
+.btn-action-negative {
+    background: linear-gradient(45deg, #f43f5e, #ef4444);
+    color: white;
+}
+.btn-action-negative:hover {
+    box-shadow: 0 0 15px #ef4444;
+}
+
+.btn-action-neutral {
+    background: linear-gradient(45deg, #64748b, #94a3b8);
+    color: white;
+}
+.btn-action-neutral:hover {
+    box-shadow: 0 0 15px #94a3b8;
+}
+
+/* --- Action Button Container --- */
+.action-buttons-container {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+@media (max-width: 767px) {
+    .action-buttons-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .action-buttons-container .btn-action {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* --- More Actions Dropdown --- */
+.mobile-actions {
+    display: none; /* Hidden by default */
+    position: relative;
+}
+
+.more-actions-toggle {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.more-actions-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    z-index: 10;
+    min-width: 150px;
+}
+
+.more-actions-dropdown.is-open {
+    display: block;
+}
+
+.more-actions-dropdown a,
+.more-actions-dropdown button {
+    display: block;
+    padding: 0.75rem 1.5rem;
+    text-align: left;
+    width: 100%;
+    background: none;
+    border: none;
+    color: #1a2551;
+    text-decoration: none;
+}
+.more-actions-dropdown button {
+    cursor: pointer;
+}
+
+@media (max-width: 767px) {
+    .action-buttons-container .desktop-actions {
+        display: none;
+    }
+    .action-buttons-container .mobile-actions {
+        display: block;
+    }
+}
+
 /* --- Assessment Page Specific Styles --- */
 .timer-glassy {
     background: rgba(255, 255, 255, 0.2);

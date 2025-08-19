@@ -24,10 +24,10 @@
                     <div class="table-cell" data-label="Student">{{ sub.student.name }}</div>
                     <div class="table-cell" data-label="Score">{{ "%.2f"|format(sub.score) }}%</div>
                     <div class="table-cell" data-label="Status">{{ sub.status.replace('_', ' ').title() }}</div>
-                    <div class="table-cell actions-cell" data-label="Actions">
+                    <div class="table-cell actions-cell action-buttons-container" data-label="Actions">
                         {% if sub.status == 'locked' %}
                             {% if sub.appeal_status == 'pending' %}
-                                <button class="btn-primary-glass compact-btn" onclick="document.getElementById('appeal-modal-{{ sub.id }}').style.display='flex'">Review Appeal</button>
+                                <button class="btn-action btn-action-neutral" onclick="document.getElementById('appeal-modal-{{ sub.id }}').style.display='flex'">Review Appeal</button>
                             {% elif sub.appeal_status %}
                                 Appeal {{ sub.appeal_status.title() }}
                             {% else %}
@@ -35,7 +35,7 @@
                             {% endif %}
                         {% elif sub.status == 'pending_review' %}
                             <form action="{{ url_for('instructor.release_submission_results', submission_id=sub.id) }}" method="post" style="display:inline;">
-                                <button type="submit" class="btn-primary-glass compact-btn">Release Results</button>
+                                <button type="submit" class="btn-action btn-action-positive">Release Results</button>
                             </form>
                         {% else %}
                             {{ sub.status.replace('_', ' ').title() }}
@@ -75,8 +75,8 @@
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn-secondary-glass" onclick="document.getElementById('appeal-modal-{{ sub.id }}').style.display='none'">Cancel</button>
-                        <button type="submit" name="action" value="reject" class="btn-secondary-glass">Reject Appeal</button>
-                        <button type="submit" name="action" value="accept" class="btn-primary-glass">Accept Appeal & Unlock</button>
+                        <button type="submit" name="action" value="reject" class="btn-action btn-action-negative">Reject Appeal</button>
+                        <button type="submit" name="action" value="accept" class="btn-action btn-action-positive">Accept Appeal & Unlock</button>
                     </div>
                 </form>
             </div>
