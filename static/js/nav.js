@@ -1,15 +1,35 @@
 document.addEventListener('DOMContentLoaded', () => {
   const navToggle = document.querySelector('.nav-toggle');
   const mainNav = document.querySelector('.main-nav');
+  const backdrop = document.querySelector('.nav-backdrop');
   const body = document.body;
 
-  if (navToggle && mainNav) {
-    navToggle.addEventListener('click', () => {
-      const isExpanded = navToggle.getAttribute('aria-expanded') === 'true';
+  function closeNav() {
+    mainNav.classList.remove('is-open');
+    backdrop.classList.remove('is-visible');
+    body.classList.remove('nav-open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  }
 
-      mainNav.classList.toggle('is-open');
-      body.classList.toggle('nav-open'); // Toggle class on body
-      navToggle.setAttribute('aria-expanded', !isExpanded);
+  function openNav() {
+    mainNav.classList.add('is-open');
+    backdrop.classList.add('is-visible');
+    body.classList.add('nav-open');
+    navToggle.setAttribute('aria-expanded', 'true');
+  }
+
+  if (navToggle && mainNav && backdrop) {
+    navToggle.addEventListener('click', () => {
+      const isOpen = mainNav.classList.contains('is-open');
+      if (isOpen) {
+        closeNav();
+      } else {
+        openNav();
+      }
+    });
+
+    backdrop.addEventListener('click', () => {
+      closeNav();
     });
   }
 });

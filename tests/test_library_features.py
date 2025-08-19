@@ -99,7 +99,8 @@ class LibraryFeaturesTests(unittest.TestCase):
         # 2. Student goes to purchase page
         response = self.client.get(f'/library/{material.id}/purchase')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Purchase Library Material', response.data)
+        self.assertIn(b'Purchase: My New eBook', response.data)
+        self.assertIn(b'A great book.', response.data)
 
         # 3. Student submits proof of payment
         data = {'proof_of_payment': (BytesIO(b"payment proof"), 'proof.png')}
