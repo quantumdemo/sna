@@ -32,9 +32,9 @@
             <div class="table-row-card">
                 <div class="table-row" style="grid-template-columns: 3fr 1fr;">
                     <div class="table-cell" data-label="Category Name">{{ category.name }}</div>
-                    <div class="table-cell" data-label="Actions">
+                    <div class="table-cell action-buttons-container" data-label="Actions">
                         <form action="{{ url_for('admin.delete_category', category_id=category.id) }}" method="post" style="display: inline;">
-                            <button type="submit" class="btn-secondary-glass compact-btn">Delete</button>
+                            <button type="submit" class="btn-action btn-action-negative">Delete</button>
                         </form>
                     </div>
                 </div>

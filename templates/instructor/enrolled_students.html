@@ -31,9 +31,9 @@
                                         {% set submission = student.assignment_submissions.filter_by(assignment_id=module.assignment.id).first() %}
                                         {% if submission %}
                                             Submitted (Grade: {{ submission.grade or 'N/A' }})
-                                            <form action="{{ url_for('instructor.grade_submission', submission_id=submission.id) }}" method="post" class="inline-grade-form">
+                                            <form action="{{ url_for('instructor.grade_submission', submission_id=submission.id) }}" method="post" class="inline-grade-form action-buttons-container">
                                                 <input type="text" name="grade" placeholder="A+" class="input-glassy compact-input">
-                                                <button type="submit" class="btn-primary-glass compact-btn">Grade</button>
+                                                <button type="submit" class="btn-action btn-action-positive">Grade</button>
                                             </form>
                                         {% else %}
                                             <em>Not Submitted</em>

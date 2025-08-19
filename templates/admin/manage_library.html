@@ -51,15 +51,15 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="card-footer">
+            <div class="card-footer action-buttons-container">
                 {% if not item.approved and not item.rejection_reason %}
                     <form action="{{ url_for('admin.approve_library_material', material_id=item.id) }}" method="post" style="display: inline;">
-                        <button type="submit" class="btn-primary-glass compact-btn">Approve</button>
+                        <button type="submit" class="btn-action btn-action-positive">Approve</button>
                     </form>
-                    <button class="btn-secondary-glass compact-btn">Reject</button>
+                    <button class="btn-action btn-action-negative">Reject</button>
                 {% endif %}
                  <form action="{{ url_for('admin.delete_library_material', material_id=item.id) }}" method="post" style="display: inline;">
-                    <button type="submit" class="btn-secondary-glass compact-btn"><i class="fas fa-trash"></i></button>
+                    <button type="submit" class="btn-action btn-action-negative"><i class="fas fa-trash"></i></button>
                 </form>
             </div>
         </div>

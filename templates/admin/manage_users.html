@@ -54,24 +54,32 @@
                             {% endif %}
                         </div>
                         <div class="table-cell user-actions" role="cell" data-label="Actions">
-                            <div class="actions-wrapper">
-                                {% if user.role == 'instructor' and not user.approved %}
-                                    <form action="{{ url_for('admin.approve_user', user_id=user.id) }}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn-primary-glass compact-btn">Approve</button>
-                                    </form>
-                                {% endif %}
-                                <a href="#" class="btn-secondary-glass compact-btn">Edit</a>
-                                {% if user.role != 'admin' %}
-                                    <form action="{{ url_for('admin.toggle_ban', user_id=user.id) }}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn-secondary-glass compact-btn">
-                                            {% if user.is_banned %}Unban{% else %}Ban{% endif %}
-                                        </button>
-                                    </form>
-                                {% endif %}
-                                <div class="mobile-actions-menu">
-                                    <button class="dropdown-toggle">⋮</button>
-                                    <div class="dropdown-content">
-                                        <!-- Mobile actions will be populated here -->
+                            <div class="action-buttons-container">
+                                <div class="desktop-actions">
+                                    {% if user.role == 'instructor' and not user.approved %}
+                                        <form action="{{ url_for('admin.approve_user', user_id=user.id) }}" method="post" style="display:inline;">
+                                            <button type="submit" class="btn-action btn-action-positive">Approve</button>
+                                        </form>
+                                    {% endif %}
+                                    <a href="#" class="btn-action btn-action-neutral">Edit</a>
+                                    {% if user.role != 'admin' %}
+                                        <form action="{{ url_for('admin.toggle_ban', user_id=user.id) }}" method="post" style="display:inline;">
+                                            <button type="submit" class="btn-action btn-action-negative">
+                                                {% if user.is_banned %}Unban{% else %}Ban{% endif %}
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                                <div class="mobile-actions">
+                                    <button class="more-actions-toggle">⋮</button>
+                                    <div class="more-actions-dropdown">
+                                        {% if user.role == 'instructor' and not user.approved %}
+                                            <form action="{{ url_for('admin.approve_user', user_id=user.id) }}" method="post"><button type="submit">Approve</button></form>
+                                        {% endif %}
+                                        <a href="#">Edit</a>
+                                        {% if user.role != 'admin' %}
+                                            <form action="{{ url_for('admin.toggle_ban', user_id=user.id) }}" method="post"><button type="submit">{% if user.is_banned %}Unban{% else %}Ban{% endif %}</button></form>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>

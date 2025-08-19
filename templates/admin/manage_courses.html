@@ -27,15 +27,15 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="course-card-actions">
+                    <div class="course-card-actions action-buttons-container">
                         {% if not course.approved %}
                             <form action="{{ url_for('admin.approve_course', course_id=course.id) }}" method="post" style="display:inline;">
-                                <button type="submit" class="btn-primary-glass compact-btn">Approve</button>
+                                <button type="submit" class="btn-action btn-action-positive">Approve</button>
                             </form>
                         {% endif %}
-                        <a href="#" class="btn-secondary-glass compact-btn">Edit</a>
+                        <a href="#" class="btn-action btn-action-neutral">Edit</a>
                         <form action="{{ url_for('admin.delete_course', course_id=course.id) }}" method="POST" onsubmit="return confirm('Are you sure?');" style="display:inline;">
-                            <button type="submit" class="btn-secondary-glass compact-btn">Delete</button>
+                            <button type="submit" class="btn-action btn-action-negative">Delete</button>
                         </form>
                     </div>
                 </div>

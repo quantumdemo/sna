@@ -22,14 +22,14 @@
                     if (editorInstance) {
                         let content = editorInstance.getData();
 
-                        const youtubeRegex = /<iframe[^>]+src="https:\/\/www\.youtube\.com\/embed\/([a-zA-Z0-9_-]+)"[^>]*><\/iframe>/g;
+                        const youtubeRegex = /<iframe[^>]+src=\"https:\\/\\/www\\.youtube\\.com\\/embed\\/([a-zA-Z0-9_-]+)\"[^>]*><\\/iframe>/g;
                         content = content.replace(youtubeRegex, (match, videoId) => {
-                            return `<div class="secure-embed" data-type="youtube" data-id="${videoId}"></div>`;
+                            return `<div class=\"secure-embed\" data-type=\"youtube\" data-id=\"${videoId}\"></div>`;
                         });
 
-                        const gdriveRegex = /<iframe[^>]+src="https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/preview"[^>]*><\/iframe>/g;
+                        const gdriveRegex = /<iframe[^>]+src=\"https:\\/\\/drive\\.google\\.com\\/file\\/d\\/([a-zA-Z0-9_-]+)\\/preview\"[^>]*><\\/iframe>/g;
                         content = content.replace(gdriveRegex, (match, fileId) => {
-                            return `<div class="secure-embed" data-type="gdrive" data-id="${fileId}"></div>`;
+                            return `<div class=\"secure-embed\" data-type=\"gdrive\" data-id=\"${fileId}\"></div>`;
                         });
 
                         editorInstance.setData(content);
@@ -63,7 +63,7 @@
                 </strong>
             </p>
             <form action="{{ url_for('instructor.toggle_course_chat_lock', course_id=course.id) }}" method="post">
-                <button type="submit" class="btn-secondary-glass compact-btn">
+                <button type="submit" class="btn-action btn-action-neutral">
                     {% if course.chat_room and course.chat_room.is_locked %}
                         Unlock Chat
                     {% else %}
@@ -82,163 +82,28 @@
             <form action="{{ url_for('instructor.edit_course', course_id=course.id) }}" method="post">
                 <div class="form-group">
                     <label for="title">Course Title:</label>
-                    <input type="text" id="title" name="title" value="{{ course.title }}" required class="input-glassy">
+                    <input type="text\" id=\"title\" name=\"title\" value=\"{{ course.title }}\" required class=\"input-glassy\">
                 </div>
-                <div class="form-group">
-                    <label for="description">Description:</label>
-                    <textarea id="description" name="description" rows="5" class="input-glassy">{{ course.description }}</textarea>
+                <div class=\"form-group\">
+                    <label for=\"description\">Description:</label>
+                    <textarea id=\"description\" name=\"description\" rows=\"5\" class=\"input-glassy\">{{ course.description }}</textarea>
                 </div>
-                <div class="form-group">
-                    <div class="radio-group-glassy">
-                        <input type="checkbox" name="final_exam_enabled" id="final_exam_enabled" {% if course.final_exam_enabled %}checked{% endif %}>
-                        <label for="final_exam_enabled">Enable Final Exam for Certificate</label>
+                <div class=\"form-group\">
+                    <div class=\"radio-group-glassy\">
+                        <input type=\"checkbox\" name=\"final_exam_enabled\" id=\"final_exam_enabled\" {% if course.final_exam_enabled %}checked{% endif %}>
+                        <label for=\"final_exam_enabled\">Enable Final Exam for Certificate</label>
                     </div>
                 </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn-primary-glass">Save Changes</button>
+                <div class=\"form-actions\">
+                    <button type=\"submit\" class=\"btn-primary-glass\">Save Changes</button>
                 </div>
             </form>
         </div>
 
-        <div class="module-manager">
-            <div class="form-container-glassy">
-                <div class="form-header">
-                    <h2 class="form-title">Modules & Lessons</h2>
+        <div class=\"module-manager\">
+            <div class=\"form-container-glassy\">
+                <div class=\"form-header\">
+                    <h2 class=\"form-title\">Modules & Lessons</h2>
                 </div>
-                <div class="modules-list">
-                    {% for module in course.modules.order_by('order') %}
-                    <div class="module-manage-item">
-                        <h4>{{ module.order }}. {{ module.title }}</h4>
-                        <ul>
-                            {% for lesson in module.lessons %}
-                            <li>
-                                {{ lesson.title }}
-                                <a href="{{ url_for('instructor.edit_lesson', lesson_id=lesson.id) }}" class="btn-secondary-glass compact-btn">Edit</a>
-                            </li>
-                            {% else %}
-                            <li>No lessons in this module yet.</li>
-                            {% endfor %}
-                        </ul>
-                        <div class="add-lesson-form form-container-glassy" style="margin-top:1rem; padding: 1.5rem;">
-                            <h5>Add New Lesson</h5>
-                            <form class="add-lesson-form-js" data-module-id="{{ module.id }}" action="{{ url_for('instructor.add_lesson', module_id=module.id) }}" method="post">
-                                <div class="form-group">
-                                    <input type="text" name="title" placeholder="Lesson Title" required class="input-glassy">
-                                </div>
-                                <div class="form-group">
-                                    <input type="text" name="video_url" placeholder="YouTube Embed URL (optional)" class="input-glassy">
-                                </div>
-                                <div class="form-group">
-                                    <textarea name="notes" id="editor-{{ module.id }}" class="ckeditor-textarea input-glassy" placeholder="Lesson Notes (optional)"></textarea>
-                                </div>
-                                <button type="submit" class="btn-primary-glass compact-btn">Add Lesson</button>
-                            </form>
-                        </div>
-                        <div class="add-assignment-form form-container-glassy" style="margin-top:1rem; padding: 1.5rem;">
-                            <h5>Add Assignment</h5>
-                            {% if module.assignment %}
-                                <p>An assignment has been added.</p>
-                                <a href="{{ url_for('instructor.review_assignment_submissions', assignment_id=module.assignment.id) }}" class="btn-primary-glass compact-btn">Review Submissions</a>
-                                <a href="#" class="btn-secondary-glass compact-btn">Edit Assignment</a>
-                            {% else %}
-                                <form action="{{ url_for('instructor.add_assignment', module_id=module.id) }}" method="post">
-                                    <div class="form-group">
-                                        <input type="text" name="title" placeholder="Assignment Title" required class="input-glassy">
-                                    </div>
-                                    <div class="form-group">
-                                        <textarea name="description" placeholder="Assignment Description" required class="input-glassy"></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Submission Type:</label>
-                                        <select name="submission_type" required class="input-glassy">
-                                            <option value="text">Text Only</option>
-                                            <option value="file" selected>File Upload Only</option>
-                                            <option value="both">Both Text and File</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Max File Size (MB):</label>
-                                        <input type="number" name="max_file_size" min="1" placeholder="e.g., 5" class="input-glassy">
-                                    </div>
-                                    <button type="submit" class="btn-primary-glass compact-btn">Add Assignment</button>
-                                </form>
-                            {% endif %}
-                        </div>
-                        <div class="add-quiz-form form-container-glassy" style="margin-top:1rem; padding: 1.5rem;">
-                             <h5>Add Quiz</h5>
-                            {% if module.quiz %}
-                                <p>A quiz has already been added.</p>
-                                <a href="{{ url_for('instructor.manage_quiz', quiz_id=module.quiz.id) }}" class="btn-secondary-glass compact-btn">Manage Quiz</a>
-                            {% else %}
-                                <form action="{{ url_for('instructor.create_quiz', module_id=module.id) }}" method="post">
-                                    <button type="submit" class="btn-primary-glass compact-btn">Create Quiz</button>
-                                </form>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% else %}
-                    <p>No modules created yet.</p>
-                    {% endfor %}
-                </div>
-
-                <div class="add-module-form form-container-glassy" style="margin-top: 2rem;">
-                    <div class="form-header">
-                        <h3 class="form-title" style="font-size:1.5rem;">Add New Module</h3>
-                    </div>
-                    <form action="{{ url_for('instructor.add_module', course_id=course.id) }}" method="post" style="display:flex; gap:1rem;">
-                        <input type="text" name="title" placeholder="Module Title" required class="input-glassy" style="flex-grow:1;">
-                        <button type="submit" class="btn-primary-glass">Add</button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="final-exam-form form-container-glassy" style="margin-top: 2rem;">
-                <div class="form-header">
-                    <h3 class="form-title" style="font-size:1.5rem;">Final Exam</h3>
-                </div>
-                {% if course.final_exam %}
-                    <p>A final exam has been set for this course.</p>
-                    <a href="{{ url_for('instructor.manage_exam', exam_id=course.final_exam.id) }}" class="btn-primary-glass">Manage Exam Questions</a>
-                {% else %}
-                    <form action="{{ url_for('instructor.create_exam', course_id=course.id) }}" method="post" class="settings-form">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="exam_time_limit">Time Limit (minutes):</label>
-                                <input type="number" name="time_limit_minutes" id="exam_time_limit" min="1" value="60" class="input-glassy">
-                            </div>
-                            <div class="form-group">
-                                <label for="pass_mark">Pass Mark (%):</label>
-                                <input type="number" name="pass_mark" id="pass_mark" min="0" max="100" value="50" class="input-glassy">
-                            </div>
-                            <div class="form-group full-span">
-                                <div class="radio-group-glassy">
-                                    <input type="checkbox" name="calculator_allowed" id="calculator_allowed">
-                                    <label for="calculator_allowed">Calculator Allowed</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-actions">
-                            <button type="submit" class="btn-primary-glass">Create Final Exam</button>
-                        </div>
-                    </form>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-.manage-course-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr;
-    gap: 2rem;
-    align-items: start;
-}
-.module-manage-item {
-    padding: 1.5rem;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-}
-</style>
-{% endblock %}
+                <div class=\"modules-list\">
+                    {% for module in course.modules.order_by('order') %}\n                    <div class=\"module-manage-item\">\n                        <h4>{{ module.order }}. {{ module.title }}</h4>\n                        <ul>\n                            {% for lesson in module.lessons %}\n                            <li>\n                                {{ lesson.title }}\n                                <a href=\"{{ url_for('instructor.edit_lesson', lesson_id=lesson.id) }}\" class=\"btn-action btn-action-neutral\">Edit</a>\n                            </li>\n                            {% else %}\n                            <li>No lessons in this module yet.</li>\n                            {% endfor %}\n                        </ul>\n                        <div class=\"add-lesson-form form-container-glassy\" style=\"margin-top:1rem; padding: 1.5rem;\">\n                            <h5>Add New Lesson</h5>\n                            <form class=\"add-lesson-form-js\" data-module-id=\"{{ module.id }}\" action=\"{{ url_for('instructor.add_lesson', module_id=module.id) }}\" method=\"post\">\n                                <div class=\"form-group\">\n                                    <input type=\"text\" name=\"title\" placeholder=\"Lesson Title\" required class=\"input-glassy\">\n                                </div>\n                                <div class=\"form-group\">\n                                    <input type=\"text\" name=\"video_url\" placeholder=\"YouTube Embed URL (optional)\" class=\"input-glassy\">\n                                </div>\n                                <div class=\"form-group\">\n                                    <textarea name=\"notes\" id=\"editor-{{ module.id }}\" class=\"ckeditor-textarea input-glassy\" placeholder=\"Lesson Notes (optional)\"></textarea>\n                                </div>\n                                <button type=\"submit\" class=\"btn-action btn-action-positive\">Add Lesson</button>\n                            </form>\n                        </div>\n                        <div class=\"add-assignment-form form-container-glassy\" style=\"margin-top:1rem; padding: 1.5rem;\">\n                            <h5>Add Assignment</h5>\n                            {% if module.assignment %}\n                                <p>An assignment has been added.</p>\n                                <a href=\"{{ url_for('instructor.review_assignment_submissions', assignment_id=module.assignment.id) }}\" class=\"btn-action btn-action-positive\">Review Submissions</a>\n                                <a href=\"#\" class=\"btn-action btn-action-neutral\">Edit Assignment</a>\n                            {% else %}\n                                <form action=\"{{ url_for('instructor.add_assignment', module_id=module.id) }}\" method=\"post\">\n                                    <div class=\"form-group\">\n                                        <input type=\"text\" name=\"title\" placeholder=\"Assignment Title\" required class=\"input-glassy\">\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <textarea name=\"description\" placeholder=\"Assignment Description\" required class=\"input-glassy\"></textarea>\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label>Submission Type:</label>\n                                        <select name=\"submission_type\" required class=\"input-glassy\">\n                                            <option value=\"text\">Text Only</option>\n                                            <option value=\"file\" selected>File Upload Only</option>\n                                            <option value=\"both\">Both Text and File</option>\n                                        </select>\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label>Max File Size (MB):</label>\n                                        <input type=\"number\" name=\"max_file_size\" min=\"1\" placeholder=\"e.g., 5\" class=\"input-glassy\">\n                                    </div>\n                                    <button type=\"submit\" class=\"btn-action btn-action-positive\">Add Assignment</button>\n                                </form>\n                            {% endif %}\n                        </div>\n                        <div class=\"add-quiz-form form-container-glassy\" style=\"margin-top:1rem; padding: 1.5rem;\">\n                             <h5>Add Quiz</h5>\n                            {% if module.quiz %}\n                                <p>A quiz has already been added.</p>\n                                <a href=\"{{ url_for('instructor.manage_quiz', quiz_id=module.quiz.id) }}\" class=\"btn-action btn-action-neutral\">Manage Quiz</a>\n                            {% else %}\n                                <form action=\"{{ url_for('instructor.create_quiz', module_id=module.id) }}\" method=\"post\">\n                                    <button type=\"submit\" class=\"btn-action btn-action-positive\">Create Quiz</button>\n                                </form>\n                            {% endif %}\n                        </div>\n                    </div>\n                    {% else %}\n                    <p>No modules created yet.</p>\n                    {% endfor %}\n                </div>\n\n                <div class=\"add-module-form form-container-glassy\" style=\"margin-top: 2rem;\">\n                    <div class=\"form-header\">\n                        <h3 class=\"form-title\" style=\"font-size:1.5rem;\">Add New Module</h3>\n                    </div>\n                    <form action=\"{{ url_for('instructor.add_module', course_id=course.id) }}\" method=\"post\" style=\"display:flex; gap:1rem;\">\n                        <input type=\"text\" name=\"title\" placeholder=\"Module Title\" required class=\"input-glassy\" style=\"flex-grow:1;\">\n                        <button type=\"submit\" class=\"btn-primary-glass\">Add</button>\n                    </form>\n                </div>\n            </div>\n\n            <div class=\"final-exam-form form-container-glassy\" style=\"margin-top: 2rem;\">\n                <div class=\"form-header\">\n                    <h3 class=\"form-title\" style=\"font-size:1.5rem;\">Final Exam</h3>\n                </div>\n                {% if course.final_exam %}\n                    <p>A final exam has been set for this course.</p>\n                    <a href=\"{{ url_for('instructor.manage_exam', exam_id=course.final_exam.id) }}\" class=\"btn-primary-glass\">Manage Exam Questions</a>\n                {% else %}\n                    <form action=\"{{ url_for('instructor.create_exam', course_id=course.id) }}\" method=\"post\" class=\"settings-form\">\n                        <div class=\"form-grid\">\n                            <div class=\"form-group\">\n                                <label for=\"exam_time_limit\">Time Limit (minutes):</label>\n                                <input type=\"number\" name=\"time_limit_minutes\" id=\"exam_time_limit\" min=\"1\" value=\"60\" class=\"input-glassy\">\n                            </div>\n                            <div class=\"form-group\">\n                                <label for=\"pass_mark\">Pass Mark (%):</label>\n                                <input type=\"number\" name=\"pass_mark\" id=\"pass_mark\" min=\"0\" max=\"100\" value=\"50\" class=\"input-glassy\">\n                            </div>\n                            <div class=\"form-group full-span\">\n                                <div class=\"radio-group-glassy\">\n                                    <input type=\"checkbox\" name=\"calculator_allowed\" id=\"calculator_allowed\">\n                                    <label for=\"calculator_allowed\">Calculator Allowed</label>\n                                </div>\n                            </div>\n                        </div>\n                        <div class=\"form-actions\">\n                            <button type=\"submit\" class=\"btn-primary-glass\">Create Final Exam</button>\n                        </div>\n                    </form>\n                {% endif %}\n            </div>\n        </div>\n    </div>\n</div>\n\n<style>\n.manage-course-grid {\n    display: grid;\n    grid-template-columns: 1fr 1.5fr;\n    gap: 2rem;\n    align-items: start;\n}\n.module-manage-item {\n    padding: 1.5rem;\n    border: 1px solid rgba(255,255,255,0.2);\n    border-radius: 12px;\n    margin-bottom: 1.5rem;\n}\n</style>\n{% endblock %}\n```", continue_working=True)
