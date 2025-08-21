@@ -1304,9 +1304,6 @@ def seed_db():
     db.session.add_all([les1_m1, les2_m1, les1_m2])
     db.session.commit()
 
-    # Enroll student in a course
-    student1.enrolled_courses.append(c1)
-    db.session.commit()
 
     # Add a comment
     comment1 = Comment(course_id=c1.id, user_id=student1.id, body='This is a great course!')

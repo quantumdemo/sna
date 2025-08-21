@@ -3,16 +3,16 @@
 {% block title %}{{ course.title }}{% endblock %}
 
 {% block content %}
-<section id="course-detail-page">
-    <div class="course-header">
+<div class="ice-sky-content">
+    <div class="course-header glassy-card-container">
         <h1>{{ course.title }}</h1>
         <p>Rating: {{ "%.1f"|format(course.avg_rating) }} / 5.0</p>
         <p>Taught by: <a href="#">{{ course.instructor.name }}</a></p> {# Instructor profile link in Phase 9 #}
-        <img src="{{ url_for('static', filename='images/' + (course.cover_image or 'course_placeholder.jpg')) }}" alt="{{ course.title }}" class="course-cover-image">
+        <img src="{{ url_for('static', filename='images/' + (course.cover_image or 'course_placeholder.jpg')) }}" alt="{{ course.title }}" class="course-cover-image" style="width:100%; height:auto; border-radius: 15px; margin-top: 1rem;">
     </div>
 
-    <div class="course-body">
-        <div class="course-main-content">
+    <div class="course-body" style="display: grid; grid-template-columns: 3fr 1fr; gap: 2rem; align-items: start;">
+        <div class="course-main-content glassy-card-container">
             <h2>About this course</h2>
             <p>{{ course.description }}</p>
 
@@ -47,30 +47,30 @@
                 <p>No modules have been added to this course yet.</p>
                 {% endfor %}
             </div>
+             <div class="final-exam-link">
+                {% if is_enrolled and course.final_exam %}
+                    <hr>
+                    <h3>Final Exam</h3>
+                    <a href="{{ url_for('main.pre_exam', exam_id=course.final_exam.id) }}" class="btn-primary">Take Final Exam</a>
+                {% endif %}
+            </div>
         </div>
 
-        <div class="final-exam-link">
-            {% if is_enrolled and course.final_exam %}
-                <hr>
-                <h3>Final Exam</h3>
-                <a href="{{ url_for('main.pre_exam', exam_id=course.final_exam.id) }}" class="btn-primary-glass">Take Final Exam</a>
-            {% endif %}
-        </div>
 
         <aside class="course-sidebar">
-            <div class="enroll-box">
+            <div class="enroll-box glassy-card-container">
                 {% if is_enrolled %}
                     <p>You are enrolled in this course.</p>
-                    <a href="#" class="btn-secondary-glass">Go to Dashboard</a> {# Link to student dashboard lesson #}
+                    <a href="#" class="btn-primary">Go to Dashboard</a> {# Link to student dashboard lesson #}
                 {% else %}
                     <h2>Price: ₦{{ "{:,.2f}".format(course.price_naira) }}</h2>
-                    <a href="{{ url_for('main.enroll', course_id=course.id) }}" class="btn-primary-glass">Enroll Now</a>
+                    <a href="{{ url_for('main.enroll', course_id=course.id) }}" class="btn-primary">Enroll Now</a>
                 {% endif %}
             </div>
         </aside>
     </div>
 
-    <div class="course-comments form-container-glassy">
+    <div class="course-comments glassy-card-container">
         <div class="form-header">
             <h2 class="form-title">Leave a Review</h2>
         </div>
@@ -78,16 +78,16 @@
             <form action="{{ url_for('main.post_comment', course_id=course.id) }}" method="post">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="rating">Your Rating (1-5):</label>
-                        <input type="number" name="rating" id="rating" min="1" max="5" required class="input-glassy">
+                        <label for="rating" class="form-label">Your Rating (1-5):</label>
+                        <input type="number" name="rating" id="rating" min="1" max="5" required class="form-input">
                     </div>
                     <div class="form-group full-span">
-                        <label for="comment_body">Your Review:</label>
-                        <textarea name="comment_body" id="comment_body" rows="4" placeholder="Write a review..." required class="input-glassy"></textarea>
+                        <label for="comment_body" class="form-label">Your Review:</label>
+                        <textarea name="comment_body" id="comment_body" rows="4" placeholder="Write a review..." required class="form-input"></textarea>
                     </div>
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn-primary-glass">Submit Review</button>
+                    <button type="submit" class="btn-primary">Submit Review</button>
                 </div>
             </form>
         {% else %}
@@ -105,5 +105,5 @@
             {% endfor %}
         </div>
     </div>
-</section>
+</div>
 {% endblock %}

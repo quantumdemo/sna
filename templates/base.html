@@ -22,12 +22,15 @@
     <!-- Page-specific styles -->
     {% block styles %}{% endblock %}
 
+    <!-- Ice Sky Theme -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ice_sky_theme.css') }}">
+
     <!-- Load admin-specific styles if on an admin page -->
     {% if request.endpoint and request.endpoint.startswith('admin.') %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
     {% endif %}
 </head>
-<body class="{{ 'admin-page' if request.endpoint and request.endpoint.startswith('admin.') else '' }}">
+<body class="{{ 'admin-page' if request.endpoint and request.endpoint.startswith('admin.') else 'ice-sky-theme' }}">
     <!-- Particle background for admin -->
     {% if request.endpoint and request.endpoint.startswith('admin.') %}
     <div class="particles">

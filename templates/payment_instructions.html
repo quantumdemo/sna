@@ -3,9 +3,9 @@
 {% block title %}Payment Instructions for {{ course.title }}{% endblock %}
 
 {% block content %}
-<section id="payment-page">
-    <div class="form-container-glassy">
-        <div class="form-header">
+<div class="ice-sky-content">
+    <div class="glassy-card-container">
+        <div class="form-header" style="text-align: center;">
             <h1 class="form-title">Payment for: {{ course.title }}</h1>
         </div>
 
@@ -13,9 +13,9 @@
             <h2>Instructions</h2>
             <p>Please make a payment of <strong>₦{{ "{:,.2f}".format(course.price_naira) }}</strong> to the following bank account:</p>
             <ul>
-                <li><strong>Bank Name:</strong> {{ course.bank_name }}</li>
-                <li><strong>Account Number:</strong> {{ course.account_number }}</li>
-                <li><strong>Account Name:</strong> {{ course.account_name }}</li>
+                <li><strong>Bank Name:</strong> {{ course.bank_name or 'N/A' }}</li>
+                <li><strong>Account Number:</strong> {{ course.account_number or 'N/A' }}</li>
+                <li><strong>Account Name:</strong> {{ course.account_name or 'N/A' }}</li>
             </ul>
             {% if course.extra_instructions %}
             <p><strong>Notes:</strong> {{ course.extra_instructions }}</p>
@@ -24,21 +24,21 @@
 
         <hr style="border-color: rgba(255,255,255,0.2); margin: 2rem 0;">
 
-        <div class="form-header">
+        <div class="form-header" style="text-align: center;">
             <h2 class="form-title" style="font-size: 1.8rem;">Upload Proof of Payment</h2>
             <p>After making the payment, please upload a screenshot or receipt for verification.</p>
         </div>
         <form action="{{ url_for('main.submit_payment_proof', course_id=course.id) }}" method="post" enctype="multipart/form-data">
             <div class="form-group">
-                <label for="proof_file">Proof of Payment (Image or PDF):</label>
-                <input type="file" name="proof_of_payment" id="proof_file" required accept="image/*,application/pdf" class="input-glassy">
+                <label for="proof_file" class="form-label">Proof of Payment (Image or PDF):</label>
+                <input type="file" name="proof_of_payment" id="proof_file" required accept="image/*,application/pdf" class="form-input">
             </div>
-            <div class="form-actions">
-                <button type="submit" class="btn-primary-glass">Submit for Verification</button>
+            <div class="form-actions" style="text-align: center;">
+                <button type="submit" class="btn-primary">Submit for Verification</button>
             </div>
         </form>
     </div>
-</section>
+</div>
 
 <style>
 .payment-instructions {
@@ -46,6 +46,10 @@
     background: rgba(255,255,255,0.1);
     padding: 1.5rem;
     border-radius: 12px;
+}
+.payment-instructions ul {
+    list-style: none;
+    padding: 0;
 }
 </style>
 {% endblock %}

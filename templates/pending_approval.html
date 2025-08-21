@@ -3,8 +3,12 @@
 {% block title %}Account Pending Approval{% endblock %}
 
 {% block content %}
-<h1>Account Pending Approval</h1>
-<p>Welcome, {{ current_user.name }}.</p>
-<p>Your instructor account is currently waiting for admin approval. You will be notified by email once it has been reviewed.</p>
-<p>You can log out <a href="{{ url_for('main.logout') }}">here</a>.</p>
+<div class="ice-sky-content" style="text-align: center;">
+    <div class="glassy-card-container">
+        <h1>Account Pending Approval</h1>
+        <p>Welcome, {{ current_user.name }}.</p>
+        <p>Your instructor account is currently waiting for admin approval. You will be notified by email once it has been reviewed.</p>
+        <p>You can log out <a href="{{ url_for('main.logout') }}">here</a>.</p>
+    </div>
+</div>
 {% endblock %}

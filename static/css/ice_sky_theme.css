@@ -1,0 +1,109 @@
+/* --- Ice Sky Theme --- */
+
+/* Global Body Styles */
+body.ice-sky-theme {
+    background: linear-gradient(135deg, #e0f7fa, #b3e5fc, #81d4fa, #4fc3f7, #29b6f6);
+    background-attachment: fixed;
+    font-family: 'Poppins', sans-serif;
+    color: #37474f;
+}
+
+/* Main Content Container */
+.ice-sky-content {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+
+/* Glassy Card Container */
+.glassy-card-container {
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+    margin-bottom: 2rem;
+}
+
+/* Typography */
+.ice-sky-theme h1, .ice-sky-theme h2, .ice-sky-theme h3, .ice-sky-theme h4, .ice-sky-theme h5, .ice-sky-theme h6 {
+    color: #0288d1;
+    font-weight: 700;
+}
+
+.ice-sky-theme h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.ice-sky-theme h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.ice-sky-theme p {
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+/* Buttons and Links */
+.ice-sky-theme .btn-primary {
+    background: linear-gradient(90deg, #29b6f6, #0288d1);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    text-decoration: none;
+    border: none;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.ice-sky-theme .btn-primary:hover {
+    background: linear-gradient(90deg, #4fc3f7, #0288d1);
+    box-shadow: 0 6px 20px rgba(2, 136, 209, 0.4);
+    transform: translateY(-2px);
+}
+
+.ice-sky-theme a {
+    color: #0288d1;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.ice-sky-theme a:hover {
+    color: #01579b;
+    text-decoration: underline;
+}
+
+/* Forms */
+.ice-sky-theme .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.ice-sky-theme .form-label {
+    display: block;
+    color: #37474f;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.ice-sky-theme .form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid #bbdefb;
+    border-radius: 12px;
+    color: #263238;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.ice-sky-theme .form-input:focus {
+    outline: none;
+    border-color: #29b6f6;
+    box-shadow: 0 0 10px rgba(41, 182, 246, 0.5);
+}
