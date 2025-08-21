@@ -107,7 +107,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Anti-cheating functionality
-    if (!isPreview && {{ assessment.is_published and 'submission' in globals() }}) {
+    {% if not preview and assessment.is_published and submission is defined %}
+    if (true) {
         let violationCount = 0;
         const maxViolations = 1;
         const overlay = document.getElementById('violation-overlay');
@@ -133,6 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         document.addEventListener("visibilitychange", handleVisibilityChange);
     }
+    {% endif %}
 
     // Submission confirmation
     const form = document.getElementById('assessment-form');

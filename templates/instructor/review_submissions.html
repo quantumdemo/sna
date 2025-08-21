@@ -22,7 +22,13 @@
             <div class="table-row-card">
                 <div class="table-row" style="grid-template-columns: 2fr 1fr 1fr 2fr;">
                     <div class="table-cell" data-label="Student">{{ sub.student.name }}</div>
-                    <div class="table-cell" data-label="Score">{{ "%.2f"|format(sub.score) }}%</div>
+                    <div class="table-cell" data-label="Score">
+                        {% if sub.score is not none %}
+                            {{ "%.2f"|format(sub.score) }}%
+                        {% else %}
+                            Not Graded
+                        {% endif %}
+                    </div>
                     <div class="table-cell" data-label="Status">{{ sub.status.replace('_', ' ').title() }}</div>
                     <div class="table-cell actions-cell action-buttons-container" data-label="Actions">
                         {% if sub.status == 'locked' %}
