@@ -47,7 +47,7 @@ def get_course_progress(user, course):
     # Check final exam status
     if course.final_exam_enabled and course.final_exam:
         exam_submission = ExamSubmission.query.filter_by(student_id=user.id, final_exam_id=course.final_exam.id).order_by(ExamSubmission.id.desc()).first()
-        exam_passed = exam_submission and exam_submission.score >= course.final_exam.pass_mark
+        exam_passed = exam_submission and exam_submission.score is not None and exam_submission.score >= course.final_exam.pass_mark
         progress['final_exam'] = {'exam': course.final_exam, 'submission': exam_submission, 'passed': exam_passed}
 
         if progress['all_prerequisites_met'] and exam_passed:
