@@ -125,6 +125,8 @@ def create_app(config_object=None):
 
     return app
 
+# Create a default app instance for discoverability by Flask CLI
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
     socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
