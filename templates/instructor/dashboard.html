@@ -18,70 +18,53 @@
         <a href="{{ url_for('instructor.exam_dashboard') }}" class="btn-secondary-glass">Manage Exams</a>
     </div>
 
-    <div class="glassy-table-wrapper" style="margin-top: 2rem;">
-        <div class="form-header">
-            <h2 class="form-title" style="font-size: 1.8rem;">Your Courses</h2>
+    <div class="dashboard-grid">
+        <div class="glassy-card">
+            <h2>Your Courses</h2>
+            <ul class="content-list">
+                {% for course in courses %}
+                <li class="content-list-item">
+                    <div class="item-details">
+                        <span class="title">{{ course.title }}</span>
+                        <span class="status {% if course.approved %}approved{% else %}pending{% endif %}">
+                            {% if course.approved %}Approved{% else %}Pending{% endif %}
+                        </span>
+                    </div>
+                    <div class="item-actions">
+                        <a href="{{ url_for('instructor.manage_course', course_id=course.id) }}" class="btn btn-manage">Manage</a>
+                    </div>
+                </li>
+                {% else %}
+                <li><p>You have not created any courses yet.</p></li>
+                {% endfor %}
+            </ul>
         </div>
-        <div class="glassy-table">
-            <div class="table-header" style="grid-template-columns: 3fr 1fr 1fr;">
-                <div class="table-cell">Title</div>
-                <div class="table-cell">Status</div>
-                <div class="table-cell">Actions</div>
-            </div>
-            {% for course in courses %}
-            <div class="table-row-card">
-                <div class="table-row" style="grid-template-columns: 3fr 1fr 1fr;">
-                    <div class="table-cell" data-label="Title">{{ course.title }}</div>
-                    <div class="table-cell" data-label="Status">
-                        {% if course.approved %}
-                            <span class="status-badge approved">Approved</span>
-                        {% else %}
-                            <span class="status-badge pending">Pending</span>
-                        {% endif %}
+
+        <div class="glassy-card">
+            <h2>Your Library Submissions</h2>
+            <ul class="content-list">
+                {% for material in library_materials %}
+                <li class="content-list-item">
+                    <div class="item-details">
+                        <span class="title">{{ material.title }}</span>
+                        <span class="status {% if material.approved %}approved{% elif material.rejection_reason %}rejected{% else %}pending{% endif %}">
+                            {% if material.approved %}
+                                Approved
+                            {% elif material.rejection_reason %}
+                            Rejected: <span class="rejection-reason-text">Reason: {{ material.rejection_reason }}</span>
+                            {% else %}
+                                Pending
+                            {% endif %}
+                        </span>
                     </div>
-                    <div class="table-cell" data-label="Actions">
-                        <a href="{{ url_for('instructor.manage_course', course_id=course.id) }}" class="btn-secondary-glass compact-btn">Manage</a>
-                    </div>
-                </div>
-            </div>
-            {% else %}
-            <div class="glass-card full-width-card"><p>You have not created any courses yet.</p></div>
-            {% endfor %}
+                </li>
+                {% else %}
+                <li><p>You have not submitted any library materials yet.</p></li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
 
-    <div class="glassy-table-wrapper" style="margin-top: 2rem;">
-        <div class="form-header">
-             <h2 class="form-title" style="font-size: 1.8rem;">Your Library Submissions</h2>
-        </div>
-        <div class="glassy-table">
-            <div class="table-header" style="grid-template-columns: 3fr 1fr;">
-                <div class="table-cell">Title</div>
-                <div class="table-cell">Status</div>
-            </div>
-            {% for material in library_materials %}
-            <div class="table-row-card">
-                <div class="table-row" style="grid-template-columns: 3fr 1fr;">
-                    <div class="table-cell" data-label="Title">{{ material.title }}</div>
-                    <div class="table-cell" data-label="Status">
-                        {% if material.approved %}
-                            <span class="status-badge approved">Approved</span>
-                        {% elif material.rejection_reason %}
-                            <span class="status-badge banned">Rejected</span>
-                            <p class="rejection-reason">Reason: {{ material.rejection_reason }}</p>
-                        {% else %}
-                             <span class="status-badge pending">Pending</span>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            {% else %}
-            <div class="glass-card full-width-card"><p>You have not submitted any library materials yet.</p></div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- Restyled Library Submission Form -->
     <div class="library-form-container">
         <div class="library-form-header">
             <h2>Submit New Library Material</h2>

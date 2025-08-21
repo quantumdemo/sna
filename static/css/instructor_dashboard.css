@@ -1,37 +1,160 @@
-/* Instructor Dashboard Redesign */
+/*
+ *  Instructor Dashboard Redesign
+ *  Author: Jules
+ *  Date: 2025-08-21
+ *
+ *  This stylesheet contains the new, modern, and responsive design
+ *  for the instructor dashboard, featuring a light icy theme with
+ *  glassmorphism effects.
+ */
 
-/* Background & Body */
+/* Global Page Style */
 body.instructor-dashboard {
-    background: linear-gradient(135deg, #dff6ff 0%, #bde0fe 100%);
+    background: linear-gradient(135deg, #d4f1f9, #a6e3f4, #74c8f7);
     font-family: 'Poppins', sans-serif;
-    color: #0a2540;
+    color: #2c3e50; /* Default dark gray for paragraphs */
 }
 
-/* Main Container */
-.instructor-container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-}
-
-/* Header */
+/* Header & Welcome Section */
 .instructor-header {
     text-align: center;
-    margin-bottom: 2.5rem;
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .instructor-header h1 {
-    font-size: 2.8rem;
-    font-weight: 700;
     color: #0d1b2a;
+    font-weight: 700;
+    font-size: 2.5rem;
 }
 
 .instructor-header p {
-    font-size: 1.1rem;
     color: #2c3e50;
+    font-size: 1.1rem;
 }
 
-/* Glassy Form Container */
+/* Dashboard Actions */
+.dashboard-actions {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.dashboard-actions a {
+    text-decoration: none;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin: 0.5rem;
+}
+
+.dashboard-actions .btn-primary-glass {
+    background: linear-gradient(90deg, #00b4d8, #0077b6);
+    box-shadow: 0 4px 15px rgba(0, 180, 216, 0.4);
+}
+
+.dashboard-actions a:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+/* Glassy Table/Card Wrapper */
+.glassy-card {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.glassy-card h2 {
+    color: #0d1b2a;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding-bottom: 1rem;
+}
+
+/* Modern List for Courses/Submissions */
+.content-list {
+    list-style: none;
+    padding: 0;
+}
+
+.content-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 12px;
+    transition: background 0.3s ease;
+}
+
+.content-list-item:not(:last-child) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.content-list-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.item-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-details .title {
+    font-weight: 600;
+    color: #003366;
+}
+
+.item-details .status {
+    font-size: 0.9rem;
+}
+
+.status.approved { color: #27ae60; }
+.status.pending { color: #7a7a7a; }
+.status.rejected { color: #e74c3c; }
+
+
+.item-actions .btn {
+    padding: 8px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.item-actions .btn-manage {
+    background-color: #3498db; /* Blue */
+}
+.item-actions .btn-delete {
+    background-color: #e74c3c; /* Red */
+}
+.item-actions .btn-view {
+    background-color: #8e44ad; /* Purple */
+}
+
+.item-actions .btn:hover {
+    opacity: 0.85;
+}
+
+/* Library Submission Form */
 .library-form-container {
     background: rgba(255, 255, 255, 0.35);
     backdrop-filter: blur(10px);
@@ -51,14 +174,12 @@ body.instructor-dashboard {
     font-weight: 700;
 }
 
-/* Form Grid Layout */
 .library-form-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.5rem;
 }
 
-/* Form Fields */
 .library-form-group label {
     display: block;
     font-weight: 600;
@@ -76,6 +197,7 @@ body.instructor-dashboard {
     color: #0a2540;
     font-size: 1rem;
     transition: all 0.3s ease;
+    border-image: linear-gradient(90deg, #00b4d8, #0077b6) 1;
 }
 
 .library-form-input::placeholder {
@@ -88,7 +210,6 @@ body.instructor-dashboard {
     border-color: #0077b6;
 }
 
-/* File Input Customization */
 .library-form-input[type="file"] {
     padding: 8px;
 }
@@ -107,7 +228,6 @@ body.instructor-dashboard {
     box-shadow: 0 4px 10px rgba(0, 180, 216, 0.3);
 }
 
-/* Submit Button */
 .library-submit-btn {
     width: 100%;
     padding: 15px;
@@ -128,14 +248,45 @@ body.instructor-dashboard {
     box-shadow: 0 6px 20px rgba(0, 180, 216, 0.5);
 }
 
-/* Responsive Design */
-@media (min-width: 600px) {
+/* Responsive Layout */
+@media (min-width: 768px) {
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
     .library-form-grid {
         grid-template-columns: 1fr 1fr;
-        gap: 1.5rem 1rem;
     }
 
     .full-span {
         grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 767px) {
+    .instructor-header h1 {
+        font-size: 2rem;
+    }
+
+    .dashboard-actions a {
+        width: 100%;
+        display: block;
+    }
+
+    .content-list-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .item-actions {
+        margin-top: 1rem;
+        width: 100%;
+    }
+
+    .item-actions .btn {
+        width: 100%;
+        text-align: center;
     }
 }
