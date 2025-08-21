@@ -471,6 +471,10 @@ def reject_payment(enrollment_id):
 
 @admin_bp.route('/payment-proof/<path:filename>')
 def payment_proof(filename):
+    # Handle legacy paths that might still include the directory
+    if filename.startswith('payment_proofs/'):
+        filename = filename.split('/')[-1]
+
     proofs_dir = os.path.join(current_app.root_path, 'static', 'payment_proofs')
     return send_from_directory(proofs_dir, filename)
 
