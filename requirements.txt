@@ -6,3 +6,5 @@ Flask-SocketIO
 WeasyPrint
 bleach
 beautifulsoup4
+pytest
+flask_migrate
