@@ -69,6 +69,7 @@
                             <span class="status-badge status-{{ 'completed' if progress.can_request_certificate else 'ongoing' }}">
                                 {{ 'Completed' if progress.can_request_certificate else 'Ongoing' }}
                             </span>
+                            <a href="{{ url_for('main.course_detail', course_id=enrollment.course.id) }}" class="btn-secondary-glass compact-btn">View Course</a>
                             {% if progress.can_request_certificate %}
                                 <form action="{{ url_for('main.request_certificate', course_id=enrollment.course.id) }}" method="POST" style="display: inline;">
                                     <button type="submit" class="btn-primary-glass compact-btn">Request Certificate</button>
