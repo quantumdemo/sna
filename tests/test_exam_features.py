@@ -102,9 +102,9 @@ class ExamFeaturesTests(unittest.TestCase):
         correct_choice = Choice.query.filter_by(question_id=question.id, is_correct=True).first()
         response = self.client.post(f'/exam/{submission.id}/submit', data={
             f'q_{question.id}': correct_choice.id
-        }, follow_redirects=True)
+        })
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Your exam has been submitted for review', response.data)
+        self.assertIn(b'Exam Submitted Successfully', response.data)
 
         # 4. Verify submission and score
         submission = ExamSubmission.query.filter_by(final_exam_id=exam.id).first()

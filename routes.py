@@ -424,7 +424,7 @@ def submit_exam(submission_id):
             # File upload logic will need to be added here
 
         answer = Answer(
-            submission_id=submission.id,
+            exam_submission_id=submission.id,
             question_id=question.id,
             **answer_data
         )
