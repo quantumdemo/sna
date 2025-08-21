@@ -2,6 +2,10 @@
 
 {% block title %}{{ assessment.title or 'Assessment' }}{% if preview %} (Preview){% endif %}{% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/calculator.css') }}">
+{% endblock %}
+
 {% block content %}
 <div id="assessment-container">
     <section id="assessment-page" class="form-container-glassy">
@@ -61,30 +65,8 @@
     </section>
 
     {% if assessment.calculator_allowed %}
-    <aside id="calculator" class="glass-card">
-        <div id="calc-display">0</div>
-        <div class="calc-keys">
-            <button class="calc-btn" data-key="clear">C</button>
-            <button class="calc-btn" data-key="sqrt">√</button>
-            <button class="calc-btn" data-key="%">%</button>
-            <button class="calc-btn operator" data-key="/">÷</button>
-            <button class="calc-btn number" data-key="7">7</button>
-            <button class="calc-btn number" data-key="8">8</button>
-            <button class="calc-btn number" data-key="9">9</button>
-            <button class="calc-btn operator" data-key="*">×</button>
-            <button class="calc-btn number" data-key="4">4</button>
-            <button class="calc-btn number" data-key="5">5</button>
-            <button class="calc-btn number" data-key="6">6</button>
-            <button class="calc-btn operator" data-key="-">−</button>
-            <button class="calc-btn number" data-key="1">1</button>
-            <button class="calc-btn number" data-key="2">2</button>
-            <button class="calc-btn number" data-key="3">3</button>
-            <button class="calc-btn operator" data-key="+">+</button>
-            <button class="calc-btn number zero" data-key="0">0</button>
-            <button class="calc-btn" data-key=".">.</button>
-            <button class="calc-btn operator" data-key="=">=</button>
-        </div>
-    </aside>
+    <button id="calculator-toggle-btn" class="floating-btn">🔢</button>
+    {% include 'calculator.html' %}
     {% endif %}
 </div>
 
@@ -99,6 +81,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/calculator.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const isPreview = {{ preview|tojson }};
@@ -164,7 +147,6 @@ document.addEventListener('DOMContentLoaded', function() {
         let unanswered = 0;
         const totalQuestions = {{ assessment.questions.count() }};
 
-        // This is a simplified check. A more robust check would group inputs by question.
         let answeredQuestions = new Set();
         inputs.forEach(input => {
             const questionName = input.name;
@@ -185,12 +167,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-
-    // Calculator functionality
-    const calculator = document.getElementById('calculator');
-    if (calculator) {
-        // Calculator logic remains the same
-    }
 });
 </script>
 {% endblock %}
