@@ -17,6 +17,7 @@ def before_request():
         abort(403)
 
 from flask import request, flash, redirect, url_for, current_app, jsonify
+from datetime import datetime
 import json
 import bleach
 from models import Category, LibraryMaterial, Module, Lesson, Assignment, AssignmentSubmission, Quiz, FinalExam, ChatRoom, ChatRoomMember, Question, Choice, ExamSubmission
@@ -386,8 +387,18 @@ def edit_exam(exam_id):
     exam.time_limit_minutes = request.form.get('time_limit_minutes', type=int)
     exam.pass_mark = request.form.get('pass_mark', type=int)
     exam.allowed_attempts = request.form.get('allowed_attempts', type=int)
-    exam.start_date = request.form.get('start_date')
-    exam.end_date = request.form.get('end_date')
+    start_date_str = request.form.get('start_date')
+    end_date_str = request.form.get('end_date')
+
+    if start_date_str:
+        exam.start_date = datetime.fromisoformat(start_date_str)
+    else:
+        exam.start_date = None
+
+    if end_date_str:
+        exam.end_date = datetime.fromisoformat(end_date_str)
+    else:
+        exam.end_date = None
     exam.instructions = request.form.get('instructions')
     exam.shuffle_questions = request.form.get('shuffle_questions') == 'on'
     exam.allow_navigation = request.form.get('allow_navigation') == 'on'
