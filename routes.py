@@ -314,7 +314,7 @@ def pre_exam(exam_id):
 
     # Check attempt limit
     submission_count = ExamSubmission.query.filter_by(student_id=current_user.id, final_exam_id=exam.id).count()
-    if submission_count >= exam.allowed_attempts:
+    if exam.allowed_attempts is not None and submission_count >= exam.allowed_attempts:
         flash(f'You have reached the maximum number of attempts ({exam.allowed_attempts}).', 'warning')
         return redirect(url_for('main.course_detail', course_id=exam.course.id))
 
