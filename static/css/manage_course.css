@@ -1,3 +1,5 @@
+/* manage_course.css */
+
 .back-button {
     display: inline-flex;
     align-items: center;
@@ -14,34 +16,110 @@
     background-color: rgba(255, 255, 255, 0.2);
 }
 
-.admin-header {
+.course-overview-card {
+    margin-bottom: 2rem;
+}
+
+.course-description {
+    color: #4a557d;
+    margin-bottom: 1.5rem;
+}
+
+.course-actions {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
     flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 1.5rem;
 }
 
 .course-settings-flex {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
-.add-module-form form {
-    display:flex;
-    gap:1rem;
+.compact-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+}
+
+.full-width {
+    width: 100%;
+    text-align: center;
+}
+
+.modules-section {
+    margin-top: 2rem;
+}
+
+.module-manage-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.lessons-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.lessons-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.lessons-list li:last-child {
+    border-bottom: none;
+}
+
+.lessons-list .empty-list-item {
+    justify-content: center;
+    color: #94a3b8;
+}
+
+.add-content-forms {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.add-assessment-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.add-module-form {
+    margin-top: 2rem;
+}
+
+.add-module-form-inner {
+    display: flex;
+    gap: 1rem;
+}
+.add-module-form-inner input {
+    flex-grow: 1;
 }
 
 @media (max-width: 768px) {
-    .manage-course-grid {
+    .add-content-forms {
         grid-template-columns: 1fr;
     }
-    .course-settings-flex {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-    .add-module-form form {
+    .add-module-form-inner {
         flex-direction: column;
     }
 }
