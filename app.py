@@ -6,6 +6,7 @@ import click
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from markupsafe import Markup
+from flask_migrate import Migrate
 
 def secure_embeds_filter(html_content):
     if not html_content:
@@ -53,6 +54,7 @@ def create_app(config_object=None):
     db.init_app(app)
     login_manager.init_app(app)
     socketio.init_app(app)
+    migrate = Migrate(app, db)
     login_manager.login_view = 'main.login'
 
     @login_manager.user_loader
@@ -69,24 +71,25 @@ def create_app(config_object=None):
     from admin_routes import admin_bp
     app.register_blueprint(admin_bp)
 
-    with app.app_context():
-        db.create_all()
-        # Ensure the general chat room exists and is public
-        general_room = ChatRoom.query.filter_by(name='General').first()
-        if not general_room:
-            general_room = ChatRoom(name='General', room_type='public', description='A place for everyone to chat.')
-            db.session.add(general_room)
-        elif general_room.room_type != 'public':
-            general_room.room_type = 'public'
-
-        db.session.commit()
-
     # Register chat events
     from chat_events import register_chat_events
     register_chat_events(socketio)
 
     # Register custom Jinja filters
     app.jinja_env.filters['secure_embeds'] = secure_embeds_filter
+
+    @app.cli.command("init-db")
+    def init_db():
+        """Creates the database and the general chat room."""
+        db.create_all()
+        general_room = ChatRoom.query.filter_by(name='General').first()
+        if not general_room:
+            general_room = ChatRoom(name='General', room_type='public', description='A place for everyone to chat.')
+            db.session.add(general_room)
+        elif general_room.room_type != 'public':
+            general_room.room_type = 'public'
+        db.session.commit()
+        print("Database initialized.")
 
     @app.cli.command("clean-chat-history")
     @click.option("--days", default=30, type=int, help="Delete messages older than this many days.")

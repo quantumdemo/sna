@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Pre-Exam: {{ exam.title }}{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="form-container-glassy" style="max-width: 800px; margin: 2rem auto;">
+        <div class="form-header">
+            <h1 class="form-title">Exam: {{ exam.title }}</h1>
+            <p>Course: {{ exam.course.title }}</p>
+        </div>
+
+        <div class="exam-details">
+            <p><strong>Duration:</strong> {{ exam.time_limit_minutes }} minutes</p>
+            <p><strong>Questions:</strong> {{ exam.questions.count() }}</p>
+            <p><strong>Allowed Attempts:</strong> {{ exam.allowed_attempts }}</p>
+            <p><strong>Your Attempt:</strong> {{ attempt_number }} of {{ exam.allowed_attempts }}</p>
+            <p><strong>Passing Score:</strong> {{ exam.pass_mark }}%</p>
+        </div>
+
+        <hr style="margin: 2rem 0;">
+
+        <div class="exam-instructions">
+            <h3 class="form-title">Instructions from Instructor</h3>
+            {% if exam.instructions %}
+                <div class="prose-glassy">
+                    {{ exam.instructions|safe }}
+                </div>
+            {% else %}
+                <p>No specific instructions were provided.</p>
+            {% endif %}
+        </div>
+
+        <hr style="margin: 2rem 0;">
+
+        <div class="exam-rules">
+            <h3 class="form-title">Exam Rules</h3>
+            <ul>
+                <li>Do not refresh the page during the exam.</li>
+                <li>Do not switch tabs or minimize the browser window. Doing so may lock your exam.</li>
+                {% if exam.full_screen_enforced %}
+                <li>This exam must be taken in full-screen mode.</li>
+                {% endif %}
+                {% if exam.disable_copy_paste %}
+                <li>Copy and paste is disabled during the exam.</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <form action="{{ url_for('main.start_exam', exam_id=exam.id) }}" method="post">
+            <div class="form-group" style="margin-top: 2rem;">
+                <div class="radio-group-glassy">
+                    <input type="checkbox" id="agree_rules" name="agree_rules" required>
+                    <label for="agree_rules">I have read and agree to the exam rules.</label>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" id="start_exam_btn" class="btn-primary-glass" disabled>Start Exam</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const agreeCheckbox = document.getElementById('agree_rules');
+    const startButton = document.getElementById('start_exam_btn');
+
+    agreeCheckbox.addEventListener('change', function() {
+        startButton.disabled = !this.checked;
+    });
+});
+</script>
+{% endblock %}

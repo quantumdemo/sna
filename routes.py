@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
 import random
 import secrets
-from models import User, Course, Category, Comment, Lesson, LibraryMaterial, Assignment, AssignmentSubmission, Quiz, FinalExam, QuizSubmission, ExamSubmission, Enrollment, LessonCompletion, Module, Certificate, CertificateRequest, LibraryPurchase, ChatRoom, ChatRoomMember, UserLastRead, ChatMessage, ExamViolation, GroupRequest
+from models import User, Course, Category, Comment, Lesson, LibraryMaterial, Assignment, AssignmentSubmission, Quiz, FinalExam, QuizSubmission, ExamSubmission, Enrollment, LessonCompletion, Module, Certificate, CertificateRequest, LibraryPurchase, ChatRoom, ChatRoomMember, UserLastRead, ChatMessage, ExamViolation, GroupRequest, Choice, Answer
 from extensions import db
 from utils import save_chat_file
 
@@ -292,52 +292,71 @@ def submit_quiz(quiz_id):
     flash(f'Quiz submitted! Your score: {final_score:.2f}%', 'success')
     return redirect(url_for('main.course_detail', course_id=quiz.module.course.id))
 
-@main.route('/exam/<int:exam_id>')
+
+@main.route('/exam/<int:exam_id>/pre-exam')
 @login_required
-def take_exam(exam_id):
+def pre_exam(exam_id):
     exam = FinalExam.query.get_or_404(exam_id)
     if not current_user.is_enrolled(exam.course):
         abort(403)
 
-    submission = ExamSubmission.query.filter_by(student_id=current_user.id, final_exam_id=exam.id).order_by(ExamSubmission.id.desc()).first()
+    if not exam.is_published:
+        flash('This exam is not yet published.', 'warning')
+        return redirect(url_for('main.course_detail', course_id=exam.course.id))
 
-    # If submission exists and is locked, show the locked page.
-    if submission and submission.locked:
-        flash('This exam is locked due to a violation.', 'danger')
-        return redirect(url_for('main.student_dashboard'))
+    # Check start and end dates
+    if exam.start_date and datetime.utcnow() < exam.start_date:
+        flash(f"This exam is not available until {exam.start_date.strftime('%Y-%m-%d %H:%M')} UTC.", 'warning')
+        return redirect(url_for('main.course_detail', course_id=exam.course.id))
+    if exam.end_date and datetime.utcnow() > exam.end_date:
+        flash('This exam has ended.', 'warning')
+        return redirect(url_for('main.course_detail', course_id=exam.course.id))
 
-    # If student has passed, they cannot retake
-    if submission and submission.score >= exam.pass_mark:
-        flash('You have already passed the final exam.', 'info')
-        return redirect(url_for('main.student_dashboard'))
+    # Check attempt limit
+    submission_count = ExamSubmission.query.filter_by(student_id=current_user.id, final_exam_id=exam.id).count()
+    if submission_count >= exam.allowed_attempts:
+        flash(f'You have reached the maximum number of attempts ({exam.allowed_attempts}).', 'warning')
+        return redirect(url_for('main.course_detail', course_id=exam.course.id))
 
-    # If student failed but retakes are not allowed
-    if submission and not exam.retake_allowed:
-        flash('You have already taken the final exam and retakes are not allowed.', 'warning')
-        return redirect(url_for('main.student_dashboard'))
+    return render_template('pre_exam.html', exam=exam, attempt_number=submission_count + 1)
 
-    # If this is a retake, create a new submission object
-    if submission and exam.retake_allowed:
-         submission = ExamSubmission(
-            final_exam_id=exam.id,
-            student_id=current_user.id,
-            answers={},
-            score=0
-        )
-         db.session.add(submission)
-         db.session.commit()
-    elif not submission:
-        # Create a new submission record at the start of the first attempt
-        submission = ExamSubmission(
-            final_exam_id=exam.id,
-            student_id=current_user.id,
-            answers={},
-            score=0
-        )
-        db.session.add(submission)
-        db.session.commit()
+@main.route('/exam/<int:exam_id>/start', methods=['POST'])
+@login_required
+def start_exam(exam_id):
+    exam = FinalExam.query.get_or_404(exam_id)
+    if not current_user.is_enrolled(exam.course):
+        abort(403)
 
-    return render_template('take_assessment.html', assessment=exam, submission=submission, time_limit=exam.time_limit_minutes, submit_url=url_for('main.submit_exam', exam_id=exam.id))
+    # Re-check eligibility before starting
+    submission_count = ExamSubmission.query.filter_by(student_id=current_user.id, final_exam_id=exam.id).count()
+    if submission_count >= exam.allowed_attempts:
+        flash('You have already used all your attempts.', 'danger')
+        return redirect(url_for('main.course_detail', course_id=exam.course.id))
+
+    # Create a new submission attempt
+    new_submission = ExamSubmission(
+        final_exam_id=exam.id,
+        student_id=current_user.id,
+        attempt_number=submission_count + 1,
+        status='in_progress'
+    )
+    db.session.add(new_submission)
+    db.session.commit()
+
+    return redirect(url_for('main.take_assessment', submission_id=new_submission.id))
+
+
+@main.route('/assessment/<int:submission_id>')
+@login_required
+def take_assessment(submission_id):
+    submission = ExamSubmission.query.get_or_404(submission_id)
+    if submission.student_id != current_user.id:
+        abort(403)
+
+    exam = submission.final_exam
+    # You might want to add more logic here, e.g., to prevent re-opening a submitted exam
+
+    return render_template('take_assessment.html', assessment=exam, submission=submission, preview=False, time_limit=exam.time_limit_minutes, submit_url=url_for('main.submit_exam', submission_id=submission.id))
 
 @main.route('/exam/submission/<int:submission_id>/log-violation', methods=['POST'])
 @login_required
@@ -361,40 +380,63 @@ def log_exam_violation(submission_id):
     return jsonify({'status': 'success', 'locked': True})
 
 
-@main.route('/exam/<int:exam_id>/submit', methods=['POST'])
+@main.route('/exam/<int:submission_id>/submit', methods=['POST'])
 @login_required
-def submit_exam(exam_id):
-    exam = FinalExam.query.get_or_404(exam_id)
-    if not current_user.is_enrolled(exam.course):
+def submit_exam(submission_id):
+    submission = ExamSubmission.query.get_or_404(submission_id)
+    if submission.student_id != current_user.id:
         abort(403)
 
-    submission = ExamSubmission.query.filter_by(student_id=current_user.id, final_exam_id=exam.id, locked=False).first()
-    if not submission:
-        flash("Could not find an active exam submission for you. It might be locked or already submitted.", "danger")
-        return redirect(url_for('main.course_detail', course_id=exam.course.id))
+    if submission.status != 'in_progress':
+         flash("This exam has already been submitted or is locked.", "warning")
+         return redirect(url_for('main.course_detail', course_id=submission.final_exam.course.id))
 
-    # Prevent re-submission
-    if submission.status != 'pending_review':
-         flash("This exam has already been submitted.", "warning")
-         return redirect(url_for('main.course_detail', course_id=exam.course.id))
-
-    score = 0
-    answers = {}
+    exam = submission.final_exam
     questions = exam.questions.all()
-    for question in questions:
-        user_answer_id = request.form.get(f'q_{question.id}')
-        if user_answer_id:
-            answers[str(question.id)] = user_answer_id
-            if int(user_answer_id) == question.correct_choice_id:
-                score += 1
+    score = 0
 
-    submission.score = (score / len(questions)) * 100 if questions else 0
-    submission.answers = answers
-    # Status remains 'pending_review'
+    for question in questions:
+        answer_data = {}
+        if question.question_type == 'multiple_choice_single':
+            choice_id = request.form.get(f'q_{question.id}')
+            if choice_id:
+                answer_data['selected_choice_id'] = int(choice_id)
+                choice = Choice.query.get(int(choice_id))
+                if choice and choice.is_correct:
+                    score += question.marks
+        elif question.question_type == 'multiple_choice_multiple':
+            choice_ids = request.form.getlist(f'q_{question.id}')
+            if choice_ids:
+                answer_data['selected_choices'] = [int(cid) for cid in choice_ids]
+                correct_choices = {c.id for c in question.choices if c.is_correct}
+                selected_choices = {int(cid) for cid in choice_ids}
+                if correct_choices == selected_choices:
+                    score += question.marks
+        elif question.question_type == 'true_false':
+            tf_answer = request.form.get(f'q_{question.id}')
+            if tf_answer:
+                answer_data['true_false_answer'] = (tf_answer == 'True')
+                if (tf_answer == 'True') == question.true_false_answer:
+                    score += question.marks
+        else: # short_answer, essay, file_upload
+            # These will be manually graded, so just store the answer
+            answer_data['text_answer'] = request.form.get(f'q_{question.id}')
+            # File upload logic will need to be added here
+
+        answer = Answer(
+            submission_id=submission.id,
+            question_id=question.id,
+            **answer_data
+        )
+        db.session.add(answer)
+
+    total_marks = sum(q.marks for q in questions)
+    submission.score = (score / total_marks) * 100 if total_marks > 0 else 0
+    submission.status = 'pending_review'
+    submission.submitted_at = datetime.utcnow()
     db.session.commit()
 
-    flash('Your exam has been submitted for review.', 'success')
-    return redirect(url_for('main.course_detail', course_id=exam.course.id))
+    return render_template('post_exam.html', submission=submission)
 
 @main.route('/course/<int:course_id>/enroll')
 @login_required

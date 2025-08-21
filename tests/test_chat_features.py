@@ -22,6 +22,7 @@ class ChatFeaturesTests(unittest.TestCase):
         self.app = create_app(TestConfig)
         self.app_context = self.app.app_context()
         self.app_context.push()
+        db.create_all()
         self.client = self.app.test_client()
         self.seed_db()
 
@@ -42,6 +43,10 @@ class ChatFeaturesTests(unittest.TestCase):
 
         self.category = Category(name='Test Category')
         db.session.add(self.category)
+        db.session.commit()
+
+        general_room = ChatRoom(name='General', room_type='public', description='A place for everyone to chat.')
+        db.session.add(general_room)
         db.session.commit()
 
     def login(self, email, password):

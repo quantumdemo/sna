@@ -163,10 +163,24 @@ class Assignment(db.Model):
 class FinalExam(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+    title = db.Column(db.String(150), nullable=False, default='Final Exam')
     time_limit_minutes = db.Column(db.Integer, nullable=True)
     pass_mark = db.Column(db.Integer, nullable=False, default=50)
     calculator_allowed = db.Column(db.Boolean, default=False)
     retake_allowed = db.Column(db.Boolean, default=False)
+    start_date = db.Column(db.DateTime, nullable=True)
+    end_date = db.Column(db.DateTime, nullable=True)
+    allowed_attempts = db.Column(db.Integer, default=1)
+    instructions = db.Column(db.Text, nullable=True)
+    shuffle_questions = db.Column(db.Boolean, default=False)
+    allow_navigation = db.Column(db.Boolean, default=True)
+    disable_backtracking = db.Column(db.Boolean, default=False)
+    full_screen_enforced = db.Column(db.Boolean, default=False)
+    tab_switch_detection = db.Column(db.Boolean, default=True) # Enabled by default
+    disable_copy_paste = db.Column(db.Boolean, default=False)
+    webcam_monitoring = db.Column(db.Boolean, default=False)
+    release_scores_immediately = db.Column(db.Boolean, default=True)
+    is_published = db.Column(db.Boolean, default=False)
 
     questions = db.relationship('Question', backref='exam', lazy='dynamic', cascade="all, delete-orphan")
     submissions = db.relationship('ExamSubmission', backref='final_exam', lazy='dynamic', cascade="all, delete-orphan")
@@ -176,7 +190,19 @@ class Question(db.Model):
     exam_id = db.Column(db.Integer, db.ForeignKey('final_exam.id'), nullable=True)
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=True)
     question_text = db.Column(db.Text, nullable=False)
-    correct_choice_id = db.Column(db.Integer, nullable=True) # Set after choices are created
+    question_type = db.Column(db.String(50), nullable=False, default='multiple_choice_single')
+    marks = db.Column(db.Float, nullable=False, default=1.0)
+    negative_marking = db.Column(db.Float, nullable=True)
+    shuffle_choices = db.Column(db.Boolean, default=False)
+
+    # For True/False questions
+    true_false_answer = db.Column(db.Boolean, nullable=True)
+
+    # For Short Answer/Essay (the answer is not stored here, but in the submission)
+
+    # For File Upload (details might be stored here, like allowed file types)
+    allowed_file_types = db.Column(db.String(255), nullable=True)
+    max_file_size_kb = db.Column(db.Integer, nullable=True)
 
     choices = db.relationship('Choice', backref='question', lazy='dynamic', cascade="all, delete-orphan")
 
@@ -184,6 +210,7 @@ class Choice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
     choice_text = db.Column(db.Text, nullable=False)
+    is_correct = db.Column(db.Boolean, default=False, nullable=False)
 
 class QuizSubmission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -206,14 +233,45 @@ class ExamSubmission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     final_exam_id = db.Column(db.Integer, db.ForeignKey('final_exam.id'), nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    answers = db.Column(db.JSON, nullable=False) # Storing a dict of {question_id: choice_id}
     score = db.Column(db.Float, nullable=True)
-    status = db.Column(db.String(50), nullable=False, default='pending_review') # pending_review, released, locked
+    status = db.Column(db.String(50), nullable=False, default='in_progress') # in_progress, submitted, pending_review, released, locked
     locked = db.Column(db.Boolean, default=False)
     appeal_text = db.Column(db.Text, nullable=True)
     appeal_status = db.Column(db.String(50), nullable=True) # pending, accepted, rejected
+    submitted_at = db.Column(db.DateTime, nullable=True)
+    attempt_number = db.Column(db.Integer, nullable=False, default=1)
 
+    answers = db.relationship('Answer', backref='submission', lazy='dynamic', cascade="all, delete-orphan")
     violations = db.relationship('ExamViolation', backref='submission', lazy='dynamic', cascade="all, delete-orphan")
+
+class Answer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    exam_submission_id = db.Column(db.Integer, db.ForeignKey('exam_submission.id'), nullable=False)
+    question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
+
+    # For multiple choice (single answer)
+    selected_choice_id = db.Column(db.Integer, db.ForeignKey('choice.id'), nullable=True)
+
+    # For multiple choice (multiple answers)
+    selected_choices = db.Column(db.JSON, nullable=True)
+
+    # For short answer and essay
+    text_answer = db.Column(db.Text, nullable=True)
+
+    # For file upload
+    file_path = db.Column(db.String(255), nullable=True)
+
+    # For True/False
+    true_false_answer = db.Column(db.Boolean, nullable=True)
+
+    # Grading information
+    marks_awarded = db.Column(db.Float, nullable=True)
+    graded_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    feedback = db.Column(db.Text, nullable=True)
+
+    question = db.relationship('Question')
+    selected_choice = db.relationship('Choice')
+    grader = db.relationship('User')
 
 class ExamViolation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
