@@ -2,9 +2,13 @@
 
 {% block title %}Instructor Dashboard{% endblock %}
 
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/instructor_dashboard.css') }}">
+{% endblock %}
+
 {% block content %}
-<div class="admin-container">
-    <div class="admin-header">
+<div class="instructor-container">
+    <div class="instructor-header">
         <h1>Your Dashboard</h1>
         <p>Welcome, {{ current_user.name }}. Here you can manage your courses and library submissions.</p>
     </div>
@@ -77,42 +81,50 @@
         </div>
     </div>
 
-    <div class="form-container-glassy" style="margin-top: 2rem;">
-        <div class="form-header">
-            <h2 class="form-title" style="font-size: 1.8rem;">Submit New Library Material</h2>
+    <!-- Restyled Library Submission Form -->
+    <div class="library-form-container">
+        <div class="library-form-header">
+            <h2>Submit New Library Material</h2>
         </div>
         <form action="{{ url_for('instructor.submit_library_material') }}" method="post" enctype="multipart/form-data">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="lib_title">Title:</label>
-                    <input type="text" id="lib_title" name="title" required class="input-glassy">
+            <div class="library-form-grid">
+                <div class="library-form-group">
+                    <label for="lib_title">Title</label>
+                    <input type="text" id="lib_title" name="title" required class="library-form-input" placeholder="e.g., Advanced Python Programming">
                 </div>
-                <div class="form-group">
-                    <label for="lib_category">Category:</label>
-                    <select id="lib_category" name="category_id" required class="input-glassy">
+                <div class="library-form-group">
+                    <label for="lib_category">Category</label>
+                    <select id="lib_category" name="category_id" required class="library-form-input">
                         <option value="">Select a category...</option>
                         {% for category in categories %}
                         <option value="{{ category.id }}">{{ category.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-group full-span">
-                    <label for="lib_description">Description:</label>
-                    <textarea id="lib_description" name="description" rows="3" class="input-glassy"></textarea>
+                <div class="library-form-group full-span">
+                    <label for="lib_description">Description</label>
+                    <textarea id="lib_description" name="description" rows="4" class="library-form-input" placeholder="A brief summary of your material..."></textarea>
                 </div>
-                <div class="form-group">
-                    <label for="lib_price">Price (₦, enter 0 for free):</label>
-                    <input type="number" id="lib_price" name="price_naira" min="0" value="0" required class="input-glassy">
+                <div class="library-form-group">
+                    <label for="lib_price">Price (₦)</label>
+                    <input type="number" id="lib_price" name="price_naira" min="0" value="0" required class="library-form-input" placeholder="Enter 0 for free">
                 </div>
-                <div class="form-group">
-                    <label for="lib_file">File (PDF, eBook, etc. Max 50MB):</label>
-                    <input type="file" id="lib_file" name="file" required class="input-glassy">
+                <div class="library-form-group">
+                    <label for="lib_file">Upload File</label>
+                    <input type="file" id="lib_file" name="file" required class="library-form-input">
                 </div>
             </div>
-            <div class="form-actions">
-                <button type="submit" class="btn-primary-glass">Submit for Review</button>
-            </div>
+            <button type="submit" class="library-submit-btn">Submit for Review</button>
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add('instructor-dashboard');
+    });
+</script>
 {% endblock %}
