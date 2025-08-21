@@ -128,51 +128,16 @@
                     {% if module.assignment %}
                         <a href="{{ url_for('instructor.review_assignment_submissions', assignment_id=module.assignment.id) }}" class="btn-secondary-glass full-width">Review Assignment</a>
                     {% else %}
-                        <button type="button" onclick="openModal('add-assignment-modal-{{ module.id }}')" class="btn-secondary-glass full-width">Add Assignment</button>
+                        <a href="#add-assignment-{{module.id}}" class="btn-secondary-glass full-width">Add Assignment</a>
                     {% endif %}
 
                     {% if module.quiz %}
                         <a href="{{ url_for('instructor.manage_quiz', quiz_id=module.quiz.id) }}" class="btn-secondary-glass full-width">Manage Quiz</a>
                     {% else %}
                         <form action="{{ url_for('instructor.create_quiz', module_id=module.id) }}" method="post" style="display: contents;">
-                            <button type="submit" class="btn-secondary-glass full-width">+ Add Quiz</button>
+                            <button type="submit" class="btn-secondary-glass full-width">Add Quiz</button>
                         </form>
                     {% endif %}
-                </div>
-            </div>
-
-            <!-- Add Assignment Modal -->
-            <div id="add-assignment-modal-{{ module.id }}" class="modal-overlay" style="display: none;">
-                <div class="modal-content form-container-glassy">
-                    <div class="form-header">
-                        <h4 class="form-title" style="font-size: 1.5rem;">Add Assignment to {{ module.title }}</h4>
-                        <button type="button" class="close-btn" onclick="closeModal('add-assignment-modal-{{ module.id }}')">&times;</button>
-                    </div>
-                    <form action="{{ url_for('instructor.add_assignment', module_id=module.id) }}" method="POST">
-                        <div class="form-group">
-                            <label for="title-{{ module.id }}">Title</label>
-                            <input type="text" id="title-{{ module.id }}" name="title" class="input-glassy" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="description-{{ module.id }}">Description</label>
-                            <textarea id="description-{{ module.id }}" name="description" rows="4" class="input-glassy" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="submission_type-{{ module.id }}">Submission Type</label>
-                            <select id="submission_type-{{ module.id }}" name="submission_type" class="input-glassy">
-                                <option value="text">Text Submission</option>
-                                <option value="file">File Upload</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="max_file_size-{{ module.id }}">Max File Size (MB)</label>
-                            <input type="number" id="max_file_size-{{ module.id }}" name="max_file_size" class="input-glassy" min="1" placeholder="e.g., 10">
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" class="btn-secondary-glass" onclick="closeModal('add-assignment-modal-{{ module.id }}')">Cancel</button>
-                            <button type="submit" class="btn-primary-glass">Save Assignment</button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>
@@ -192,13 +157,4 @@
         </div>
     </div>
 </div>
-
-<script>
-function openModal(modalId) {
-    document.getElementById(modalId).style.display = 'flex';
-}
-function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
-}
-</script>
 {% endblock %}
