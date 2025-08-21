@@ -1,11 +1,2 @@
-# Byte-compiled / optimized / DLL files
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-
-# Log files
-*.log
-
-# Instance folder
-instance/
