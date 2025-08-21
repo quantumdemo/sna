@@ -20,6 +20,7 @@ class ExamFeaturesTests(unittest.TestCase):
         self.app = create_app(TestConfig)
         self.app_context = self.app.app_context()
         self.app_context.push()
+        db.create_all()
         self.client = self.app.test_client()
         self.seed_db()
 
@@ -65,11 +66,12 @@ class ExamFeaturesTests(unittest.TestCase):
 
         # 2. Add a question
         response = self.client.post(f'/instructor/exam/{exam.id}/add_question', data={
+            'question_type': 'multiple_choice_single',
             'question_text': 'What is 2+2?',
-            'choice1': '3',
-            'choice2': '4',
-            'choice3': '5',
-            'choice4': '6',
+            'choice_0': '3',
+            'choice_1': '4',
+            'choice_2': '5',
+            'choice_3': '6',
             'correct_choice': '1' # Index of '4'
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
@@ -79,7 +81,7 @@ class ExamFeaturesTests(unittest.TestCase):
         self.assertIsNotNone(question)
         self.assertEqual(question.question_text, 'What is 2+2?')
         self.assertEqual(len(question.choices.all()), 4)
-        self.assertEqual(question.correct_choice_id, question.choices[1].id)
+        self.assertTrue(question.choices[1].is_correct)
 
     def test_exam_submission_and_release_workflow(self):
         # 1. Setup exam with a question
@@ -92,14 +94,17 @@ class ExamFeaturesTests(unittest.TestCase):
         self.client.get(f'/course/{self.course_id}/enroll', follow_redirects=True)
 
         # 3. Student starts the exam (which creates the submission object)
-        self.client.get(f'/exam/{exam.id}')
+        self.client.post(f'/exam/{exam.id}/start', follow_redirects=True)
+        submission = ExamSubmission.query.filter_by(final_exam_id=exam.id, student_id=self.student.id).first()
+        self.assertIsNotNone(submission)
 
         # 4. Student submits the exam with the correct answer
-        response = self.client.post(f'/exam/{exam.id}/submit', data={
-            f'q_{question.id}': question.correct_choice_id
+        correct_choice = Choice.query.filter_by(question_id=question.id, is_correct=True).first()
+        response = self.client.post(f'/exam/{submission.id}/submit', data={
+            f'q_{question.id}': correct_choice.id
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'submitted for review', response.data)
+        self.assertIn(b'Your exam has been submitted for review', response.data)
 
         # 4. Verify submission and score
         submission = ExamSubmission.query.filter_by(final_exam_id=exam.id).first()

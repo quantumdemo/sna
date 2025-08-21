@@ -29,6 +29,7 @@ class RichTextEditorTests(unittest.TestCase):
 
         self.app_context = self.app.app_context()
         self.app_context.push()
+        db.create_all()
         self.client = self.app.test_client()
         self.seed_db()
 

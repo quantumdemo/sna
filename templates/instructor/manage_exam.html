@@ -16,25 +16,90 @@
         <form action="{{ url_for('instructor.edit_exam', exam_id=exam.id) }}" method="post">
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="time_limit_minutes">Time Limit (minutes):</label>
+                    <label for="title">Exam Title</label>
+                    <input type="text" name="title" id="title" value="{{ exam.title }}" class="input-glassy" required>
+                </div>
+                <div class="form-group">
+                    <label for="time_limit_minutes">Time Limit (minutes)</label>
                     <input type="number" name="time_limit_minutes" id="time_limit_minutes" value="{{ exam.time_limit_minutes or '' }}" class="input-glassy">
                 </div>
                 <div class="form-group">
-                    <label for="pass_mark">Pass Mark (%):</label>
+                    <label for="pass_mark">Pass Mark (%)</label>
                     <input type="number" name="pass_mark" id="pass_mark" value="{{ exam.pass_mark }}" required class="input-glassy">
                 </div>
                 <div class="form-group">
-                    <label>Options</label>
+                    <label for="allowed_attempts">Allowed Attempts</label>
+                    <input type="number" name="allowed_attempts" id="allowed_attempts" value="{{ exam.allowed_attempts }}" required class="input-glassy">
+                </div>
+                <div class="form-group">
+                    <label for="start_date">Start Date (Optional)</label>
+                    <input type="datetime-local" name="start_date" id="start_date" value="{{ exam.start_date.strftime('%Y-%m-%dT%H:%M') if exam.start_date else '' }}" class="input-glassy">
+                </div>
+                <div class="form-group">
+                    <label for="end_date">End Date (Optional)</label>
+                    <input type="datetime-local" name="end_date" id="end_date" value="{{ exam.end_date.strftime('%Y-%m-%dT%H:%M') if exam.end_date else '' }}" class="input-glassy">
+                </div>
+                <div class="form-group full-span">
+                    <label for="instructions">Instructions</label>
+                    <textarea name="instructions" id="instructions" class="input-glassy" rows="5">{{ exam.instructions or '' }}</textarea>
+                </div>
+
+                <div class="form-group full-span"><hr></div>
+
+                <div class="form-group">
+                    <label>Behavioral Settings</label>
+                    <div class="radio-group-glassy">
+                        <input type="checkbox" name="shuffle_questions" id="shuffle_questions" {% if exam.shuffle_questions %}checked{% endif %}>
+                        <label for="shuffle_questions">Shuffle Question Order</label>
+                    </div>
+                    <div class="radio-group-glassy">
+                        <input type="checkbox" name="allow_navigation" id="allow_navigation" {% if exam.allow_navigation %}checked{% endif %}>
+                        <label for="allow_navigation">Allow Navigation with Palette</label>
+                    </div>
+                    <div class="radio-group-glassy">
+                        <input type="checkbox" name="disable_backtracking" id="disable_backtracking" {% if exam.disable_backtracking %}checked{% endif %}>
+                        <label for="disable_backtracking">Disable Backtracking</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Result Settings</label>
+                    <div class="radio-group-glassy">
+                        <input type="checkbox" name="release_scores_immediately" id="release_scores_immediately" {% if exam.release_scores_immediately %}checked{% endif %}>
+                        <label for="release_scores_immediately">Release Scores Immediately</label>
+                    </div>
+                     <div class="radio-group-glassy">
+                        <input type="checkbox" name="retake_allowed" id="retake_allowed" {% if exam.retake_allowed %}checked{% endif %}>
+                        <label for="retake_allowed">Allow Retake if Failed</label>
+                    </div>
+                </div>
+
+                <div class="form-group full-span"><hr></div>
+
+                <div class="form-group">
+                    <label>Anti-Cheating</label>
+                    <div class="radio-group-glassy">
+                        <input type="checkbox" name="full_screen_enforced" id="full_screen_enforced" {% if exam.full_screen_enforced %}checked{% endif %}>
+                        <label for="full_screen_enforced">Full-screen Enforced</label>
+                    </div>
+                    <div class="radio-group-glassy">
+                        <input type="checkbox" name="tab_switch_detection" id="tab_switch_detection" {% if exam.tab_switch_detection %}checked{% endif %}>
+                        <label for="tab_switch_detection">Tab Switch Detection</label>
+                    </div>
+                    <div class="radio-group-glassy">
+                        <input type="checkbox" name="disable_copy_paste" id="disable_copy_paste" {% if exam.disable_copy_paste %}checked{% endif %}>
+                        <label for="disable_copy_paste">Disable Copy-Paste</label>
+                    </div>
+                    <div class="radio-group-glassy">
+                        <input type="checkbox" name="webcam_monitoring" id="webcam_monitoring" {% if exam.webcam_monitoring %}checked{% endif %}>
+                        <label for="webcam_monitoring">Webcam Monitoring (Optional)</label>
+                    </div>
+                </div>
+                 <div class="form-group">
+                    <label>Other</label>
                     <div class="radio-group-glassy">
                         <input type="checkbox" name="calculator_allowed" id="calculator_allowed" {% if exam.calculator_allowed %}checked{% endif %}>
                         <label for="calculator_allowed">Calculator Allowed</label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>&nbsp;</label>
-                    <div class="radio-group-glassy">
-                        <input type="checkbox" name="retake_allowed" id="retake_allowed" {% if exam.retake_allowed %}checked{% endif %}>
-                        <label for="retake_allowed">Allow Retake if Failed</label>
                     </div>
                 </div>
             </div>
@@ -46,7 +111,15 @@
 
     <div class="page-actions" style="text-align:center; margin: 2rem 0;">
         <a href="{{ url_for('instructor.manage_course', course_id=exam.course.id) }}" class="btn-secondary-glass">Back to Course</a>
+        <a href="{{ url_for('instructor.preview_exam', exam_id=exam.id) }}" class="btn-secondary-glass" target="_blank">Preview Exam</a>
         <a href="{{ url_for('instructor.review_exam_submissions', exam_id=exam.id) }}" class="btn-primary-glass">Review Submissions</a>
+        {% if not exam.is_published %}
+        <form action="{{ url_for('instructor.publish_exam', exam_id=exam.id) }}" method="post" style="display: inline;">
+            <button type="submit" class="btn-action btn-action-positive">Publish Exam</button>
+        </form>
+        {% else %}
+        <span class="chip-glassy chip-positive">Published</span>
+        {% endif %}
     </div>
 
     <div class="exam-questions-manager">
@@ -58,10 +131,10 @@
                 <ol>
                     {% for q in exam.questions %}
                     <li class="question-list-item">
-                        <strong>{{ q.question_text }}</strong>
+                        <strong>{{ q.question_text }}</strong> ({{ q.question_type.replace('_', ' ')|title }})
                         <ul>
                             {% for choice in q.choices %}
-                            <li {% if choice.id == q.correct_choice_id %}class="correct-answer"{% endif %}>
+                            <li {% if choice.is_correct %}class="correct-answer"{% endif %}>
                                 {{ choice.choice_text }}
                             </li>
                             {% endfor %}
@@ -78,30 +151,62 @@
             <div class="form-header">
                 <h3 class="form-title" style="font-size: 1.5rem;">Add New Question</h3>
             </div>
-            <form action="{{ url_for('instructor.add_question_to_exam', exam_id=exam.id) }}" method="post">
+            <form action="{{ url_for('instructor.add_question_to_exam', exam_id=exam.id) }}" method="post" id="add-question-form">
+                <div class="form-group">
+                    <label for="question_type">Question Type</label>
+                    <select name="question_type" id="question_type" class="input-glassy">
+                        <option value="multiple_choice_single">Multiple Choice (Single Answer)</option>
+                        <option value="multiple_choice_multiple">Multiple Choice (Multiple Answers)</option>
+                        <option value="true_false">True/False</option>
+                        <option value="short_answer">Short Answer</option>
+                        <option value="essay">Essay</option>
+                        <option value="file_upload">File Upload</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <label for="question_text">Question:</label>
                     <textarea name="question_text" id="question_text" rows="3" required class="input-glassy"></textarea>
                 </div>
-                <div class="choices-group">
-                    <label>Choices (select the correct one):</label>
+
+                <div id="choices-container" class="choices-group question-type-specific">
+                    <label>Choices (select the correct one/s):</label>
                     <div class="choice-item">
                         <input type="radio" name="correct_choice" value="0" required>
-                        <input type="text" name="choice1" placeholder="Choice A" required class="input-glassy">
+                        <input type="text" name="choice_0" placeholder="Choice A" required class="input-glassy">
                     </div>
                     <div class="choice-item">
                         <input type="radio" name="correct_choice" value="1">
-                        <input type="text" name="choice2" placeholder="Choice B" required class="input-glassy">
+                        <input type="text" name="choice_1" placeholder="Choice B" required class="input-glassy">
                     </div>
                     <div class="choice-item">
                         <input type="radio" name="correct_choice" value="2">
-                        <input type="text" name="choice3" placeholder="Choice C" required class="input-glassy">
+                        <input type="text" name="choice_2" placeholder="Choice C" required class="input-glassy">
                     </div>
                     <div class="choice-item">
                         <input type="radio" name="correct_choice" value="3">
-                        <input type="text" name="choice4" placeholder="Choice D" required class="input-glassy">
+                        <input type="text" name="choice_3" placeholder="Choice D" required class="input-glassy">
                     </div>
                 </div>
+
+                <div id="true-false-container" class="form-group question-type-specific" style="display: none;">
+                    <label>Correct Answer:</label>
+                    <div class="radio-group-glassy">
+                        <input type="radio" name="true_false_answer" value="True" id="true_answer"> <label for="true_answer">True</label>
+                        <input type="radio" name="true_false_answer" value="False" id="false_answer"> <label for="false_answer">False</label>
+                    </div>
+                </div>
+
+                <div id="file-upload-container" class="form-grid question-type-specific" style="display: none;">
+                    <div class="form-group">
+                        <label for="allowed_file_types">Allowed File Types (comma-separated, e.g., pdf,docx,txt)</label>
+                        <input type="text" name="allowed_file_types" id="allowed_file_types" class="input-glassy">
+                    </div>
+                    <div class="form-group">
+                        <label for="max_file_size_kb">Max File Size (KB)</label>
+                        <input type="number" name="max_file_size_kb" id="max_file_size_kb" class="input-glassy" min="1">
+                    </div>
+                </div>
+
                 <div class="form-actions">
                     <button type="submit" class="btn-action btn-action-positive">Add Question</button>
                 </div>
@@ -109,12 +214,59 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const questionTypeSelect = document.getElementById('question_type');
+    const specificContainers = document.querySelectorAll('.question-type-specific');
+
+    function toggleQuestionFields() {
+        const questionType = questionTypeSelect.value;
+
+        // Hide all specific containers
+        specificContainers.forEach(container => container.style.display = 'none');
+
+        if (questionType.startsWith('multiple_choice')) {
+            document.getElementById('choices-container').style.display = 'block';
+            const choiceItems = document.getElementById('choices-container').querySelectorAll('.choice-item');
+            const newType = questionType === 'multiple_choice_multiple' ? 'checkbox' : 'radio';
+
+            choiceItems.forEach((item, index) => {
+                const input = item.querySelector('input[type="radio"], input[type="checkbox"]');
+                if (input.type !== newType) {
+                    const newName = newType === 'checkbox' ? 'correct_choices' : 'correct_choice';
+                    const newInput = document.createElement('input');
+                    newInput.type = newType;
+                    newInput.name = newName;
+                    newInput.value = index;
+                    if (newType === 'radio') {
+                        newInput.required = true;
+                    }
+                    input.parentNode.replaceChild(newInput, input);
+                }
+            });
+        } else if (questionType === 'true_false') {
+            document.getElementById('true-false-container').style.display = 'block';
+        } else if (questionType === 'file_upload') {
+            document.getElementById('file-upload-container').style.display = 'grid';
+        }
+        // For short_answer and essay, no specific container is shown.
+    }
+
+    questionTypeSelect.addEventListener('change', toggleQuestionFields);
+
+    // Initial call to set the correct fields on page load
+    toggleQuestionFields();
+});
+</script>
 <style>
 .question-list-item { margin-bottom: 1rem; }
 .correct-answer { font-weight: bold; color: #22c55e; }
 .choices-group { margin-top: 1.5rem; }
 .choice-item { display:flex; align-items:center; gap: 1rem; margin-bottom: 0.5rem; }
-.choice-item input[type="radio"] { flex-shrink: 0; }
+.choice-item input[type="radio"], .choice-item input[type="checkbox"] { flex-shrink: 0; }
 .choice-item input[type="text"] { flex-grow: 1; }
 </style>
 {% endblock %}

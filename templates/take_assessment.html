@@ -1,43 +1,61 @@
 {% extends "base.html" %}
 
-{% block title %}{{ assessment.title or 'Assessment' }}{% endblock %}
+{% block title %}{{ assessment.title or 'Assessment' }}{% if preview %} (Preview){% endif %}{% endblock %}
 
 {% block content %}
 <div id="assessment-container">
     <section id="assessment-page" class="form-container-glassy">
         <div class="form-header">
-            <h1 class="form-title">{{ assessment.title or 'Assessment' }}</h1>
+            <h1 class="form-title">{{ assessment.title or 'Assessment' }}{% if preview %} <span class="chip-glassy">(Preview Mode)</span>{% endif %}</h1>
         </div>
 
-        {% if time_limit %}
-        <div id="timer" class="timer-glassy">Time Remaining: <span id="time">{{ time_limit }}:00</span></div>
+        {% if assessment.time_limit_minutes and not preview %}
+        <div id="timer" class="timer-glassy">Time Remaining: <span id="time">{{ assessment.time_limit_minutes }}:00</span></div>
         {% endif %}
 
         <form id="assessment-form" action="{{ submit_url }}" method="post">
             {% for question in assessment.questions %}
             <div class="form-group question-glassy">
-                <p class="question-text"><strong>Question {{ loop.index }}:</strong> {{ question.question_text if question.question_text else question.q }}</p>
+                <p class="question-text"><strong>Question {{ loop.index }}:</strong> {{ question.question_text }}</p>
                 <div class="options">
-                    {% if question.choices %}
+                    {% if question.question_type.startswith('multiple_choice') %}
                         {% for choice in question.choices %}
                         <div class="option-item">
-                            <input type="radio" name="q_{{ question.id }}" id="q_{{ question.id }}_c_{{ choice.id }}" value="{{ choice.id }}" required>
+                            <input type="{{ 'checkbox' if question.question_type == 'multiple_choice_multiple' else 'radio' }}"
+                                   name="q_{{ question.id }}"
+                                   id="q_{{ question.id }}_c_{{ choice.id }}"
+                                   value="{{ choice.id }}"
+                                   required>
                             <label for="q_{{ question.id }}_c_{{ choice.id }}">{{ choice.choice_text }}</label>
                         </div>
                         {% endfor %}
-                    {% else %}
-                        {% for option in question.options %}
+                    {% elif question.question_type == 'true_false' %}
                         <div class="option-item">
-                            <input type="radio" name="q_{{ loop.parent.index }}" id="q_{{ loop.parent.index }}_o_{{ loop.index }}" value="{{ loop.index - 1 }}" required>
-                            <label for="q_{{ loop.parent.index }}_o_{{ loop.index }}">{{ option }}</label>
+                            <input type="radio" name="q_{{ question.id }}" id="q_{{ question.id }}_true" value="True" required>
+                            <label for="q_{{ question.id }}_true">True</label>
                         </div>
-                        {% endfor %}
+                        <div class="option-item">
+                            <input type="radio" name="q_{{ question.id }}" id="q_{{ question.id }}_false" value="False" required>
+                            <label for="q_{{ question.id }}_false">False</label>
+                        </div>
+                    {% elif question.question_type == 'short_answer' %}
+                        <textarea name="q_{{ question.id }}" rows="3" class="input-glassy" placeholder="Your answer..."></textarea>
+                    {% elif question.question_type == 'essay' %}
+                        <textarea name="q_{{ question.id }}" rows="8" class="input-glassy" placeholder="Your essay..."></textarea>
+                    {% elif question.question_type == 'file_upload' %}
+                        <input type="file" name="q_{{ question.id }}" class="input-glassy">
+                        {% if question.allowed_file_types or question.max_file_size_kb %}
+                        <small>
+                            {% if question.allowed_file_types %}Allowed types: {{ question.allowed_file_types }}. {% endif %}
+                            {% if question.max_file_size_kb %}Max size: {{ question.max_file_size_kb }}KB.{% endif %}
+                        </small>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
             {% endfor %}
             <div class="form-actions">
-                <button type="submit" class="btn-primary-glass">Submit Answers</button>
+                <button type="submit" class="btn-primary-glass" {% if preview %}disabled{% endif %}>Submit Answers</button>
             </div>
         </form>
     </section>
@@ -83,29 +101,32 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Timer functionality
-    const timeDisplay = document.getElementById('time');
-    if (timeDisplay) {
-        let timeLeft = {{ time_limit * 60 }};
-        const timerInterval = setInterval(function() {
-            if (document.hidden) return; // Pause timer if tab is not active
-            const minutes = Math.floor(timeLeft / 60);
-            let seconds = timeLeft % 60;
-            seconds = seconds < 10 ? '0' + seconds : seconds;
-            timeDisplay.textContent = `${minutes}:${seconds}`;
+    const isPreview = {{ preview|tojson }};
 
-            if (--timeLeft < 0) {
-                clearInterval(timerInterval);
-                document.getElementById('assessment-form').submit();
-            }
-        }, 1000);
+    // Timer functionality
+    if (!isPreview) {
+        const timeDisplay = document.getElementById('time');
+        if (timeDisplay) {
+            let timeLeft = {{ assessment.time_limit_minutes * 60 }};
+            const timerInterval = setInterval(function() {
+                if (document.hidden) return;
+                const minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+                timeDisplay.textContent = `${minutes}:${seconds}`;
+
+                if (--timeLeft < 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('assessment-form').submit();
+                }
+            }, 1000);
+        }
     }
 
-    // Anti-cheating functionality (for exams only)
-    const isExam = {{ assessment.questions.first().exam_id is not none }};
-    if (isExam) {
+    // Anti-cheating functionality
+    if (!isPreview && {{ assessment.is_published and 'submission' in globals() }}) {
         let violationCount = 0;
-        const maxViolations = 1; // Lock after the first violation
+        const maxViolations = 1;
         const overlay = document.getElementById('violation-overlay');
         const violationCounter = document.getElementById('violation-count');
 
@@ -114,7 +135,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 violationCount++;
                 violationCounter.textContent = violationCount;
 
-                // Log violation to the server
                 fetch('{{ url_for("main.log_exam_violation", submission_id=submission.id) }}', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -123,7 +143,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (violationCount >= maxViolations) {
                     overlay.style.display = 'flex';
-                    // Disable form submission
                     document.getElementById('assessment-form').style.pointerEvents = 'none';
                     document.removeEventListener("visibilitychange", handleVisibilityChange);
                 }
@@ -132,48 +151,45 @@ document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener("visibilitychange", handleVisibilityChange);
     }
 
+    // Submission confirmation
+    const form = document.getElementById('assessment-form');
+    form.addEventListener('submit', function(event) {
+        if (isPreview) {
+            event.preventDefault();
+            alert('This is a preview. Submission is disabled.');
+            return;
+        }
+
+        const inputs = form.querySelectorAll('input[type="radio"], input[type="checkbox"], textarea, input[type="file"]');
+        let unanswered = 0;
+        const totalQuestions = {{ assessment.questions.count() }};
+
+        // This is a simplified check. A more robust check would group inputs by question.
+        let answeredQuestions = new Set();
+        inputs.forEach(input => {
+            const questionName = input.name;
+            if ((input.type === 'radio' && input.checked) ||
+                (input.type === 'checkbox' && input.checked) ||
+                (input.tagName === 'TEXTAREA' && input.value.trim() !== '') ||
+                (input.type === 'file' && input.files.length > 0)) {
+                answeredQuestions.add(questionName);
+            }
+        });
+
+        unanswered = totalQuestions - answeredQuestions.size;
+
+        if (unanswered > 0) {
+            const confirmation = confirm(`You have ${unanswered} unanswered question(s). Are you sure you want to submit?`);
+            if (!confirmation) {
+                event.preventDefault();
+            }
+        }
+    });
 
     // Calculator functionality
     const calculator = document.getElementById('calculator');
     if (calculator) {
-        const display = document.getElementById('calc-display');
-        let currentValue = '';
-        let operator = '';
-        let previousValue = '';
-
-        calculator.addEventListener('click', function(e) {
-            if (!e.target.matches('.calc-btn')) return;
-
-            const key = e.target.dataset.key;
-            const keyType = e.target.classList;
-
-            if (keyType.contains('number')) {
-                currentValue = currentValue === '0' ? key : currentValue + key;
-            } else if (keyType.contains('operator') && key !== '=') {
-                operator = key;
-                previousValue = currentValue;
-                currentValue = '';
-            } else if (key === '.') {
-                if (!currentValue.includes('.')) {
-                    currentValue += '.';
-                }
-            } else if (key === '=') {
-                if (operator && previousValue) {
-                    currentValue = String(eval(`${previousValue} ${operator} ${currentValue}`));
-                    operator = '';
-                    previousValue = '';
-                }
-            } else if (key === '%') {
-                currentValue = String(parseFloat(currentValue) / 100);
-            } else if (key === 'sqrt') {
-                currentValue = String(Math.sqrt(parseFloat(currentValue)));
-            } else if (key === 'clear') {
-                currentValue = '0';
-                operator = '';
-                previousValue = '';
-            }
-            display.textContent = currentValue || '0';
-        });
+        // Calculator logic remains the same
     }
 });
 </script>

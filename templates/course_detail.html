@@ -53,7 +53,7 @@
             {% if is_enrolled and course.final_exam %}
                 <hr>
                 <h3>Final Exam</h3>
-                <a href="{{ url_for('main.take_exam', exam_id=course.final_exam.id) }}" class="btn-primary-glass">Take Final Exam</a>
+                <a href="{{ url_for('main.pre_exam', exam_id=course.final_exam.id) }}" class="btn-primary-glass">Take Final Exam</a>
             {% endif %}
         </div>
 

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Exam - Step 1{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Create New Exam - Step 1: Basic Information</h1>
+    </div>
+
+    <div class="form-container-glassy">
+        <form action="{{ url_for('instructor.create_exam_step_1') }}" method="post">
+            <div class="form-grid">
+                <div class="form-group full-span">
+                    <label for="title">Exam Title</label>
+                    <input type="text" id="title" name="title" class="input-glassy" required>
+                </div>
+                <div class="form-group">
+                    <label for="course_id">Course</label>
+                    <select name="course_id" id="course_id" class="input-glassy" required>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="time_limit_minutes">Time Limit (minutes)</label>
+                    <input type="number" id="time_limit_minutes" name="time_limit_minutes" class="input-glassy" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="allowed_attempts">Allowed Attempts</label>
+                    <input type="number" id="allowed_attempts" name="allowed_attempts" class="input-glassy" min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label for="pass_mark">Pass Mark (%)</label>
+                    <input type="number" id="pass_mark" name="pass_mark" class="input-glassy" min="0" max="100" value="50">
+                </div>
+                <div class="form-group full-span">
+                    <label for="instructions">Instructions</label>
+                    <textarea id="instructions" name="instructions" rows="5" class="input-glassy"></textarea>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary-glass">Next: Add Questions</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

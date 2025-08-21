@@ -40,6 +40,11 @@ def dashboard():
                            library_materials=library_materials,
                            categories=categories)
 
+@instructor_bp.route('/exams')
+def exam_dashboard():
+    exams = FinalExam.query.join(Course).filter(Course.instructor_id == current_user.id).all()
+    return render_template('instructor/exam_dashboard.html', exams=exams)
+
 @instructor_bp.route('/course/create', methods=['GET', 'POST'])
 def create_course():
     # ... (existing code) ...
@@ -87,6 +92,45 @@ def create_course():
 
     categories = Category.query.all()
     return render_template('instructor/create_course.html', categories=categories)
+
+
+@instructor_bp.route('/exam/create', methods=['GET', 'POST'])
+def create_exam_step_1():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        course_id = request.form.get('course_id')
+        time_limit_minutes = request.form.get('time_limit_minutes', type=int)
+        allowed_attempts = request.form.get('allowed_attempts', type=int)
+        pass_mark = request.form.get('pass_mark', type=int)
+        instructions = request.form.get('instructions')
+
+        # Basic validation
+        course = Course.query.filter_by(id=course_id, instructor_id=current_user.id).first()
+        if not all([title, course]):
+            flash('Title and a valid course are required.', 'danger')
+            # Need to re-populate courses for the template
+            courses = Course.query.filter_by(instructor_id=current_user.id).all()
+            return render_template('instructor/create_exam_step_1.html', courses=courses)
+
+        new_exam = FinalExam(
+            title=title,
+            course_id=course_id,
+            time_limit_minutes=time_limit_minutes,
+            allowed_attempts=allowed_attempts,
+            pass_mark=pass_mark,
+            instructions=instructions
+        )
+        db.session.add(new_exam)
+        db.session.commit()
+
+        flash('Exam created successfully. Now add questions.', 'success')
+        # Redirect to the next step, which will be adding questions
+        return redirect(url_for('instructor.manage_exam', exam_id=new_exam.id))
+
+    # For GET request
+    courses = Course.query.filter_by(instructor_id=current_user.id).order_by(Course.title).all()
+    return render_template('instructor/create_exam_step_1.html', courses=courses)
+
 
 @instructor_bp.route('/course/<int:course_id>/manage', methods=['GET'])
 def manage_course(course_id):
@@ -338,10 +382,24 @@ def edit_exam(exam_id):
     if exam.course.instructor_id != current_user.id:
         abort(403)
 
+    exam.title = request.form.get('title')
     exam.time_limit_minutes = request.form.get('time_limit_minutes', type=int)
     exam.pass_mark = request.form.get('pass_mark', type=int)
+    exam.allowed_attempts = request.form.get('allowed_attempts', type=int)
+    exam.start_date = request.form.get('start_date')
+    exam.end_date = request.form.get('end_date')
+    exam.instructions = request.form.get('instructions')
+    exam.shuffle_questions = request.form.get('shuffle_questions') == 'on'
+    exam.allow_navigation = request.form.get('allow_navigation') == 'on'
+    exam.disable_backtracking = request.form.get('disable_backtracking') == 'on'
+    exam.full_screen_enforced = request.form.get('full_screen_enforced') == 'on'
+    exam.tab_switch_detection = request.form.get('tab_switch_detection') == 'on'
+    exam.disable_copy_paste = request.form.get('disable_copy_paste') == 'on'
+    exam.webcam_monitoring = request.form.get('webcam_monitoring') == 'on'
+    exam.release_scores_immediately = request.form.get('release_scores_immediately') == 'on'
     exam.calculator_allowed = request.form.get('calculator_allowed') == 'on'
     exam.retake_allowed = request.form.get('retake_allowed') == 'on'
+
     db.session.commit()
 
     flash('Exam settings updated successfully.', 'success')
@@ -355,6 +413,25 @@ def manage_exam(exam_id):
         abort(403)
     return render_template('instructor/manage_exam.html', exam=exam)
 
+@instructor_bp.route('/exam/<int:exam_id>/preview')
+@login_required
+def preview_exam(exam_id):
+    exam = FinalExam.query.get_or_404(exam_id)
+    if exam.course.instructor_id != current_user.id:
+        abort(403)
+    return render_template('take_assessment.html', assessment=exam, preview=True, submit_url="#")
+
+@instructor_bp.route('/exam/<int:exam_id>/publish', methods=['POST'])
+@login_required
+def publish_exam(exam_id):
+    exam = FinalExam.query.get_or_404(exam_id)
+    if exam.course.instructor_id != current_user.id:
+        abort(403)
+    exam.is_published = True
+    db.session.commit()
+    flash('Exam published successfully.', 'success')
+    return redirect(url_for('instructor.manage_exam', exam_id=exam.id))
+
 @instructor_bp.route('/exam/<int:exam_id>/add_question', methods=['POST'])
 @login_required
 def add_question_to_exam(exam_id):
@@ -362,33 +439,70 @@ def add_question_to_exam(exam_id):
     if exam.course.instructor_id != current_user.id:
         abort(403)
 
+    question_type = request.form.get('question_type')
     question_text = request.form.get('question_text')
-    choices = [
-        request.form.get('choice1'),
-        request.form.get('choice2'),
-        request.form.get('choice3'),
-        request.form.get('choice4')
-    ]
-    correct_choice_index = int(request.form.get('correct_choice'))
 
-    if not all([question_text, all(choices), correct_choice_index is not None]):
-        flash('All fields are required to add a question.', 'danger')
+    if not question_text:
+        flash('Question text is required.', 'danger')
         return redirect(url_for('instructor.manage_exam', exam_id=exam.id))
 
-    # Create the question and choices
-    new_question = Question(exam_id=exam.id, question_text=question_text)
+    new_question = Question(
+        exam_id=exam.id,
+        question_text=question_text,
+        question_type=question_type
+    )
+
+    if question_type in ['multiple_choice_single', 'multiple_choice_multiple']:
+        choices = []
+        for i in range(4):
+            choice_text = request.form.get(f'choice_{i}')
+            if choice_text:
+                choices.append(choice_text)
+            else:
+                flash(f'Choice {i+1} is required.', 'danger')
+                return redirect(url_for('instructor.manage_exam', exam_id=exam.id))
+
+        db.session.add(new_question)
+        db.session.commit()
+
+        new_choices = []
+        for text in choices:
+            choice = Choice(question_id=new_question.id, choice_text=text)
+            new_choices.append(choice)
+        db.session.add_all(new_choices)
+        db.session.commit()
+
+        if question_type == 'multiple_choice_single':
+            correct_choice_index = request.form.get('correct_choice', type=int)
+            if correct_choice_index is not None:
+                new_choices[correct_choice_index].is_correct = True
+            else:
+                flash('A correct choice must be selected for single answer questions.', 'danger')
+                return redirect(url_for('instructor.manage_exam', exam_id=exam.id))
+
+        elif question_type == 'multiple_choice_multiple':
+            correct_choices_indices = request.form.getlist('correct_choices')
+            if not correct_choices_indices:
+                flash('At least one correct choice must be selected for multiple answer questions.', 'danger')
+                return redirect(url_for('instructor.manage_exam', exam_id=exam.id))
+
+            for index in correct_choices_indices:
+                new_choices[int(index)].is_correct = True
+
+    elif question_type == 'true_false':
+        correct_answer = request.form.get('true_false_answer')
+        if correct_answer is None:
+            flash('You must select either True or False.', 'danger')
+            return redirect(url_for('instructor.manage_exam', exam_id=exam.id))
+        new_question.true_false_answer = (correct_answer == 'True')
+
+    elif question_type == 'file_upload':
+        new_question.allowed_file_types = request.form.get('allowed_file_types')
+        new_question.max_file_size_kb = request.form.get('max_file_size_kb', type=int)
+
+    # For short_answer and essay, no extra data is needed at question creation
+
     db.session.add(new_question)
-    db.session.commit() # Commit to get the new_question.id
-
-    new_choices = []
-    for text in choices:
-        choice = Choice(question_id=new_question.id, choice_text=text)
-        new_choices.append(choice)
-    db.session.add_all(new_choices)
-    db.session.commit() # Commit to get choice IDs
-
-    # Set the correct choice ID on the question
-    new_question.correct_choice_id = new_choices[correct_choice_index].id
     db.session.commit()
 
     flash('New question added successfully.', 'success')
@@ -401,8 +515,38 @@ def review_exam_submissions(exam_id):
     if exam.course.instructor_id != current_user.id:
         abort(403)
 
-    submissions = exam.submissions.order_by(ExamSubmission.id.desc()).all()
+    submissions = exam.submissions.order_by(ExamSubmission.submitted_at.desc()).all()
     return render_template('instructor/review_submissions.html', exam=exam, submissions=submissions)
+
+@instructor_bp.route('/submission/<int:submission_id>/review', methods=['GET', 'POST'])
+@login_required
+def review_submission(submission_id):
+    submission = ExamSubmission.query.get_or_404(submission_id)
+    if submission.final_exam.course.instructor_id != current_user.id:
+        abort(403)
+
+    if request.method == 'POST':
+        total_score = 0
+        for answer in submission.answers:
+            if answer.question.question_type in ['short_answer', 'essay', 'file_upload']:
+                marks = request.form.get(f'marks_{answer.id}', type=float)
+                feedback = request.form.get(f'feedback_{answer.id}')
+                answer.marks_awarded = marks
+                answer.feedback = feedback
+                if marks:
+                    total_score += marks
+            else: # Auto-graded questions
+                if answer.marks_awarded:
+                    total_score += answer.marks_awarded
+
+        total_marks = sum(q.marks for q in submission.final_exam.questions)
+        submission.score = (total_score / total_marks) * 100 if total_marks > 0 else 0
+        submission.status = 'released'
+        db.session.commit()
+        flash('Grades have been saved and released to the student.', 'success')
+        return redirect(url_for('instructor.review_exam_submissions', exam_id=submission.final_exam_id))
+
+    return render_template('instructor/review_submission.html', submission=submission)
 
 @instructor_bp.route('/submission/<int:submission_id>/release', methods=['POST'])
 @login_required

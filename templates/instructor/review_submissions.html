@@ -34,9 +34,7 @@
                                 No Appeal Submitted
                             {% endif %}
                         {% elif sub.status == 'pending_review' %}
-                            <form action="{{ url_for('instructor.release_submission_results', submission_id=sub.id) }}" method="post" style="display:inline;">
-                                <button type="submit" class="btn-action btn-action-positive">Release Results</button>
-                            </form>
+                            <a href="{{ url_for('instructor.review_submission', submission_id=sub.id) }}" class="btn-action btn-action-neutral">Review & Grade</a>
                         {% else %}
                             {{ sub.status.replace('_', ' ').title() }}
                         {% endif %}
