@@ -3,33 +3,34 @@
 {% block title %}FAQ & Support{% endblock %}
 
 {% block content %}
-<section id="faq-page">
-    <h1>Frequently Asked Questions</h1>
+<div class="ice-sky-content">
+    <div class="glassy-card-container">
+        <h1>Frequently Asked Questions</h1>
 
-    <div class="faq-list">
-        <div class="faq-item">
-            <h3 class="faq-question">How do I enroll in a course?</h3>
-            <div class="faq-answer">
-                <p>Simply navigate to the "Courses" page, find a course you're interested in, and click the "Enroll Now" or "Buy Now" button. You will be guided through the payment process.</p>
+        <div class="faq-list">
+            <div class="faq-item">
+                <h3 class="faq-question">How do I enroll in a course?</h3>
+                <div class="faq-answer">
+                    <p>Simply navigate to the "Courses" page, find a course you're interested in, and click the "Enroll Now" or "Buy Now" button. You will be guided through the payment process.</p>
+                </div>
             </div>
-        </div>
-        <div class="faq-item">
-            <h3 class="faq-question">How do I become an instructor?</h3>
-            <div class="faq-answer">
-                <p>Click the "Register" button on the home page and select the "Instructor" role. After you fill out your information, your account will be submitted for admin approval. You will be notified once it's reviewed.</p>
+            <div class="faq-item">
+                <h3 class="faq-question">How do I become an instructor?</h3>
+                <div class="faq-answer">
+                    <p>Click the "Register" button on the home page and select the "Instructor" role. After you fill out your information, your account will be submitted for admin approval. You will be notified once it's reviewed.</p>
+                </div>
             </div>
-        </div>
-        <div class="faq-item">
-            <h3 class="faq-question">What payment methods do you accept?</h3>
-            <div class="faq-answer">
-                <p>We accept all major credit cards and bank transfers. (Note: Payment processing is not yet implemented).</p>
+            <div class="faq-item">
+                <h3 class="faq-question">What payment methods do you accept?</h3>
+                <div class="faq-answer">
+                    <p>We accept all major credit cards and bank transfers. (Note: Payment processing is not yet implemented).</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <hr>
 
-    <div class="form-container-glassy">
+    <div class="glassy-card-container">
         <div class="form-header">
             <h2 class="form-title">Contact Support</h2>
             <p>If you can't find the answer here, please feel free to contact us.</p>
@@ -37,25 +38,25 @@
         <form action="{{ url_for('main.support') }}" method="post">
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="name">Your Name:</label>
-                    <input type="text" id="name" name="name" required class="input-glassy">
+                    <label for="name" class="form-label">Your Name:</label>
+                    <input type="text" id="name" name="name" required class="form-input">
                 </div>
                 <div class="form-group">
-                    <label for="email">Your Email:</label>
-                    <input type="email" id="email" name="email" required class="input-glassy">
+                    <label for="email" class="form-label">Your Email:</label>
+                    <input type="email" id="email" name="email" required class="form-input">
                 </div>
                 <div class="form-group full-span">
-                    <label for="message">Message:</label>
-                    <textarea id="message" name="message" rows="5" required class="input-glassy"></textarea>
+                    <label for="message" class="form-label">Message:</label>
+                    <textarea id="message" name="message" rows="5" required class="form-input"></textarea>
                 </div>
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn-primary-glass">Send Message</button>
+                <button type="submit" class="btn-primary">Send Message</button>
             </div>
         </form>
     </div>
 
-</section>
+</div>
 {% endblock %}
 
 {% block scripts %}
