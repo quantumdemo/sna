@@ -7,16 +7,16 @@
 {% endblock %}
 
 {% block content %}
-<div class="library-page-container">
+<div class="ice-sky-content">
     <!-- 1. Hero Section -->
-    <section class="library-hero">
+    <section class="library-hero glassy-card-container">
         <div class="hero-content">
             <h1 class="hero-title">Library of Knowledge</h1>
             <p class="hero-subtitle">Browse and download curated learning resources.</p>
             <div class="hero-search-wrapper">
                 <form action="{{ url_for('main.library') }}" method="get" class="hero-search-form">
-                    <input type="search" name="search" class="input-glassy" placeholder="Search for resources..." value="{{ request.args.get('search', '') }}" style="border-radius: 9999px;">
-                    <button type="submit" class="btn-primary-glass" style="padding: 0.8rem 1.5rem;"><i class="fas fa-search"></i></button>
+                    <input type="search" name="search" class="form-input" placeholder="Search for resources..." value="{{ request.args.get('search', '') }}" style="border-radius: 9999px;">
+                    <button type="submit" class="btn-primary" style="padding: 0.8rem 1.5rem;"><i class="fas fa-search"></i></button>
                 </form>
             </div>
         </div>
@@ -31,13 +31,13 @@
     <div class="library-layout">
         <!-- 2. Filter Panel -->
         <aside class="filters-panel-wrapper">
-            <div class="filters-panel form-container-glassy" style="padding: 2rem; margin: 0;">
+            <div class="filters-panel glassy-card-container" style="padding: 2rem; margin: 0;">
                 <h3 class="filter-title">Filters</h3>
                 <form action="{{ url_for('main.library') }}" method="get">
                     <!-- Category Filter -->
                     <div class="form-group">
-                        <label for="category" class="filter-label">Category</label>
-                        <select name="category" id="category" class="input-glassy">
+                        <label for="category" class="form-label">Category</label>
+                        <select name="category" id="category" class="form-input">
                             <option value="">All Categories</option>
                             {% for cat in categories %}
                             <option value="{{ cat.id }}" {% if request.args.get('category') == cat.id|string %}selected{% endif %}>{{ cat.name }}</option>
@@ -47,7 +47,7 @@
 
                     <!-- Price Filter -->
                     <div class="form-group">
-                        <label class="filter-label">Price</label>
+                        <label class="form-label">Price</label>
                         <div class="pill-toggle">
                             <input type="radio" id="price_all" name="price" value="" {% if not request.args.get('price') %}checked{% endif %}>
                             <label for="price_all">All</label>
@@ -60,14 +60,14 @@
 
                     <!-- Sort By Filter -->
                     <div class="form-group">
-                        <label for="sort" class="filter-label">Sort by</label>
-                         <select name="sort" id="sort" class="input-glassy">
+                        <label for="sort" class="form-label">Sort by</label>
+                         <select name="sort" id="sort" class="form-input">
                             <option value="newest" {% if request.args.get('sort', 'newest') == 'newest' %}selected{% endif %}>Newest</option>
                             <option value="popular" {% if request.args.get('sort') == 'popular' %}selected{% endif %}>Most Popular</option>
                         </select>
                     </div>
 
-                    <button type="submit" class="btn-primary-glass" style="width: 100%; margin-top: 1rem;">Apply Filters</button>
+                    <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Apply Filters</button>
                 </form>
             </div>
         </aside>
@@ -77,7 +77,7 @@
             {% if materials.items %}
                 <div class="materials-grid">
                     {% for item in materials.items %}
-                    <div class="material-card-item glass-card">
+                    <div class="material-card-item glassy-card-container">
                         <div class="material-thumbnail">
                             <i class="fas fa-book-reader"></i>
                         </div>
@@ -90,9 +90,9 @@
                                     {% if item.price_naira == 0 %}Free{% else %}₦{{ "{:,.0f}".format(item.price_naira) }}{% endif %}
                                 </span>
                                 {% if item.price_naira == 0 %}
-                                    <a href="{{ url_for('main.download_library_material', material_id=item.id) }}" class="btn-secondary-glass compact-btn">Download <i class="fas fa-download"></i></a>
+                                    <a href="{{ url_for('main.download_library_material', material_id=item.id) }}" class="btn-primary compact-btn">Download <i class="fas fa-download"></i></a>
                                 {% else %}
-                                    <a href="{{ url_for('main.purchase_library_material', material_id=item.id) }}" class="btn-primary-glass compact-btn">Purchase <i class="fas fa-shopping-cart"></i></a>
+                                    <a href="{{ url_for('main.purchase_library_material', material_id=item.id) }}" class="btn-primary compact-btn">Purchase <i class="fas fa-shopping-cart"></i></a>
                                 {% endif %}
                             </div>
                         </div>
@@ -101,11 +101,11 @@
                 </div>
             {% else %}
                 <!-- 4. Empty State -->
-                <div class="empty-state">
+                <div class="empty-state glassy-card-container">
                     <i class="fas fa-search-minus empty-state-icon"></i>
                     <h3 class="empty-state-title">No Materials Found</h3>
                     <p class="empty-state-text">Try adjusting your search or filter criteria.</p>
-                    <a href="{{ url_for('main.library') }}" class="btn-secondary-glass">Reset Filters</a>
+                    <a href="{{ url_for('main.library') }}" class="btn-primary">Reset Filters</a>
                 </div>
             {% endif %}
 

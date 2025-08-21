@@ -2,173 +2,23 @@
 
 {% block title %}Chat Rooms{% endblock %}
 
-{% block styles %}
-<style>
-    body {
-        background-color: #14191D;
-        color: #FFFFFF;
-        font-family: 'Poppins', sans-serif;
-    }
-
-    .brand-bar {
-        background: linear-gradient(90deg, #002D62, #FDB813);
-        color: white;
-        text-align: center;
-        padding: 1rem 0;
-        font-size: 1.5rem;
-        font-weight: bold;
-        text-transform: uppercase;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        z-index: 1000;
-    }
-
-    .chat-list-container {
-        padding-top: 80px; /* Space for fixed brand-bar */
-        padding-bottom: 20px;
-    }
-
-    .search-bar-container {
-        position: sticky;
-        top: 60px; /* Position below brand-bar */
-        background-color: #14191D;
-        padding: 1rem 0;
-        z-index: 999;
-    }
-
-    #search-input {
-        width: 100%;
-        padding: 0.75rem;
-        border-radius: 20px;
-        border: 1px solid #808080;
-        background-color: #1F262D;
-        color: #FFFFFF;
-        font-size: 1rem;
-    }
-
-    #search-input::placeholder {
-        color: #808080;
-    }
-
-    .room-card-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .room-card {
-        background-color: #1F262D;
-        border: 1px solid #000000;
-        border-radius: 20px;
-        padding: 15px;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        gap: 15px;
-    }
-
-    .room-card-avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background-color: #002D62;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 1.2rem;
-        color: white;
-        flex-shrink: 0;
-    }
-
-    .room-card-avatar img {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .room-card:hover {
-        background-color: #2A343D;
-    }
-
-    .room-card-info h3 {
-        margin: 0 0 5px 0;
-        font-weight: bold;
-    }
-
-    .room-card-info p {
-        margin: 0;
-        font-size: 0.9rem;
-        color: #B0B0B0;
-    }
-
-    .room-card-meta {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        color: #B0B0B0;
-    }
-
-    .member-count {
-        font-size: 0.9rem;
-    }
-
-    .missed-message-counter {
-        background-color: #007BFF;
-        color: white;
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 0.8rem;
-    }
-    .create-group-btn {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 60px;
-        height: 60px;
-        background-color: #007BFF;
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-        text-decoration: none;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        transition: background-color 0.3s;
-    }
-    .create-group-btn:hover {
-        background-color: #0056b3;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="brand-bar">
-    NOVARA
-</div>
-
-<div class="container chat-list-container">
-    <div class="search-bar-container">
-        <input type="text" id="search-input" placeholder="Search chat rooms...">
+<div class="ice-sky-content">
+    <div class="chat-list-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1>Chat Rooms</h1>
+        <a href="{{ url_for('main.create_group') }}" class="btn-primary">Create New Group</a>
     </div>
 
-    <ul class="room-card-list">
+    <div class="search-bar-container glassy-card-container" style="margin-bottom: 2rem; padding: 1rem;">
+        <input type="text" id="search-input" placeholder="Search chat rooms..." class="form-input">
+    </div>
+
+    <ul class="room-card-list" style="list-style: none; padding: 0;">
         {% for room in rooms %}
-        <li class="room-card" data-room-id="{{ room.id }}" data-room-name="{{ room.name | lower }}">
-            <div class="room-card-avatar">
+        <li class="room-card glassy-card-container" data-room-id="{{ room.id }}" data-room-name="{{ room.name | lower }}" style="display: flex; align-items: center; gap: 15px; margin-bottom: 1rem; cursor: pointer;">
+            <div class="room-card-avatar" style="width: 50px; height: 50px; border-radius: 50%; background-color: #0288d1; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; color: white; flex-shrink: 0;">
                 {% if room.cover_image %}
-                    <img src="{{ url_for('static', filename=room.cover_image) }}" alt="{{ room.name }}">
+                    <img src="{{ url_for('static', filename=room.cover_image) }}" alt="{{ room.name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
                 {% else %}
                     <span>{{ room.name[0] | upper }}</span>
                 {% endif %}
@@ -177,19 +27,19 @@
                 <h3>{{ room.name }}</h3>
                 <p>{{ room.description or 'No description available.' }}</p>
             </div>
-            <div class="room-card-meta">
+            <div class="room-card-meta" style="display: flex; align-items: center; gap: 15px;">
                 <span class="member-count">{{ room.member_count }} members</span>
                 {% if room.unread_count > 0 %}
-                <span class="missed-message-counter">{{ room.unread_count }}</span>
+                <span class="missed-message-counter" style="background-color: #29b6f6; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem;">{{ room.unread_count }}</span>
                 {% endif %}
             </div>
         </li>
         {% else %}
-        <p>You don't have access to any chat rooms yet.</p>
+        <p class="glassy-card-container">You don't have access to any chat rooms yet.</p>
         {% endfor %}
     </ul>
 
-    <a href="{{ url_for('main.create_group') }}" class="create-group-btn">+</a>
+    <a href="{{ url_for('main.create_group') }}" class="btn-primary" style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; text-decoration: none; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">+</a>
 </div>
 {% endblock %}
 

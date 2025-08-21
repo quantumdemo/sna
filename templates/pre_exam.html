@@ -3,9 +3,9 @@
 {% block title %}Pre-Exam: {{ exam.title }}{% endblock %}
 
 {% block content %}
-<div class="admin-container">
-    <div class="form-container-glassy" style="max-width: 800px; margin: 2rem auto;">
-        <div class="form-header">
+<div class="ice-sky-content">
+    <div class="glassy-card-container" style="max-width: 800px; margin: 2rem auto;">
+        <div class="form-header text-center">
             <h1 class="form-title">Exam: {{ exam.title }}</h1>
             <p>Course: {{ exam.course.title }}</p>
         </div>
@@ -18,7 +18,7 @@
             <p><strong>Passing Score:</strong> {{ exam.pass_mark }}%</p>
         </div>
 
-        <hr style="margin: 2rem 0;">
+        <hr style="margin: 2rem 0; border-color: rgba(255,255,255,0.2);">
 
         <div class="exam-instructions">
             <h3 class="form-title">Instructions from Instructor</h3>
@@ -31,7 +31,7 @@
             {% endif %}
         </div>
 
-        <hr style="margin: 2rem 0;">
+        <hr style="margin: 2rem 0; border-color: rgba(255,255,255,0.2);">
 
         <div class="exam-rules">
             <h3 class="form-title">Exam Rules</h3>
@@ -49,13 +49,13 @@
 
         <form action="{{ url_for('main.start_exam', exam_id=exam.id) }}" method="post">
             <div class="form-group" style="margin-top: 2rem;">
-                <div class="radio-group-glassy">
-                    <input type="checkbox" id="agree_rules" name="agree_rules" required>
-                    <label for="agree_rules">I have read and agree to the exam rules.</label>
+                <div class="form-check">
+                    <input type="checkbox" id="agree_rules" name="agree_rules" required class="form-check-input">
+                    <label for="agree_rules" class="form-check-label">I have read and agree to the exam rules.</label>
                 </div>
             </div>
-            <div class="form-actions">
-                <button type="submit" id="start_exam_btn" class="btn-primary-glass" disabled>Start Exam</button>
+            <div class="form-actions text-center">
+                <button type="submit" id="start_exam_btn" class="btn-primary" disabled>Start Exam</button>
             </div>
         </form>
     </div>

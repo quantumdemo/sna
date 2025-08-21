@@ -7,67 +7,69 @@
 {% endblock %}
 
 {% block content %}
-<div id="assessment-container">
-    <section id="assessment-page" class="form-container-glassy">
-        <div class="form-header">
-            <h1 class="form-title">{{ assessment.title or 'Assessment' }}{% if preview %} <span class="chip-glassy">(Preview Mode)</span>{% endif %}</h1>
-        </div>
+<div class="ice-sky-content">
+    <div id="assessment-container">
+        <section id="assessment-page" class="glassy-card-container">
+            <div class="form-header text-center">
+                <h1 class="form-title">{{ assessment.title or 'Assessment' }}{% if preview %} <span class="chip-glassy">(Preview Mode)</span>{% endif %}</h1>
+            </div>
 
-        {% if assessment.time_limit_minutes and not preview %}
-        <div id="timer" class="timer-glassy">Time Remaining: <span id="time">{{ assessment.time_limit_minutes }}:00</span></div>
-        {% endif %}
+            {% if assessment.time_limit_minutes and not preview %}
+            <div id="timer" class="timer-glassy">Time Remaining: <span id="time">{{ assessment.time_limit_minutes }}:00</span></div>
+            {% endif %}
 
-        <form id="assessment-form" action="{{ submit_url }}" method="post">
-            {% for question in assessment.questions %}
-            <div class="form-group question-glassy">
-                <p class="question-text"><strong>Question {{ loop.index }}:</strong> {{ question.question_text }}</p>
-                <div class="options">
-                    {% if question.question_type.startswith('multiple_choice') %}
-                        {% for choice in question.choices %}
-                        <div class="option-item">
-                            <input type="{{ 'checkbox' if question.question_type == 'multiple_choice_multiple' else 'radio' }}"
-                                   name="q_{{ question.id }}"
-                                   id="q_{{ question.id }}_c_{{ choice.id }}"
-                                   value="{{ choice.id }}"
-                                   required>
-                            <label for="q_{{ question.id }}_c_{{ choice.id }}">{{ choice.choice_text }}</label>
-                        </div>
-                        {% endfor %}
-                    {% elif question.question_type == 'true_false' %}
-                        <div class="option-item">
-                            <input type="radio" name="q_{{ question.id }}" id="q_{{ question.id }}_true" value="True" required>
-                            <label for="q_{{ question.id }}_true">True</label>
-                        </div>
-                        <div class="option-item">
-                            <input type="radio" name="q_{{ question.id }}" id="q_{{ question.id }}_false" value="False" required>
-                            <label for="q_{{ question.id }}_false">False</label>
-                        </div>
-                    {% elif question.question_type == 'short_answer' %}
-                        <textarea name="q_{{ question.id }}" rows="3" class="input-glassy" placeholder="Your answer..."></textarea>
-                    {% elif question.question_type == 'essay' %}
-                        <textarea name="q_{{ question.id }}" rows="8" class="input-glassy" placeholder="Your essay..."></textarea>
-                    {% elif question.question_type == 'file_upload' %}
-                        <input type="file" name="q_{{ question.id }}" class="input-glassy">
-                        {% if question.allowed_file_types or question.max_file_size_kb %}
-                        <small>
-                            {% if question.allowed_file_types %}Allowed types: {{ question.allowed_file_types }}. {% endif %}
-                            {% if question.max_file_size_kb %}Max size: {{ question.max_file_size_kb }}KB.{% endif %}
-                        </small>
+            <form id="assessment-form" action="{{ submit_url }}" method="post">
+                {% for question in assessment.questions %}
+                <div class="form-group question-glassy">
+                    <p class="question-text"><strong>Question {{ loop.index }}:</strong> {{ question.question_text }}</p>
+                    <div class="options">
+                        {% if question.question_type.startswith('multiple_choice') %}
+                            {% for choice in question.choices %}
+                            <div class="option-item form-check">
+                                <input type="{{ 'checkbox' if question.question_type == 'multiple_choice_multiple' else 'radio' }}"
+                                       name="q_{{ question.id }}"
+                                       id="q_{{ question.id }}_c_{{ choice.id }}"
+                                       value="{{ choice.id }}"
+                                       required class="form-check-input">
+                                <label for="q_{{ question.id }}_c_{{ choice.id }}" class="form-check-label">{{ choice.choice_text }}</label>
+                            </div>
+                            {% endfor %}
+                        {% elif question.question_type == 'true_false' %}
+                            <div class="option-item form-check">
+                                <input type="radio" name="q_{{ question.id }}" id="q_{{ question.id }}_true" value="True" required class="form-check-input">
+                                <label for="q_{{ question.id }}_true" class="form-check-label">True</label>
+                            </div>
+                            <div class="option-item form-check">
+                                <input type="radio" name="q_{{ question.id }}" id="q_{{ question.id }}_false" value="False" required class="form-check-input">
+                                <label for="q_{{ question.id }}_false" class="form-check-label">False</label>
+                            </div>
+                        {% elif question.question_type == 'short_answer' %}
+                            <textarea name="q_{{ question.id }}" rows="3" class="form-input" placeholder="Your answer..."></textarea>
+                        {% elif question.question_type == 'essay' %}
+                            <textarea name="q_{{ question.id }}" rows="8" class="form-input" placeholder="Your essay..."></textarea>
+                        {% elif question.question_type == 'file_upload' %}
+                            <input type="file" name="q_{{ question.id }}" class="form-input">
+                            {% if question.allowed_file_types or question.max_file_size_kb %}
+                            <small>
+                                {% if question.allowed_file_types %}Allowed types: {{ question.allowed_file_types }}. {% endif %}
+                                {% if question.max_file_size_kb %}Max size: {{ question.max_file_size_kb }}KB.{% endif %}
+                            </small>
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
+                    </div>
                 </div>
-            </div>
-            {% endfor %}
-            <div class="form-actions">
-                <button type="submit" class="btn-primary-glass" {% if preview %}disabled{% endif %}>Submit Answers</button>
-            </div>
-        </form>
-    </section>
+                {% endfor %}
+                <div class="form-actions text-center">
+                    <button type="submit" class="btn-primary" {% if preview %}disabled{% endif %}>Submit Answers</button>
+                </div>
+            </form>
+        </section>
 
-    {% if assessment.calculator_allowed %}
-    <button id="calculator-toggle-btn" class="floating-btn">🔢</button>
-    {% include 'calculator.html' %}
-    {% endif %}
+        {% if assessment.calculator_allowed %}
+        <button id="calculator-toggle-btn" class="floating-btn">🔢</button>
+        {% include 'calculator.html' %}
+        {% endif %}
+    </div>
 </div>
 
 <div id="violation-overlay" style="display: none;">
