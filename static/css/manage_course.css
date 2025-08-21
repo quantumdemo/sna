@@ -122,4 +122,9 @@
     .add-module-form-inner {
         flex-direction: column;
     }
+    .page-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
 }
