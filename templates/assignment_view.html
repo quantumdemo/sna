@@ -3,64 +3,66 @@
 {% block title %}Assignment: {{ assignment.title }}{% endblock %}
 
 {% block content %}
-<div class="form-container-glassy">
-    <div class="form-header">
-        <h1 class="form-title">Assignment: {{ assignment.title }}</h1>
-        <p>From course: <a href="{{ url_for('main.course_detail', course_id=assignment.module.course.id) }}">{{ assignment.module.course.title }}</a></p>
-    </div>
-
-    <hr style="border-color: rgba(255,255,255,0.2); margin: 2rem 0;">
-
-    <div class="assignment-details">
-        <h2>Description</h2>
-        <p>{{ assignment.description }}</p>
-    </div>
-
-    <hr style="border-color: rgba(255,255,255,0.2); margin: 2rem 0;">
-
-    <div class="form-header">
-        <h2 class="form-title" style="font-size: 1.8rem;">Your Submission</h2>
-    </div>
-
-    {% if submission %}
-        <div class="submission-details">
-            <p><strong>Submitted on:</strong> {{ submission.submitted_at.strftime('%Y-%m-%d %H:%M') }}</p>
-            <p><strong>Grade:</strong> {{ submission.grade or 'Not graded yet' }}</p>
-            {% if submission.text_submission %}
-                <h4>Your Text Submission:</h4>
-                <div class="submission-text-box">
-                    {{ submission.text_submission }}
-                </div>
-            {% endif %}
-            {% if submission.file_path %}
-                <p><strong>Submitted File:</strong> <a href="{{ url_for('static', filename='assignments/' + submission.file_path) }}" target="_blank" class="btn-secondary-glass">Download File</a></p>
-            {% endif %}
+<div class="ice-sky-content">
+    <div class="glassy-card-container">
+        <div class="form-header text-center">
+            <h1 class="form-title">Assignment: {{ assignment.title }}</h1>
+            <p>From course: <a href="{{ url_for('main.course_detail', course_id=assignment.module.course.id) }}">{{ assignment.module.course.title }}</a></p>
         </div>
-    {% else %}
-        <form action="{{ url_for('main.submit_assignment', assignment_id=assignment.id) }}" method="post" enctype="multipart/form-data">
-            <div class="form-grid">
-                {% if assignment.submission_type in ['text', 'both'] %}
-                <div class="form-group full-span">
-                    <label for="text_submission">Text Submission:</label>
-                    <textarea name="text_submission" id="text_submission" rows="10" {% if assignment.submission_type == 'text' %}required{% endif %} class="input-glassy"></textarea>
-                </div>
-                {% endif %}
 
-                {% if assignment.submission_type in ['file', 'both'] %}
-                <div class="form-group full-span">
-                    <label for="file_submission">File Upload:</label>
-                    <input type="file" name="file_submission" id="file_submission" {% if assignment.submission_type == 'file' %}required{% endif %} class="input-glassy">
-                    {% if assignment.max_file_size %}
-                    <small>Maximum file size: {{ assignment.max_file_size }}MB</small>
+        <hr style="border-color: rgba(255,255,255,0.2); margin: 2rem 0;">
+
+        <div class="assignment-details">
+            <h2>Description</h2>
+            <p>{{ assignment.description }}</p>
+        </div>
+
+        <hr style="border-color: rgba(255,255,255,0.2); margin: 2rem 0;">
+
+        <div class="form-header text-center">
+            <h2 class="form-title" style="font-size: 1.8rem;">Your Submission</h2>
+        </div>
+
+        {% if submission %}
+            <div class="submission-details">
+                <p><strong>Submitted on:</strong> {{ submission.submitted_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                <p><strong>Grade:</strong> {{ submission.grade or 'Not graded yet' }}</p>
+                {% if submission.text_submission %}
+                    <h4>Your Text Submission:</h4>
+                    <div class="submission-text-box">
+                        {{ submission.text_submission }}
+                    </div>
+                {% endif %}
+                {% if submission.file_path %}
+                    <p><strong>Submitted File:</strong> <a href="{{ url_for('static', filename='assignments/' + submission.file_path) }}" target="_blank" class="btn-primary">Download File</a></p>
+                {% endif %}
+            </div>
+        {% else %}
+            <form action="{{ url_for('main.submit_assignment', assignment_id=assignment.id) }}" method="post" enctype="multipart/form-data">
+                <div class="form-grid">
+                    {% if assignment.submission_type in ['text', 'both'] %}
+                    <div class="form-group full-span">
+                        <label for="text_submission" class="form-label">Text Submission:</label>
+                        <textarea name="text_submission" id="text_submission" rows="10" {% if assignment.submission_type == 'text' %}required{% endif %} class="form-input"></textarea>
+                    </div>
+                    {% endif %}
+
+                    {% if assignment.submission_type in ['file', 'both'] %}
+                    <div class="form-group full-span">
+                        <label for="file_submission" class="form-label">File Upload:</label>
+                        <input type="file" name="file_submission" id="file_submission" {% if assignment.submission_type == 'file' %}required{% endif %} class="form-input">
+                        {% if assignment.max_file_size %}
+                        <small>Maximum file size: {{ assignment.max_file_size }}MB</small>
+                        {% endif %}
+                    </div>
                     {% endif %}
                 </div>
-                {% endif %}
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="btn-primary-glass">Submit Assignment</button>
-            </div>
-        </form>
-    {% endif %}
+                <div class="form-actions text-center">
+                    <button type="submit" class="btn-primary">Submit Assignment</button>
+                </div>
+            </form>
+        {% endif %}
+    </div>
 </div>
 
 <style>
@@ -74,6 +76,9 @@
     padding: 1rem;
     border-radius: 8px;
     white-space: pre-wrap;
+}
+.text-center {
+    text-align: center;
 }
 </style>
 {% endblock %}

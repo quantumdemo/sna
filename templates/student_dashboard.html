@@ -7,9 +7,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
+<div class="ice-sky-content">
     <!-- Welcome Area -->
-    <section class="welcome-area">
+    <section class="welcome-area glassy-card-container">
         <div class="profile-pic">
             <img src="{{ url_for('static', filename='profile_pics/' + (current_user.profile_pic if current_user.profile_pic else 'default.jpg')) }}" alt="Profile Picture">
         </div>
@@ -21,28 +21,28 @@
 
     <!-- Quick Indicators -->
     <section class="quick-indicators">
-        <div class="glass-card indicator-card">
+        <div class="glassy-card-container indicator-card">
             <div class="indicator-icon"><i class="fas fa-book-open"></i></div>
             <div class="indicator-text">
                 <span class="indicator-value">{{ active_courses_count }}</span>
                 <span class="indicator-label">Active Courses</span>
             </div>
         </div>
-        <div class="glass-card indicator-card">
+        <div class="glassy-card-container indicator-card">
             <div class="indicator-icon"><i class="fas fa-check-circle"></i></div>
             <div class="indicator-text">
                 <span class="indicator-value">{{ completed_courses_count }}</span>
                 <span class="indicator-label">Completed Courses</span>
             </div>
         </div>
-        <div class="glass-card indicator-card">
+        <div class="glassy-card-container indicator-card">
             <div class="indicator-icon"><i class="fas fa-certificate"></i></div>
             <div class="indicator-text">
                 <span class="indicator-value">{{ certificates_count }}</span>
                 <span class="indicator-label">Certificates Earned</span>
             </div>
         </div>
-        <div class="glass-card indicator-card">
+        <div class="glassy-card-container indicator-card">
             <div class="indicator-icon"><i class="fas fa-envelope"></i></div>
             <div class="indicator-text">
                 <span class="indicator-value">{{ unread_messages_count }}</span>
@@ -52,13 +52,13 @@
     </section>
 
     <!-- Browse Courses Section -->
-    <section class="course-section">
+    <section class="course-section glassy-card-container">
         <h2 class="section-title">Browse Your Courses</h2>
         <div class="dashboard-grid">
             {% for data in enrollment_data %}
                 {% set enrollment = data.enrollment %}
                 {% set progress = data.progress %}
-                <div class="glass-card course-card">
+                <div class="glassy-card-container course-card">
                     <div class="course-card-image" style="background-image: url('{{ url_for('static', filename='images/course_placeholder.jpg') }}');"></div>
                     <div class="course-card-content">
                         <h3 class="course-title">{{ enrollment.course.title }}</h3>
@@ -69,13 +69,13 @@
                             <span class="status-badge status-{{ 'completed' if progress.can_request_certificate else 'ongoing' }}">
                                 {{ 'Completed' if progress.can_request_certificate else 'Ongoing' }}
                             </span>
-                            <a href="{{ url_for('main.course_detail', course_id=enrollment.course.id) }}" class="btn-secondary-glass compact-btn">View Course</a>
+                            <a href="{{ url_for('main.course_detail', course_id=enrollment.course.id) }}" class="btn-primary compact-btn">View Course</a>
                             {% if progress.can_request_certificate %}
                                 <form action="{{ url_for('main.request_certificate', course_id=enrollment.course.id) }}" method="POST" style="display: inline;">
-                                    <button type="submit" class="btn-primary-glass compact-btn">Request Certificate</button>
+                                    <button type="submit" class="btn-primary compact-btn">Request Certificate</button>
                                 </form>
                             {% else %}
-                                <a class="btn-secondary-glass compact-btn btn-disabled" title="Complete all requirements to unlock. Missing: {{ progress.reasons|join(', ') }}">Request Certificate</a>
+                                <a class="btn-primary compact-btn btn-disabled" title="Complete all requirements to unlock. Missing: {{ progress.reasons|join(', ') }}">Request Certificate</a>
                             {% endif %}
                         </div>
                     </div>
@@ -87,12 +87,12 @@
     </section>
 
     <!-- Browse Library Section -->
-    <section class="library-section">
+    <section class="library-section glassy-card-container">
         <h2 class="section-title">Browse Library</h2>
         <div class="dashboard-grid">
             {% for purchase in library_purchases %}
                 {% if purchase.status == 'approved' %}
-                <div class="glass-card library-card">
+                <div class="glassy-card-container library-card">
                     <div class="library-card-icon">
                         <i class="fas fa-file-pdf"></i>
                     </div>
@@ -100,7 +100,7 @@
                         <h3 class="library-title">{{ purchase.material.title }}</h3>
                         <p class="library-category">{{ purchase.material.category.name if purchase.material.category else 'General' }}</p>
                     </div>
-                    <a href="{{ url_for('main.download_library_material', material_id=purchase.material.id) }}" class="btn-primary-glass compact-btn">View / Open</a>
+                    <a href="{{ url_for('main.download_library_material', material_id=purchase.material.id) }}" class="btn-primary compact-btn">View / Open</a>
                 </div>
                 {% endif %}
             {% else %}

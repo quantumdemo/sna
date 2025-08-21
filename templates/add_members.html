@@ -3,27 +3,29 @@
 {% block title %}Add Members to {{ room.name }}{% endblock %}
 
 {% block content %}
-<div class="form-container-glassy">
-    <div class="form-header">
-        <h2 class="form-title">Add Members to {{ room.name }}</h2>
-    </div>
-    <form action="{{ url_for('main.add_members', room_id=room.id) }}" method="POST">
-        <div class="form-group">
-            <label>Select users to add</label>
-            <input type="text" id="member-search" placeholder="Search for users..." class="input-glassy">
-            <div class="user-list-glassy">
-                {% for user in users %}
-                <div class="user-item-glassy">
-                    <input type="checkbox" name="members" value="{{ user.id }}" id="user-{{ user.id }}">
-                    <label for="user-{{ user.id }}">{{ user.name }}</label>
+<div class="ice-sky-content">
+    <div class="glassy-card-container">
+        <div class="form-header text-center">
+            <h2 class="form-title">Add Members to {{ room.name }}</h2>
+        </div>
+        <form action="{{ url_for('main.add_members', room_id=room.id) }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Select users to add</label>
+                <input type="text" id="member-search" placeholder="Search for users..." class="form-input">
+                <div class="user-list-glassy">
+                    {% for user in users %}
+                    <div class="user-item-glassy form-check">
+                        <input type="checkbox" name="members" value="{{ user.id }}" id="user-{{ user.id }}" class="form-check-input">
+                        <label for="user-{{ user.id }}" class="form-check-label">{{ user.name }}</label>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
-        </div>
-        <div class="form-actions">
-            <button type="submit" class="btn-primary-glass">Add Selected Members</button>
-        </div>
-    </form>
+            <div class="form-actions text-center">
+                <button type="submit" class="btn-primary">Add Selected Members</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <style>

@@ -2,335 +2,56 @@
 
 {% block title %}{{ room.name }} - Info{% endblock %}
 
-{% block styles %}
-<style>
-    footer {
-        display: none;
-    }
-    body, html {
-        background-color: #14191D !important;
-        color: #FFFFFF;
-        font-family: 'Poppins', sans-serif;
-    }
-    .info-page-container {
-        padding-bottom: 2rem;
-    }
-    .info-header {
-        display: flex;
-        align-items: center;
-        padding: 1rem;
-        background-color: #1F262D;
-        position: sticky;
-        top: 0;
-        z-index: 10;
-    }
-    .info-header .back-arrow {
-        color: white;
-        font-size: 1.5rem;
-        text-decoration: none;
-        margin-right: 1rem;
-    }
-    .info-header h1 {
-        margin: 0;
-        font-size: 1.2rem;
-    }
-    .info-top-section {
-        text-align: center;
-        padding: 2rem 1rem;
-    }
-    .info-avatar-large {
-        position: relative;
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        background-color: #002D62;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 4rem;
-        color: white;
-        border: 3px solid white;
-        margin-bottom: 1rem;
-    }
-    .camera-icon {
-        position: absolute;
-        bottom: 5px;
-        right: 5px;
-        width: 40px;
-        height: 40px;
-        background-color: #007BFF;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.5rem;
-        cursor: pointer;
-        border: 2px solid white;
-    }
-    .info-avatar-large img {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-    .info-top-section h2 {
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-    }
-    .room-description {
-        color: #B0B0B0;
-        font-size: 0.9rem;
-        margin-bottom: 1rem;
-    }
-    .members-count {
-        color: #B0B0B0;
-        font-size: 0.9rem;
-        text-align: left;
-        padding: 0 1rem;
-    }
-    .info-section {
-        background-color: #1F262D;
-        margin: 1rem 0;
-        padding: 1rem;
-        border-radius: 10px;
-    }
-    .info-section h3 {
-        margin-top: 0;
-        margin-bottom: 1rem;
-        font-size: 1rem;
-        font-weight: normal;
-        color: #007BFF;
-    }
-    .members-list {
-        list-style: none;
-        padding: 0;
-    }
-    .members-list li {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem 0;
-        border-bottom: 1px solid #444;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    .members-list li:last-child {
-        border-bottom: none;
-    }
-    .members-list li:hover {
-        background-color: #2A343D;
-    }
-    .member-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background-color: #002D62;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        color: white;
-        margin-right: 1rem;
-    }
-    .member-avatar img {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-    .member-info {
-        display: flex;
-        flex-direction: column;
-    }
-    .member-name {
-        font-weight: bold;
-    }
-    .member-role {
-        font-size: 0.8rem;
-        color: #B0B0B0;
-    }
-    .media-scroller {
-        display: flex;
-        gap: 10px;
-        overflow-x: auto;
-        padding-bottom: 10px;
-    }
-    .media-item {
-        flex: 0 0 100px;
-        height: 100px;
-        background-color: #444;
-        border-radius: 5px;
-        overflow: hidden;
-        position: relative;
-    }
-    .media-item img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    .file-placeholder {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        text-align: center;
-        padding: 5px;
-    }
-    .file-placeholder i {
-        font-size: 2rem;
-        margin-bottom: 5px;
-    }
-    .file-placeholder span {
-        font-size: 0.7rem;
-        word-break: break-all;
-    }
-    .mute-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 50px;
-        height: 28px;
-    }
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: .4s;
-    }
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 20px;
-        width: 20px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: .4s;
-    }
-    input:checked + .slider {
-        background-color: #007BFF;
-    }
-    input:checked + .slider:before {
-        transform: translateX(22px);
-    }
-    .slider.round {
-        border-radius: 28px;
-    }
-    .slider.round:before {
-        border-radius: 50%;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="info-page-container">
-    <div class="info-header">
-        <a href="{{ url_for('main.chat_room', room_id=room.id) }}" class="back-arrow">&larr;</a>
-        <h1>Group Info</h1>
+<div class="ice-sky-content">
+    <div class="info-header glassy-card-container" style="text-align: center; margin-bottom: 2rem;">
+        <a href="{{ url_for('main.chat_room', room_id=room.id) }}" class="btn-primary" style="float: left;">Back to Chat</a>
+        <h1>{{ room.name }}</h1>
+        <p>{{ room.description }}</p>
     </div>
 
-    <div class="info-top-section">
-        <div class="info-avatar-large">
-            {% if room.cover_image %}
-                <img src="{{ url_for('static', filename=room.cover_image) }}" alt="{{ room.name }}">
-            {% else %}
-                <span>{{ room.name[0] | upper }}</span>
-            {% endif %}
+    <div class="grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; padding: 1rem;">
+        <div class="info-card glassy-card-container">
+            <h3>Members ({{ room.members.count() }})</h3>
+            <ul class="members-list" style="list-style: none; padding: 0;">
+                {% for member in room.members.limit(10) %}
+                <li style="display: flex; align-items: center; margin-bottom: 0.75rem;">
+                    <img src="{{ url_for('static', filename='profile_pics/' + member.user.profile_pic) }}" alt="{{ member.user.name }}" class="member-avatar" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 1rem; object-fit: cover;">
+                    <span>{{ member.user.name }}</span>
+                </li>
+                {% endfor %}
+            </ul>
             {% if user_role_in_room == 'admin' %}
-                <a href="{{ url_for('main.edit_group_icon', room_id=room.id) }}" class="camera-icon">
-                    <i class="fas fa-camera"></i>
-                </a>
+            <a href="{{ url_for('main.add_members', room_id=room.id) }}" class="btn-primary">Add Members</a>
             {% endif %}
         </div>
-        <h2>{{ room.name }}</h2>
-        <p class="room-description">{{ room.description or 'No description available.' }}</p>
-    </div>
 
-    <div class="info-section">
-        <p class="members-count">{{ room.members.count() }} participants</p>
-    </div>
-
-    <div class="info-section members-list-section">
-        <div class="d-flex justify-content-between align-items-center">
-            <h3>Members</h3>
-            {% if user_role_in_room == 'admin' %}
-                <a href="{{ url_for('main.add_members', room_id=room.id) }}" class="btn btn-primary btn-sm">Add Member</a>
-            {% endif %}
-        </div>
-        <ul class="members-list">
-            {% for member in room.members %}
-            <li class="d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <div class="member-avatar">
-                        {% if member.user.profile_pic %}
-                            <img src="{{ url_for('static', filename='profile_pics/' + member.user.profile_pic) }}" alt="{{ member.user.name }}">
-                        {% else %}
-                            <span>{{ member.user.name[0] | upper }}</span>
-                        {% endif %}
+        <div class="info-card glassy-card-container">
+            <h3>Shared Media</h3>
+            <div class="media-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem;">
+                {% for message in media_messages %}
+                    {% if message.file_path and message.file_name.lower().endswith(('png', 'jpg', 'jpeg', 'gif')) %}
+                    <div class="media-item">
+                        <img src="{{ url_for('static', filename=message.file_path) }}" alt="Shared media" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px;">
                     </div>
-                    <div class="member-info">
-                        <span class="member-name">{{ member.user.name }}</span>
-                        <span class="member-role">{{ member.role_in_room | capitalize }}</span>
-                    </div>
-                </div>
-                {% if user_role_in_room == 'admin' and member.user_id != current_user.id %}
-                    <button class="btn btn-danger btn-sm remove-member-btn" data-member-id="{{ member.user.id }}">Remove</button>
-                {% endif %}
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div class="info-section media-section">
-        <h3>Media, Links & Docs</h3>
-        <div class="media-scroller">
-            {% for message in media_messages %}
-                <a href="{{ url_for('static', filename=message.file_path) }}" target="_blank" class="media-item">
-                    {% if message.file_name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')) %}
-                        <img src="{{ url_for('static', filename=message.file_path) }}" alt="Media">
-                    {% else %}
-                        <div class="file-placeholder">
-                            <i class="fas fa-file-alt"></i>
-                            <span>{{ message.file_name }}</span>
-                        </div>
                     {% endif %}
-                </a>
-            {% else %}
-                <p>No media has been shared in this room yet.</p>
-            {% endfor %}
+                {% else %}
+                    <p>No media has been shared yet.</p>
+                {% endfor %}
+            </div>
         </div>
-    </div>
 
-    <div class="info-section mute-section">
-        <span>Mute Notifications</span>
-        <label class="switch">
-            <input type="checkbox">
-            <span class="slider round"></span>
-        </label>
+        {% if user_role_in_room == 'admin' %}
+        <div class="info-card glassy-card-container">
+            <h3>Admin Actions</h3>
+            <a href="{{ url_for('main.edit_group_icon', room_id=room.id) }}" class="btn-primary">Change Group Icon</a>
+            <hr style="margin: 1rem 0; border-color: rgba(255,255,255,0.2);">
+            <p>Danger Zone</p>
+            <form action="{{ url_for('admin.delete_chat_room', room_id=room.id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this group? This action cannot be undone.');">
+                <button type="submit" class="btn-danger" style="background-color: #ef4444; color: white; padding: 0.75rem 1.5rem; border-radius: 50px; text-decoration: none; border: none; font-weight: 700;">Delete Group</button>
+            </form>
+        </div>
+        {% endif %}
     </div>
-
-    {% if room.room_type == 'public' and user_role_in_room == 'admin' and room.join_token %}
-    <div class="info-section">
-        <h3>Shareable Link</h3>
-        <p>Anyone with the link can join this group.</p>
-        <input type="text" value="{{ url_for('main.join_chat', token=room.join_token, _external=True) }}" readonly>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

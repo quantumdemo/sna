@@ -3,8 +3,8 @@
 {% block title %}Exam Submitted{% endblock %}
 
 {% block content %}
-<div class="admin-container">
-    <div class="form-container-glassy" style="max-width: 800px; margin: 2rem auto; text-align: center;">
+<div class="ice-sky-content">
+    <div class="glassy-card-container" style="max-width: 800px; margin: 2rem auto; text-align: center;">
         <div class="form-header">
             <h1 class="form-title">Exam Submitted Successfully</h1>
         </div>
@@ -12,7 +12,7 @@
         <p>Your submission for the exam "<strong>{{ submission.final_exam.title }}</strong>" has been recorded.</p>
 
         {% if submission.final_exam.release_scores_immediately %}
-            <hr style="margin: 2rem 0;">
+            <hr style="margin: 2rem 0; border-color: rgba(255,255,255,0.2);">
             <div class="exam-results">
                 <h3 class="form-title">Your Score</h3>
                 <p class="score-display {{ 'passed' if submission.score >= submission.final_exam.pass_mark else 'failed' }}">
@@ -24,7 +24,7 @@
                     <p class="text-negative">Unfortunately, you did not pass the exam.</p>
                     {% if submission.final_exam.retake_allowed and submission.attempt_number < submission.final_exam.allowed_attempts %}
                         <p>You have {{ submission.final_exam.allowed_attempts - submission.attempt_number }} attempt(s) remaining.</p>
-                        <a href="{{ url_for('main.pre_exam', exam_id=submission.final_exam.id) }}" class="btn-primary-glass">Retake Exam</a>
+                        <a href="{{ url_for('main.pre_exam', exam_id=submission.final_exam.id) }}" class="btn-primary">Retake Exam</a>
                     {% endif %}
                 {% endif %}
             </div>
@@ -33,7 +33,7 @@
         {% endif %}
 
         <div class="form-actions" style="margin-top: 2rem;">
-            <a href="{{ url_for('main.course_detail', course_id=submission.final_exam.course.id) }}" class="btn-secondary-glass">Back to Course</a>
+            <a href="{{ url_for('main.course_detail', course_id=submission.final_exam.course.id) }}" class="btn-primary">Back to Course</a>
         </div>
     </div>
 </div>

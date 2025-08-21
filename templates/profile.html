@@ -7,18 +7,18 @@
 {% endblock %}
 
 {% block content %}
-<div class="profile-container">
+<div class="ice-sky-content">
     <div class="profile-layout">
         <!-- Left Column -->
         <aside class="profile-left-column">
-            <div class="glass-card profile-header">
+            <div class="glassy-card-container profile-header">
                 <div class="profile-pic">
                     <img src="{{ url_for('static', filename='profile_pics/' + (user.profile_pic if user.profile_pic else 'default.jpg')) }}" alt="Profile Picture">
                 </div>
                 <h1 class="student-name">{{ user.name }}</h1>
                 <p class="student-role">{{ user.role | capitalize }}</p>
             </div>
-            <div class="glass-card profile-section">
+            <div class="glassy-card-container profile-section">
                 <h3>About Me</h3>
                 <p class="profile-bio {{ 'placeholder' if not user.bio }}">{{ user.bio or 'No bio provided. You can add one by editing your profile.' }}</p>
             </div>
@@ -26,22 +26,22 @@
 
         <!-- Right Column -->
         <main class="profile-right-column">
-            <div class="glass-card profile-section">
+            <div class="glassy-card-container profile-section">
                 <h3>Contact Information</h3>
                 <ul class="contact-info">
                     <li><i class="fas fa-envelope"></i> {{ user.email }}</li>
                 </ul>
             </div>
 
-            <div class="glass-card profile-section">
+            <div class="glassy-card-container profile-section">
                 <h3>My Certificates</h3>
                 <div class="certificates-grid">
                     {% if certificates %}
                         {% for cert in certificates %}
-                        <div class="glass-card certificate-card">
+                        <div class="glassy-card-container certificate-card">
                             <p class="course-name">{{ cert.course.title }}</p>
                             <p class="completion-date">Issued: {{ cert.issued_at.strftime('%b %d, %Y') }}</p>
-                            <a href="{{ url_for('static', filename=cert.file_path) }}" class="btn-secondary-glass" target="_blank">View</a>
+                            <a href="{{ url_for('static', filename=cert.file_path) }}" class="btn-primary" target="_blank">View</a>
                         </div>
                         {% endfor %}
                     {% else %}
@@ -54,53 +54,53 @@
             </div>
 
             <!-- Edit Profile Form -->
-            <div class="form-container-glassy">
+            <div class="glassy-card-container">
                 <div class="form-header">
                     <h2 class="form-title">Edit Profile</h2>
                 </div>
                 <form action="{{ url_for('main.edit_profile') }}" method="post" enctype="multipart/form-data">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" id="name" name="name" value="{{ user.name }}" class="input-glassy">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" id="name" name="name" value="{{ user.name }}" class="form-input">
                         </div>
                         <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email" value="{{ user.email }}" class="input-glassy">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" name="email" value="{{ user.email }}" class="form-input">
                         </div>
                         <div class="form-group full-span">
-                            <label for="bio">Bio</label>
-                            <textarea name="bio" id="bio" rows="5" class="input-glassy">{{ user.bio or '' }}</textarea>
+                            <label for="bio" class="form-label">Bio</label>
+                            <textarea name="bio" id="bio" rows="5" class="form-input">{{ user.bio or '' }}</textarea>
                         </div>
                         <div class="form-group full-span">
-                            <label for="profile_pic">Update Profile Picture</label>
-                            <input type="file" name="profile_pic" id="profile_pic" class="input-glassy">
+                            <label for="profile_pic" class="form-label">Update Profile Picture</label>
+                            <input type="file" name="profile_pic" id="profile_pic" class="form-input">
                         </div>
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn-primary-glass">Update Profile</button>
+                        <button type="submit" class="btn-primary">Update Profile</button>
                     </div>
                 </form>
             </div>
 
             <!-- Change Password Form -->
-            <div class="form-container-glassy">
+            <div class="glassy-card-container">
                 <div class="form-header">
                     <h2 class="form-title">Change Password</h2>
                 </div>
                 <form action="{{ url_for('main.change_password') }}" method="post">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="old_password">Old Password</label>
-                            <input type="password" name="old_password" id="old_password" required class="input-glassy">
+                            <label for="old_password" class="form-label">Old Password</label>
+                            <input type="password" name="old_password" id="old_password" required class="form-input">
                         </div>
                         <div class="form-group">
-                            <label for="new_password">New Password</label>
-                            <input type="password" name="new_password" id="new_password" required class="input-glassy">
+                            <label for="new_password" class="form-label">New Password</label>
+                            <input type="password" name="new_password" id="new_password" required class="form-input">
                         </div>
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn-primary-glass">Change Password</button>
+                        <button type="submit" class="btn-primary">Change Password</button>
                     </div>
                 </form>
             </div>

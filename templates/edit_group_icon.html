@@ -3,22 +3,24 @@
 {% block title %}Edit Group Icon{% endblock %}
 
 {% block content %}
-<div class="form-container-glassy">
-    <div class="form-header">
-        <h2 class="form-title">Change Group Icon</h2>
+<div class="ice-sky-content">
+    <div class="glassy-card-container">
+        <div class="form-header text-center">
+            <h2 class="form-title">Change Group Icon</h2>
+        </div>
+        <form action="{{ url_for('main.edit_group_icon', room_id=room.id) }}" method="POST" enctype="multipart/form-data">
+            <div class="preview-container">
+                <img id="image-preview" src="{{ url_for('static', filename=room.cover_image or 'images/course_placeholder.jpg') }}" alt="Group Icon Preview">
+            </div>
+            <div class="form-group" style="text-align: center;">
+                <label for="group_icon" class="form-label">Select new icon</label>
+                <input type="file" id="group_icon" name="group_icon" accept="image/*" required onchange="previewImage(event)" class="form-input">
+            </div>
+            <div class="form-actions text-center">
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </div>
+        </form>
     </div>
-    <form action="{{ url_for('main.edit_group_icon', room_id=room.id) }}" method="POST" enctype="multipart/form-data">
-        <div class="preview-container">
-            <img id="image-preview" src="{{ url_for('static', filename=room.cover_image or 'images/course_placeholder.jpg') }}" alt="Group Icon Preview">
-        </div>
-        <div class="form-group" style="text-align: center;">
-            <label for="group_icon">Select new icon</label>
-            <input type="file" id="group_icon" name="group_icon" accept="image/*" required onchange="previewImage(event)" class="input-glassy">
-        </div>
-        <div class="form-actions">
-            <button type="submit" class="btn-primary-glass">Save Changes</button>
-        </div>
-    </form>
 </div>
 
 <style>
