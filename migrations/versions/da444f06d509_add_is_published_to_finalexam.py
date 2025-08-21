@@ -1,7 +1,7 @@
 """Add is_published to FinalExam
 
 Revision ID: da444f06d509
-Revises:
+Revises: fb48a7f7b472
 Create Date: 2025-08-21 09:46:11.950051
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'da444f06d509'
-down_revision = None
+down_revision = 'fb48a7f7b472'
 branch_labels = None
 depends_on = None
 
