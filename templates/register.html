@@ -21,6 +21,7 @@
 
     <div class="auth-form-container form-container-glassy">
         <div class="auth-header">
+            <span class="header-icon">✨</span>
             <h1 class="form-title">Create Account</h1>
             <p>Join our community of lifelong learners.</p>
         </div>
@@ -54,10 +55,11 @@
         </form>
 
         <div class="auth-links">
-            <p>Already have an account? <a href="{{ url_for('main.login') }}">Sign In</a></p>
+            <a href="{{ url_for('main.login') }}">Already have an account? Sign In</a>
         </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <a href="{{ url_for('main.login') }}" class="mobile-fab">&rarr;</a>
 </body>
 </html>
