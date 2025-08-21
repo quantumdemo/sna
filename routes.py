@@ -618,8 +618,8 @@ def save_payment_proof(file):
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
 
     file.save(filepath)
-    # Return a URL-friendly path with forward slashes
-    return f"payment_proofs/{new_filename}"
+    # Return just the filename
+    return new_filename
 
 @main.route('/library/<int:material_id>/purchase', methods=['GET'])
 @login_required
